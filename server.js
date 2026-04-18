@@ -8,6 +8,11 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+// Serve a página principal
+app.get('/', (req, res) => {
+    res.sendFile(__dirname + '/index.html');
+});
+
 // Inicializa a I.A. com a chave que você vai configurar no Railway
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
