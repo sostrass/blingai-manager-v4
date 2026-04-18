@@ -1,7 +1,8 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
-const puppeteer = require('puppeteer');
+const axios = require('axios');
+const cheerio = require('cheerio'); // O novo espião ultraleve
 const { GoogleGenerativeAI } = require('@google/generative-ai');
 
 const app = express();
@@ -14,7 +15,6 @@ app.get('/', (req, res) => {
     res.sendFile(__dirname + '/index.html');
 });
 
-// 1. DATA GRID (A Bolsa de Valores)
 app.get('/api/produtos/monitoramento', async (req, res) => {
     const catalogo = [
         { sku: "CX-ORG-30", nome: "Kit 30 Caixas Organizadoras", custo: 45.00, preco_atual: 89.90, margem: "49%", status: "Lucro Ideal" },
@@ -23,47 +23,57 @@ app.get('/api/produtos/monitoramento', async (req, res) => {
     res.json({ sucesso: true, dados: catalogo });
 });
 
-// 2. ROBÔ ESPIÃO "SNIPER" (Com Vacina Anti-Travamento)
+// MOTOR ESPIÃO FANTASMA (AXIOS + CHEERIO)
 app.post('/api/scraper/preco', async (req, res) => {
     const { url_concorrente } = req.body;
     if (!url_concorrente) return res.status(400).json({ erro: "URL não fornecida." });
 
-    let browser;
     try {
-        browser = await puppeteer.launch({ 
-            headless: 'new',
-            executablePath: '/usr/bin/chromium', // <-- O Segredo da velocidade está aqui
-            args: [
-                '--no-sandbox', 
-                '--disable-setuid-sandbox', 
-                '--disable-dev-shm-usage', // Evita estouro de memória no servidor
-                '--disable-gpu'
-            ]
-        });
-        const page = await browser.newPage();
-        
-        await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Safari/537.36');
-        await page.goto(url_concorrente, { waitUntil: 'domcontentloaded', timeout: 30000 });
-
-        const preco = await page.evaluate(() => {
-            const el = document.querySelector('.andes-money-amount__fraction');
-            return el ? el.innerText : "Preço oculto ou layout desconhecido";
+        // Disfarce máximo para parecer um humano no Chrome
+        const response = await axios.get(url_concorrente, {
+            headers: {
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+                'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+                'Accept-Language': 'pt-BR,pt;q=0.9,en-US;q=0.8,en;q=0.7'
+            },
+            timeout: 15000 // Desiste se demorar mais de 15 segundos
         });
 
-        await browser.close();
-        res.json({ sucesso: true, preco_concorrente: preco });
+        // Carrega o site na memória do servidor
+        const $ = cheerio.load(response.data);
+        let precoExtraido = null;
+
+        // LÓGICA MULTI-SITE: Procura o preço dependendo do site
+        if (url_concorrente.includes('mercadolivre.com')) {
+            // Pega os centavos e os reais separados e junta, ou tenta a meta tag oficial
+            precoExtraido = $('meta[itemprop="price"]').attr('content') || $('.andes-money-amount__fraction').first().text();
+        } 
+        else {
+            // Varredura Genérica (Nuvemshop, Tray, Lojas Independentes)
+            precoExtraido = $('meta[property="product:price:amount"]').attr('content') || 
+                            $('[itemprop="price"]').attr('content') || 
+                            $('.price').first().text() || 
+                            $('.preco-por').first().text();
+        }
+
+        if (precoExtraido && precoExtraido.trim() !== '') {
+            res.json({ sucesso: true, preco_concorrente: precoExtraido.trim() });
+        } else {
+            res.json({ sucesso: false, erro: "Preço oculto no código deste site." });
+        }
+
     } catch (erro) {
-        if(browser) await browser.close();
-        res.status(500).json({ erro: "Falha na conexão com o site concorrente." });
+        // Agora sabemos se o erro foi bloqueio real do site
+        res.status(500).json({ erro: "O site bloqueou o servidor ou demorou a responder." });
     }
 });
 
-// 3. I.A. DESCRITIVA
+// MOTOR DE I.A.
 app.post('/api/ia/gerar-descricao', async (req, res) => {
     const { nome_produto, caracteristicas } = req.body;
     try {
         const model = genAI.getGenerativeModel({ model: "gemini-1.5-pro" });
-        const prompt = `Crie uma descrição técnica e comercial para: ${nome_produto}. Use linguagem clara para artesãos, detalhe medidas e foque em evitar devoluções.`;
+        const prompt = `Crie uma descrição técnica para: ${nome_produto}. Foco em artesanato e medidas exatas.`;
         const result = await model.generateContent(prompt);
         res.json({ sucesso: true, descricao_gerada: result.response.text() });
     } catch (erro) {
