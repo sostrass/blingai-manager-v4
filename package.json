@@ -1,7 +1,6 @@
 {
-  "name": "blingai-manager-v4",
+  "name": "blingai-manager",
   "version": "1.0.0",
-  "description": "Gestor de E-commerce com IA",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
