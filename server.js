@@ -23,23 +23,28 @@ app.get('/api/produtos/monitoramento', async (req, res) => {
     res.json({ sucesso: true, dados: catalogo });
 });
 
-// 2. ROBÔ ESPIÃO "SNIPER" (Atualizado para ML)
+// 2. ROBÔ ESPIÃO "SNIPER" (Com Vacina Anti-Travamento)
 app.post('/api/scraper/preco', async (req, res) => {
     const { url_concorrente } = req.body;
     if (!url_concorrente) return res.status(400).json({ erro: "URL não fornecida." });
 
+    let browser;
     try {
-        const browser = await puppeteer.launch({ 
+        browser = await puppeteer.launch({ 
             headless: 'new',
-            args: ['--no-sandbox', '--disable-setuid-sandbox']
+            executablePath: '/usr/bin/chromium', // <-- O Segredo da velocidade está aqui
+            args: [
+                '--no-sandbox', 
+                '--disable-setuid-sandbox', 
+                '--disable-dev-shm-usage', // Evita estouro de memória no servidor
+                '--disable-gpu'
+            ]
         });
         const page = await browser.newPage();
         
-        // Disfarce anti-bloqueio
         await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Safari/537.36');
         await page.goto(url_concorrente, { waitUntil: 'domcontentloaded', timeout: 30000 });
 
-        // Tenta achar o preço no Mercado Livre
         const preco = await page.evaluate(() => {
             const el = document.querySelector('.andes-money-amount__fraction');
             return el ? el.innerText : "Preço oculto ou layout desconhecido";
@@ -48,7 +53,8 @@ app.post('/api/scraper/preco', async (req, res) => {
         await browser.close();
         res.json({ sucesso: true, preco_concorrente: preco });
     } catch (erro) {
-        res.status(500).json({ erro: "O site demorou a responder ou bloqueou o acesso." });
+        if(browser) await browser.close();
+        res.status(500).json({ erro: "Falha na conexão com o site concorrente." });
     }
 });
 
