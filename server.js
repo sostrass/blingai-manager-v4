@@ -2,7 +2,7 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const axios = require('axios');
-const cheerio = require('cheerio'); // O novo espião ultraleve
+const cheerio = require('cheerio');
 const { GoogleGenerativeAI } = require('@google/generative-ai');
 
 const app = express();
@@ -15,6 +15,7 @@ app.get('/', (req, res) => {
     res.sendFile(__dirname + '/index.html');
 });
 
+// 1. DATA GRID (A Bolsa de Valores)
 app.get('/api/produtos/monitoramento', async (req, res) => {
     const catalogo = [
         { sku: "CX-ORG-30", nome: "Kit 30 Caixas Organizadoras", custo: 45.00, preco_atual: 89.90, margem: "49%", status: "Lucro Ideal" },
@@ -23,67 +24,65 @@ app.get('/api/produtos/monitoramento', async (req, res) => {
     res.json({ sucesso: true, dados: catalogo });
 });
 
-// 2. MOTOR ESPIÃO FANTASMA (CAÇADOR DE JSON-LD / GOOGLE DATA)
-app.post('/api/scraper/preco', async (req, res) => {
-    const { url_concorrente } = req.body;
-    if (!url_concorrente) return res.status(400).json({ erro: "URL não fornecida." });
-
-    try {
-        const response = await axios.get(url_concorrente, {
-            headers: {
-                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
-                'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
-                'Accept-Language': 'pt-BR,pt;q=0.9,en-US;q=0.8,en;q=0.7'
-            },
-            timeout: 15000 
-        });
-
-        const $ = cheerio.load(response.data);
-        let precoExtraido = null;
-
-        // TENTATIVA 1: O "Santo Graal" do Scraping (JSON-LD do Google Shopping)
-        // Isso funciona em Nuvemshop, Shopify, Tray, Loja Integrada e ML
-        $('script[type="application/ld+json"]').each((i, el) => {
-            try {
-                const jsonData = JSON.parse($(el).html());
-                
-                // Se for um produto direto
-                if (jsonData.offers && jsonData.offers.price) {
-                    precoExtraido = jsonData.offers.price;
-                } 
-                // Se o ML jogar dentro de uma array
-                else if (Array.isArray(jsonData)) {
-                    const produto = jsonData.find(item => item['@type'] === 'Product' || item.offers);
-                    if (produto && produto.offers && produto.offers.price) {
-                        precoExtraido = produto.offers.price;
-                    }
-                }
-            } catch (e) {
-                // Ignora se o json estiver quebrado
-            }
-        });
-
-        // TENTATIVA 2: Seletores Visuais (Plano B)
-        if (!precoExtraido) {
-            precoExtraido = $('meta[itemprop="price"]').attr('content') || 
-                            $('meta[property="product:price:amount"]').attr('content') ||
-                            $('.ui-pdp-price__second-line .andes-money-amount__fraction').first().text(); 
-        }
-
-        if (precoExtraido && precoExtraido.toString().trim() !== '') {
-            // Limpa o preço garantindo que é um número (ex: 35.90)
-            const precoLimpo = precoExtraido.toString().replace(/[^0-9.,]/g, '').trim();
-            res.json({ sucesso: true, preco_concorrente: precoLimpo });
-        } else {
-            res.json({ sucesso: false, erro: "Preço super oculto. O site blindou a leitura (Javascript puro)." });
-        }
-
-    } catch (erro) {
-        res.status(500).json({ erro: "Conexão bloqueada pelo firewall do concorrente." });
+// 2. RADAR MULTI-CONCORRENTES (Axios + Cheerio)
+app.post('/api/scraper/precos-multiplos', async (req, res) => {
+    const { urls } = req.body;
+    if (!urls || !Array.isArray(urls) || urls.length === 0) {
+        return res.status(400).json({ erro: "Nenhuma URL fornecida." });
     }
+
+    const resultados = [];
+
+    // Roda um "Loop" para cada link que você colou
+    for (const url of urls) {
+        try {
+            const response = await axios.get(url, {
+                headers: {
+                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
+                    'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8'
+                },
+                timeout: 10000 
+            });
+
+            const $ = cheerio.load(response.data);
+            let precoExtraido = null;
+
+            $('script[type="application/ld+json"]').each((i, el) => {
+                try {
+                    const jsonData = JSON.parse($(el).html());
+                    if (jsonData.offers && jsonData.offers.price) precoExtraido = jsonData.offers.price;
+                    else if (Array.isArray(jsonData)) {
+                        const produto = jsonData.find(item => item['@type'] === 'Product' || item.offers);
+                        if (produto && produto.offers && produto.offers.price) precoExtraido = produto.offers.price;
+                    }
+                } catch (e) {}
+            });
+
+            if (!precoExtraido) {
+                precoExtraido = $('meta[itemprop="price"]').attr('content') || 
+                                $('meta[property="product:price:amount"]').attr('content') ||
+                                $('.ui-pdp-price__second-line .andes-money-amount__fraction').first().text(); 
+            }
+
+            if (precoExtraido && precoExtraido.toString().trim() !== '') {
+                const precoLimpo = precoExtraido.toString().replace(/[^0-9.,]/g, '').trim();
+                resultados.push({ url, sucesso: true, preco: precoLimpo });
+            } else {
+                resultados.push({ url, sucesso: false, erro: "Preço não encontrado." });
+            }
+
+        } catch (erro) {
+            resultados.push({ url, sucesso: false, erro: "Bloqueado ou fora do ar." });
+        }
+        
+        // Pausa de 1 segundo entre cada site para não ser bloqueado por "ataque"
+        await new Promise(resolve => setTimeout(resolve, 1000));
+    }
+
+    res.json({ sucesso: true, resultados });
 });
 
-// MOTOR DE I.A.
+// 3. MOTOR DE I.A.
 app.post('/api/ia/gerar-descricao', async (req, res) => {
     const { nome_produto, caracteristicas } = req.body;
     try {
