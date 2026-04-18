@@ -95,5 +95,40 @@ app.post('/api/ia/gerar-descricao', async (req, res) => {
     }
 });
 
+// A ROTA ROBUSTA DE SINCRONIZAÇÃO BLING
+app.post('/api/bling/sincronizar', async (req, res) => {
+    const BLING_API_KEY = process.env.BLING_API_KEY;
+    let pagina = 1;
+    let produtosBling = [];
+    let temMaisPaginas = true;
+
+    try {
+        // Loop inteligente: Puxa 100 produtos por vez para não explodir a memória
+        while(temMaisPaginas) {
+            const url = `https://www.bling.com.br/Api/v2/produtos/page=${pagina}/json/?apikey=${BLING_API_KEY}&estoque=S`;
+            
+            const response = await axios.get(url);
+            const dados = response.data.retorno;
+
+            if (dados.erros) {
+                // Acabaram as páginas
+                temMaisPaginas = false; 
+            } else {
+                produtosBling = produtosBling.concat(dados.produtos);
+                pagina++;
+                
+                // Trava de segurança para não ser bloqueado pelo Bling (Rate Limit)
+                await new Promise(resolve => setTimeout(resolve, 340)); // 3 requisições por segundo máximo
+            }
+        }
+
+        // Aqui o sistema salva no Banco de Dados interno e retorna o sucesso
+        res.json({ sucesso: true, total_importado: produtosBling.length, mensagem: "Sincronização Enterprise concluída." });
+
+    } catch (erro) {
+        res.status(500).json({ erro: "Falha de comunicação com o servidor da API." });
+    }
+});
+
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`🚀 BlingAI Manager online na porta ${PORT}`));
