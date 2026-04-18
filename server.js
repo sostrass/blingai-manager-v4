@@ -23,48 +23,63 @@ app.get('/api/produtos/monitoramento', async (req, res) => {
     res.json({ sucesso: true, dados: catalogo });
 });
 
-// MOTOR ESPIÃO FANTASMA (AXIOS + CHEERIO)
+// 2. MOTOR ESPIÃO FANTASMA (CAÇADOR DE JSON-LD / GOOGLE DATA)
 app.post('/api/scraper/preco', async (req, res) => {
     const { url_concorrente } = req.body;
     if (!url_concorrente) return res.status(400).json({ erro: "URL não fornecida." });
 
     try {
-        // Disfarce máximo para parecer um humano no Chrome
         const response = await axios.get(url_concorrente, {
             headers: {
-                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
                 'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
                 'Accept-Language': 'pt-BR,pt;q=0.9,en-US;q=0.8,en;q=0.7'
             },
-            timeout: 15000 // Desiste se demorar mais de 15 segundos
+            timeout: 15000 
         });
 
-        // Carrega o site na memória do servidor
         const $ = cheerio.load(response.data);
         let precoExtraido = null;
 
-        // LÓGICA MULTI-SITE: Procura o preço dependendo do site
-        if (url_concorrente.includes('mercadolivre.com')) {
-            // Pega os centavos e os reais separados e junta, ou tenta a meta tag oficial
-            precoExtraido = $('meta[itemprop="price"]').attr('content') || $('.andes-money-amount__fraction').first().text();
-        } 
-        else {
-            // Varredura Genérica (Nuvemshop, Tray, Lojas Independentes)
-            precoExtraido = $('meta[property="product:price:amount"]').attr('content') || 
-                            $('[itemprop="price"]').attr('content') || 
-                            $('.price').first().text() || 
-                            $('.preco-por').first().text();
+        // TENTATIVA 1: O "Santo Graal" do Scraping (JSON-LD do Google Shopping)
+        // Isso funciona em Nuvemshop, Shopify, Tray, Loja Integrada e ML
+        $('script[type="application/ld+json"]').each((i, el) => {
+            try {
+                const jsonData = JSON.parse($(el).html());
+                
+                // Se for um produto direto
+                if (jsonData.offers && jsonData.offers.price) {
+                    precoExtraido = jsonData.offers.price;
+                } 
+                // Se o ML jogar dentro de uma array
+                else if (Array.isArray(jsonData)) {
+                    const produto = jsonData.find(item => item['@type'] === 'Product' || item.offers);
+                    if (produto && produto.offers && produto.offers.price) {
+                        precoExtraido = produto.offers.price;
+                    }
+                }
+            } catch (e) {
+                // Ignora se o json estiver quebrado
+            }
+        });
+
+        // TENTATIVA 2: Seletores Visuais (Plano B)
+        if (!precoExtraido) {
+            precoExtraido = $('meta[itemprop="price"]').attr('content') || 
+                            $('meta[property="product:price:amount"]').attr('content') ||
+                            $('.ui-pdp-price__second-line .andes-money-amount__fraction').first().text(); 
         }
 
-        if (precoExtraido && precoExtraido.trim() !== '') {
-            res.json({ sucesso: true, preco_concorrente: precoExtraido.trim() });
+        if (precoExtraido && precoExtraido.toString().trim() !== '') {
+            // Limpa o preço garantindo que é um número (ex: 35.90)
+            const precoLimpo = precoExtraido.toString().replace(/[^0-9.,]/g, '').trim();
+            res.json({ sucesso: true, preco_concorrente: precoLimpo });
         } else {
-            res.json({ sucesso: false, erro: "Preço oculto no código deste site." });
+            res.json({ sucesso: false, erro: "Preço super oculto. O site blindou a leitura (Javascript puro)." });
         }
 
     } catch (erro) {
-        // Agora sabemos se o erro foi bloqueio real do site
-        res.status(500).json({ erro: "O site bloqueou o servidor ou demorou a responder." });
+        res.status(500).json({ erro: "Conexão bloqueada pelo firewall do concorrente." });
     }
 });
 
