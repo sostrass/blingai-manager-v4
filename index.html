@@ -11,19 +11,19 @@
 
     <header class="bg-white border-b border-slate-200 px-6 py-4 flex justify-between items-center shadow-sm">
         <h1 class="text-xl font-bold text-slate-900"><i class="fas fa-layer-group text-indigo-600 mr-2"></i>BlingAI Manager v4</h1>
-        <span class="text-sm font-medium text-emerald-600"><i class="fas fa-circle text-xs mr-1"></i> Sistema Online</span>
+        <span class="text-sm font-medium text-emerald-600"><i class="fas fa-shield-alt mr-1"></i> Modo de Simulação Seguro</span>
     </header>
 
     <main class="flex-1 p-8">
         <div class="max-w-7xl mx-auto">
-            <h2 class="text-2xl font-bold text-slate-800 mb-6">Catálogo Dinâmico</h2>
+            <h2 class="text-2xl font-bold text-slate-800 mb-6">Teste de Catálogo (Sem Risco)</h2>
             
             <div class="bg-white rounded-xl shadow-sm border border-slate-200">
                 <table class="w-full text-left text-sm">
                     <thead class="bg-slate-50 border-b border-slate-200 text-slate-600">
                         <tr>
                             <th class="px-6 py-4">Produto</th>
-                            <th class="px-6 py-4">Custo</th>
+                            <th class="px-6 py-4">Custo Fixo</th>
                             <th class="px-6 py-4">Preço Atual</th>
                             <th class="px-6 py-4 text-right">Ação</th>
                         </tr>
@@ -36,24 +36,26 @@
 
     <div id="drawer-ia" class="fixed inset-y-0 right-0 w-[450px] bg-white shadow-2xl transform translate-x-full transition-transform z-50 border-l border-slate-200 flex flex-col">
         <div class="px-6 py-4 border-b flex justify-between items-center bg-slate-50">
-            <h3 class="font-bold text-slate-800">Painel de Ações</h3>
+            <h3 class="font-bold text-slate-800"><i class="fas fa-balance-scale text-indigo-600 mr-2"></i> Simulador de Margem</h3>
             <button onclick="fecharDrawer()" class="text-slate-400 hover:text-red-500"><i class="fas fa-times text-xl"></i></button>
         </div>
         
         <div class="p-6 flex-1 overflow-auto">
-            <h4 id="drawer-nome" class="font-bold text-lg mb-6 text-slate-900"></h4>
+            <h4 id="drawer-nome" class="font-bold text-lg text-slate-900"></h4>
+            <p class="text-sm text-slate-500 mb-6">Custo base: R$ <span id="drawer-custo" class="font-bold text-slate-700"></span></p>
 
             <div class="bg-slate-100 p-4 rounded-lg mb-6 border border-slate-200">
-                <h5 class="text-sm font-bold text-slate-700 mb-2"><i class="fas fa-crosshairs text-rose-500 mr-1"></i> Espionar Concorrente</h5>
-                <input type="text" id="url-concorrente" placeholder="Cole o link do Mercado Livre aqui..." class="w-full p-2 text-sm border rounded mb-3 focus:ring-2 focus:ring-indigo-500 outline-none">
-                <button id="btn-espionar" onclick="acionarEspiao()" class="w-full bg-slate-800 hover:bg-slate-900 text-white text-sm py-2 rounded font-medium transition">
-                    Verificar Preço Agora
+                <h5 class="text-sm font-bold text-slate-700 mb-2"><i class="fas fa-crosshairs text-rose-500 mr-1"></i> Radar de Concorrência</h5>
+                <input type="text" id="url-concorrente" placeholder="Cole o link do Mercado Livre..." class="w-full p-2 text-sm border rounded mb-3 focus:ring-2 focus:ring-indigo-500 outline-none">
+                <button id="btn-espionar" onclick="acionarEspiao()" class="w-full bg-slate-800 hover:bg-slate-900 text-white text-sm py-2 rounded font-medium transition shadow">
+                    Buscar e Simular Impacto
                 </button>
-                <div id="resultado-espiao" class="mt-3 text-sm text-center font-bold"></div>
+                
+                <div id="resultado-espiao" class="mt-3 text-sm text-center"></div>
             </div>
 
             <button id="btn-ia" onclick="acionarIA()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-3 rounded-lg shadow font-medium transition">
-                <i class="fas fa-sparkles text-amber-300 mr-1"></i> Gerar Descrição Blindada
+                <i class="fas fa-sparkles text-amber-300 mr-1"></i> Gerar Descrição (Modo Teste)
             </button>
             <div id="resultado-ia" class="mt-4 bg-slate-50 border p-3 rounded text-sm text-slate-700 hidden"></div>
         </div>
@@ -71,10 +73,10 @@
                 tb.innerHTML += `
                     <tr class="hover:bg-slate-50">
                         <td class="px-6 py-4 font-medium">${p.nome}<br><span class="text-xs text-slate-400">${p.sku}</span></td>
-                        <td class="px-6 py-4">R$ ${p.custo.toFixed(2)}</td>
-                        <td class="px-6 py-4 font-bold">R$ ${p.preco_atual.toFixed(2)}</td>
+                        <td class="px-6 py-4 font-bold text-slate-600">R$ ${p.custo.toFixed(2)}</td>
+                        <td class="px-6 py-4 text-indigo-600 font-medium">R$ ${p.preco_atual.toFixed(2)}</td>
                         <td class="px-6 py-4 text-right">
-                            <button onclick='abrirDrawer(${JSON.stringify(p)})' class="bg-indigo-50 text-indigo-600 px-3 py-1 rounded text-sm hover:bg-indigo-100 font-medium">Gerenciar</button>
+                            <button onclick='abrirDrawer(${JSON.stringify(p)})' class="bg-indigo-50 text-indigo-600 px-4 py-2 rounded text-sm hover:bg-indigo-100 font-bold shadow-sm transition">Simular</button>
                         </td>
                     </tr>`;
             });
@@ -83,7 +85,9 @@
         function abrirDrawer(p) {
             produtoAtual = p;
             document.getElementById('drawer-nome').innerText = p.nome;
-            document.getElementById('resultado-espiao').innerText = '';
+            document.getElementById('drawer-custo').innerText = p.custo.toFixed(2);
+            document.getElementById('url-concorrente').value = '';
+            document.getElementById('resultado-espiao').innerHTML = '';
             document.getElementById('resultado-ia').classList.add('hidden');
             document.getElementById('drawer-ia').classList.remove('translate-x-full');
         }
@@ -97,7 +101,8 @@
             if(!url) return alert("Cole o link!");
             
             const btn = document.getElementById('btn-espionar');
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Espionando...';
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Analisando Mercado...';
+            document.getElementById('resultado-espiao').innerHTML = '';
             
             try {
                 const res = await fetch('/api/scraper/preco', {
@@ -105,14 +110,60 @@
                     body: JSON.stringify({ url_concorrente: url })
                 });
                 const data = await res.json();
-                document.getElementById('resultado-espiao').innerHTML = data.sucesso ? `<span class="text-emerald-600">R$ ${data.preco_concorrente}</span>` : `<span class="text-rose-600">${data.erro}</span>`;
-            } catch(e) { document.getElementById('resultado-espiao').innerText = "Erro de conexão."; }
-            btn.innerHTML = 'Verificar Preço Agora';
+                
+                if(data.sucesso) {
+                    // Limpa o texto (ex: "R$ 35" vira 35.00)
+                    const precoLimpo = data.preco_concorrente.replace(/[^0-9,.]/g, '').replace(',', '.');
+                    const precoConcorrenteNum = parseFloat(precoLimpo);
+                    
+                    if(!isNaN(precoConcorrenteNum)) {
+                        const custo = produtoAtual.custo;
+                        const lucroReais = precoConcorrenteNum - custo;
+                        const margemPercentual = ((lucroReais / precoConcorrenteNum) * 100).toFixed(1);
+                        
+                        // Lógica de cores baseada na margem
+                        let corMargem = "text-rose-600"; // Prejuízo ou muito baixo
+                        let bgMargem = "bg-rose-50 border-rose-200";
+                        let iconeStatus = "<i class='fas fa-exclamation-triangle'></i> Margem Crítica";
+                        
+                        if(margemPercentual >= 30) { 
+                            corMargem = "text-emerald-600"; bgMargem = "bg-emerald-50 border-emerald-200"; iconeStatus = "<i class='fas fa-check-circle'></i> Margem Saudável";
+                        } else if (margemPercentual >= 15) {
+                            corMargem = "text-amber-600"; bgMargem = "bg-amber-50 border-amber-200"; iconeStatus = "<i class='fas fa-exclamation-circle'></i> Atenção";
+                        }
+
+                        // Constrói o visual do simulador
+                        document.getElementById('resultado-espiao').innerHTML = `
+                            <div class="mt-4 p-4 ${bgMargem} border rounded-lg text-left shadow-inner transition-all">
+                                <p class="text-xs font-bold text-slate-500 uppercase tracking-wide">Preço Encontrado</p>
+                                <p class="text-2xl font-black text-slate-800 mb-2">R$ ${precoConcorrenteNum.toFixed(2)}</p>
+                                <div class="bg-white p-3 rounded border border-white/50">
+                                    <p class="text-xs text-slate-500 mb-1">Se você aplicar este preço:</p>
+                                    <div class="flex justify-between items-center mb-1">
+                                        <span class="text-sm font-medium">Lucro Bruto:</span>
+                                        <span class="text-sm font-bold ${corMargem}">R$ ${lucroReais.toFixed(2)}</span>
+                                    </div>
+                                    <div class="flex justify-between items-center">
+                                        <span class="text-sm font-medium">Margem:</span>
+                                        <span class="text-sm font-bold ${corMargem}">${margemPercentual}%</span>
+                                    </div>
+                                </div>
+                                <p class="text-xs font-bold mt-3 text-center ${corMargem}">${iconeStatus}</p>
+                            </div>
+                        `;
+                    } else {
+                        document.getElementById('resultado-espiao').innerHTML = `<span class="text-slate-600 font-medium">Preço oculto no layout do site.</span>`;
+                    }
+                } else {
+                    document.getElementById('resultado-espiao').innerHTML = `<span class="text-rose-600 font-medium"><i class="fas fa-times"></i> ${data.erro}</span>`;
+                }
+            } catch(e) { document.getElementById('resultado-espiao').innerText = "Erro ao conectar com o robô."; }
+            btn.innerHTML = 'Buscar e Simular Impacto';
         }
 
         async function acionarIA() {
             const btn = document.getElementById('btn-ia');
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Gerando...';
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Formulando...';
             try {
                 const res = await fetch('/api/ia/gerar-descricao', {
                     method: 'POST', headers: { 'Content-Type': 'application/json' },
@@ -123,7 +174,7 @@
                 box.innerText = data.descricao_gerada;
                 box.classList.remove('hidden');
             } catch(e) { alert("Erro de IA."); }
-            btn.innerHTML = '<i class="fas fa-sparkles text-amber-300 mr-1"></i> Gerar Descrição Blindada';
+            btn.innerHTML = '<i class="fas fa-sparkles text-amber-300 mr-1"></i> Gerar Descrição (Modo Teste)';
         }
 
         window.onload = carregar;
