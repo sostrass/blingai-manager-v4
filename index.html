@@ -101,6 +101,447 @@
             
             </main>
     </div>
+
+/* Parte II */
+
+    <div id="view-catalogo" class="block space-y-6 animate-[slideIn_0.3s_ease-out]">
+                <div class="flex justify-between items-end mb-6">
+                    <div>
+                        <h2 class="text-3xl font-black text-slate-800 tracking-tight">Catálogo ERP</h2>
+                        <p class="text-slate-500 mt-1">Gerenciamento com cálculo real de margem (Bling vs. Marketplaces).</p>
+                    </div>
+                </div>
+                <div class="glass-panel rounded-2xl overflow-hidden">
+                    <table class="w-full text-left text-sm whitespace-nowrap">
+                        <thead class="bg-slate-100/80 border-b border-slate-200 text-slate-500 uppercase text-[10px] tracking-wider font-black">
+                            <tr>
+                                <th class="px-6 py-4">SKU / Produto</th>
+                                <th class="px-6 py-4 text-right">Custo Base</th>
+                                <th class="px-6 py-4 text-right">Preço Sugerido</th>
+                                <th class="px-6 py-4 text-center">Margem</th>
+                                <th class="px-6 py-4 text-right">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabela-produtos" class="divide-y divide-slate-100">
+                            </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="view-massa" class="hidden space-y-6">
+                <div class="flex justify-between items-end mb-6">
+                    <div>
+                        <h2 class="text-3xl font-black text-slate-800 tracking-tight text-amber-600 flex items-center gap-3"><i class="fas fa-bolt"></i> Operação em Massa</h2>
+                        <p class="text-slate-500 mt-1">Aplique regras de precificação e custos para múltiplos SKUs simultaneamente.</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-3 gap-8">
+                    <div class="col-span-2 glass-panel rounded-2xl p-6 flex flex-col h-[70vh]">
+                        <div class="flex gap-4 mb-4">
+                            <input type="text" id="massa-busca" placeholder="Filtrar produtos por SKU ou Nome..." class="ios-input flex-1 text-sm" oninput="renderMassaList()">
+                            <button onclick="selecionarTodosMassa()" class="bg-slate-100 text-slate-600 px-4 py-2 rounded-lg text-sm font-bold border border-slate-200 hover:bg-slate-200 transition">Sel. Todos</button>
+                            <button onclick="limparMassa()" class="bg-white text-slate-500 px-4 py-2 rounded-lg text-sm font-bold border border-slate-200 hover:bg-slate-50 transition">Limpar</button>
+                        </div>
+                        <div class="flex-1 overflow-auto border border-slate-200 rounded-xl bg-slate-50/50 p-2 space-y-1" id="massa-list">
+                            </div>
+                    </div>
+
+                    <div class="glass-panel rounded-2xl p-6 flex flex-col relative overflow-hidden">
+                        <div class="absolute top-0 left-0 w-full h-1 bg-amber-400"></div>
+                        <h3 class="font-bold text-slate-800 mb-4 uppercase text-xs tracking-wider">Parâmetros de Alteração</h3>
+                        
+                        <label class="text-xs font-bold text-slate-500 mb-1">O que alterar?</label>
+                        <select class="ios-input w-full mb-4 text-sm" id="massa-campo">
+                            <option value="preco">Preço Bling Atual</option>
+                            <option value="custo">Custo do Produto</option>
+                        </select>
+
+                        <label class="text-xs font-bold text-slate-500 mb-1">Tipo de Operação</label>
+                        <div class="grid grid-cols-2 gap-2 mb-4">
+                            <button class="bg-indigo-600 text-white rounded-lg py-2 text-xs font-bold shadow" id="btn-op-fixo" onclick="setMassaOp('fixo')">Definir Fixo</button>
+                            <button class="bg-slate-100 text-slate-600 border border-slate-200 rounded-lg py-2 text-xs font-bold hover:bg-slate-200" id="btn-op-pct" onclick="setMassaOp('pct')">Acréscimo %</button>
+                        </div>
+
+                        <label class="text-xs font-bold text-slate-500 mb-1">Valor</label>
+                        <input type="number" id="massa-valor" class="ios-input w-full mb-6 text-2xl font-black text-slate-800 text-right" value="0.00" step="0.01">
+
+                        <div class="mt-auto space-y-3">
+                            <button onclick="aplicarMassa(false)" class="w-full bg-slate-800 hover:bg-slate-900 text-white py-3 rounded-xl font-bold transition shadow-lg">✓ Aplicar Localmente</button>
+                            <button onclick="aplicarMassa(true)" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-3 rounded-xl font-bold transition shadow-lg flex items-center justify-center gap-2"><i class="fas fa-cloud-upload-alt"></i> Salvar e Enviar p/ Bling</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="view-simulador" class="hidden space-y-6">
+                <div class="flex justify-between items-end mb-6">
+                    <div>
+                        <h2 class="text-3xl font-black text-slate-800 tracking-tight flex items-center gap-3"><i class="fas fa-globe text-indigo-600"></i> Precificação Global</h2>
+                        <p class="text-slate-500 mt-1">Defina os parâmetros base. O sistema usa estes valores para sugerir o Preço Bling ideal de cada produto.</p>
+                    </div>
+                    <button onclick="salvarCustosGlobais()" class="bg-indigo-600 text-white px-6 py-2.5 rounded-lg font-bold shadow-lg hover:bg-indigo-700 transition">Salvar Parâmetros</button>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-8">
+                    <div class="glass-panel rounded-2xl p-6 relative overflow-hidden">
+                        <div class="absolute top-0 left-0 w-full h-1 bg-indigo-500"></div>
+                        <h3 class="font-bold text-slate-800 mb-4 border-b border-slate-200/50 pb-2">Variáveis Fixas do Negócio</h3>
+                        <div class="space-y-4 mt-4">
+                            <div class="flex justify-between items-center"><span class="text-sm text-slate-600 font-medium">Impostos (%)</span> <input type="number" id="cg-imp" step="0.5" class="ios-input w-24 text-right font-bold text-slate-800" oninput="simularPreco(document.getElementById('sim-custo').value)"></div>
+                            <div class="flex justify-between items-center"><span class="text-sm text-slate-600 font-medium">Taxa de Cartão Média (%)</span> <input type="number" id="cg-cartao" step="0.1" class="ios-input w-24 text-right font-bold text-slate-800" oninput="simularPreco(document.getElementById('sim-custo').value)"></div>
+                            <div class="flex justify-between items-center"><span class="text-sm text-slate-600 font-medium">Embalagem por Pedido (R$)</span> <input type="number" id="cg-emb" step="0.5" class="ios-input w-24 text-right font-bold text-slate-800" oninput="simularPreco(document.getElementById('sim-custo').value)"></div>
+                            <div class="flex justify-between items-center"><span class="text-sm text-slate-600 font-medium">Frete Fixo Próprio (R$)</span> <input type="number" id="cg-frete" step="0.5" class="ios-input w-24 text-right font-bold text-slate-800" oninput="simularPreco(document.getElementById('sim-custo').value)"></div>
+                            <div class="flex justify-between items-center pt-2"><span class="text-sm text-slate-800 font-black">Margem de Lucro Alvo (%)</span> <input type="number" id="cg-ganho" step="1" class="ios-input w-24 text-right font-black text-emerald-600 bg-emerald-50 border-emerald-200" oninput="simularPreco(document.getElementById('sim-custo').value)"></div>
+                        </div>
+                    </div>
+
+                    <div class="glass-panel rounded-2xl p-6 bg-gradient-to-br from-indigo-50/50 to-white relative overflow-hidden">
+                        <div class="absolute top-0 left-0 w-full h-1 bg-emerald-400"></div>
+                        <h3 class="font-bold text-slate-800 mb-4 border-b border-slate-200/50 pb-2">Simulador de Prova Real</h3>
+                        <label class="text-xs font-bold text-slate-500 mb-1">Se o meu produto custa (R$):</label>
+                        <input type="number" id="sim-custo" value="50.00" class="ios-input w-full mb-4 text-2xl font-black text-slate-800" oninput="simularPreco(this.value)">
+                        
+                        <div class="bg-indigo-600 text-white rounded-xl p-5 shadow-lg shadow-indigo-200/50 mt-4 relative overflow-hidden">
+                            <i class="fas fa-calculator absolute -right-4 -bottom-4 text-6xl text-white opacity-10"></i>
+                            <p class="text-xs font-medium opacity-80 uppercase tracking-wider mb-1">Preço Sugerido (Bling)</p>
+                            <p class="text-4xl font-black tracking-tight" id="sim-resultado">R$ 0,00</p>
+                            <p class="text-xs mt-3 opacity-90 font-medium"><i class="fas fa-check-circle text-emerald-300 mr-1"></i> Cobre o custo, a embalagem, o frete, dilui os impostos e garante a margem alvo exata.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="view-automacoes" class="hidden space-y-6">
+                <div class="flex justify-between items-end mb-6">
+                    <div>
+                        <h2 class="text-3xl font-black text-slate-800 tracking-tight flex items-center gap-3">
+                            <i class="fas fa-microchip text-emerald-600"></i> AI Automations Core
+                        </h2>
+                        <p class="text-slate-500 mt-1">Gerenciamento de respostas a avaliações e blindagem de anúncios.</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-8">
+                    <div class="glass-panel rounded-2xl shadow-lg border-t-4 border-t-amber-400 overflow-hidden flex flex-col">
+                        <div class="bg-white/50 px-6 py-4 border-b border-slate-200/50 flex justify-between items-center">
+                            <h3 class="font-black text-slate-800"><i class="fas fa-comments text-amber-500 mr-2"></i> Consultor Parceiro (SAC)</h3>
+                            <span class="bg-amber-100 text-amber-700 text-[10px] font-bold px-2 py-1 rounded-md uppercase tracking-wider">Modo Ateliê</span>
+                        </div>
+                        <div class="p-6 flex-1 space-y-4">
+                            <div>
+                                <label class="text-xs font-bold text-slate-500 uppercase">Nome do Cliente</label>
+                                <input type="text" id="sac-cliente" placeholder="Ex: Cláudia987" class="ios-input w-full mt-1">
+                            </div>
+                            <div>
+                                <label class="text-xs font-bold text-slate-500 uppercase">Produto Adquirido</label>
+                                <input type="text" id="sac-produto" placeholder="Ex: Kit Alicates Coloridos" class="ios-input w-full mt-1">
+                            </div>
+                            <div>
+                                <label class="text-xs font-bold text-slate-500 uppercase">Relato do Cliente (Avaliação)</label>
+                                <textarea id="sac-relato" rows="3" placeholder="Cole o que o cliente escreveu aqui..." class="ios-input w-full mt-1 resize-none"></textarea>
+                            </div>
+                            
+                            <button onclick="gerarRespostaSAC()" id="btn-sac" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-3 rounded-xl transition shadow-lg flex items-center justify-center gap-2">
+                                <i class="fas fa-magic text-amber-400"></i> Formular Resposta Humanizada
+                            </button>
+
+                            <div id="sac-resultado" class="hidden mt-4 bg-slate-800 p-4 rounded-xl relative group">
+                                <p class="text-xs font-mono text-amber-400 mb-2">// Retorno da I.A.</p>
+                                <p id="sac-texto" class="text-sm text-slate-200 leading-relaxed font-sans"></p>
+                                <button onclick="copiarTexto('sac-texto')" class="absolute top-4 right-4 text-slate-400 hover:text-white transition opacity-0 group-hover:opacity-100 bg-slate-700/50 p-2 rounded">
+                                    <i class="fas fa-copy"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="glass-panel rounded-2xl shadow-lg border-t-4 border-t-indigo-500 overflow-hidden flex flex-col">
+                        <div class="bg-white/50 px-6 py-4 border-b border-slate-200/50 flex justify-between items-center">
+                            <h3 class="font-black text-slate-800"><i class="fas fa-shield-alt text-indigo-500 mr-2"></i> Descrições Blindadas</h3>
+                            <span class="bg-indigo-100 text-indigo-700 text-[10px] font-bold px-2 py-1 rounded-md uppercase tracking-wider">Anti-Plágio IP</span>
+                        </div>
+                        <div class="p-6 flex-1 space-y-4">
+                            <div>
+                                <label class="text-xs font-bold text-slate-500 uppercase">Nome / Ficha Técnica Curta</label>
+                                <textarea id="desc-produto" rows="2" placeholder="Ex: Caixa 30 Divisórias, 20x19cm..." class="ios-input w-full mt-1 resize-none"></textarea>
+                            </div>
+                            
+                            <div class="bg-indigo-50/50 border border-indigo-100 rounded-lg p-3 flex gap-3 items-start">
+                                <i class="fas fa-info-circle text-indigo-500 mt-0.5"></i>
+                                <p class="text-xs text-slate-600">A I.A. gerará uma descrição com foco em redução de devoluções (medidas exatas) e embutirá o código HTML jurídico de proteção da Sóstrass no final.</p>
+                            </div>
+
+                            <button onclick="gerarDescricaoSegura()" id="btn-desc" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-xl transition shadow-lg flex items-center justify-center gap-2">
+                                <i class="fas fa-cogs"></i> Gerar Ficha c/ HTML Jurídico
+                            </button>
+
+                            <div id="desc-resultado" class="hidden mt-4 bg-slate-900 border border-slate-700 p-4 rounded-xl relative group">
+                                <div class="flex justify-between items-center mb-2">
+                                    <p class="text-xs font-mono text-emerald-400">root@sostrass-ai:~# output gerado</p>
+                                    <button onclick="copiarTexto('desc-texto')" class="text-slate-400 hover:text-white transition opacity-0 group-hover:opacity-100 bg-slate-700/50 p-1.5 rounded">
+                                        <i class="fas fa-copy"></i>
+                                    </button>
+                                </div>
+                                <div id="desc-texto" class="text-xs text-slate-300 font-mono leading-relaxed h-40 overflow-y-auto whitespace-pre-wrap"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="view-config" class="hidden space-y-6">
+                <div class="flex justify-between items-end mb-6">
+                    <div>
+                        <h2 class="text-3xl font-black text-slate-800 tracking-tight"><i class="fas fa-cog text-slate-600 mr-2"></i> Configurações do Sistema</h2>
+                        <p class="text-slate-500 mt-1">Gestão da infraestrutura Backend Proxy e auditoria do sistema.</p>
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-8">
+                    <div class="glass-panel rounded-2xl p-6 relative overflow-hidden">
+                        <div class="absolute top-0 left-0 w-full h-1 bg-slate-800"></div>
+                        <h3 class="font-bold text-slate-800 mb-4 border-b border-slate-200/50 pb-2"><i class="fas fa-server mr-2"></i>Conexão Backend Proxy</h3>
+                        <div class="bg-emerald-50 border border-emerald-200 rounded-lg p-3 text-xs text-emerald-700 mb-4">
+                            <strong>Arquitetura Segura:</strong> As chaves API (Bling e Gemini) nunca ficam expostas no navegador. Este painel se comunica apenas com o seu servidor no Railway.
+                        </div>
+                        <label class="text-xs font-bold text-slate-500 mb-1">URL do Servidor Node.js</label>
+                        <input type="text" id="cfg-url" class="ios-input w-full mb-2 font-mono text-sm" placeholder="https://seu-app.up.railway.app">
+                        
+                        <label class="text-xs font-bold text-slate-500 mb-1 mt-4 block">Modelo de Inteligência Artificial</label>
+                        <select id="cfg-model" class="ios-input w-full mb-4 text-sm">
+                            <option value="gemini-1.5-pro">Gemini 1.5 Pro (Mais potente - Padrão)</option>
+                            <option value="gemini-2.5-flash">Gemini 2.5 Flash (Rápido)</option>
+                        </select>
+
+                        <div class="flex gap-2 mt-4">
+                            <button onclick="salvarConfig()" class="flex-1 bg-slate-800 text-white py-2.5 rounded-lg font-bold hover:bg-slate-900 transition shadow">💾 Salvar Conexão</button>
+                            <button onclick="testarServidor()" class="bg-slate-200 text-slate-700 px-4 py-2.5 rounded-lg font-bold hover:bg-slate-300 transition" title="Testar Ping"><i class="fas fa-satellite-dish"></i></button>
+                        </div>
+                    </div>
+
+                    <div class="glass-panel rounded-2xl p-6 relative overflow-hidden flex flex-col h-[60vh]">
+                        <div class="absolute top-0 left-0 w-full h-1 bg-rose-500"></div>
+                        <div class="flex justify-between items-center border-b border-slate-200/50 pb-2 mb-4 shrink-0">
+                            <h3 class="font-bold text-slate-800"><i class="fas fa-terminal mr-2"></i>Console / Auditoria</h3>
+                            <button onclick="limparLogs()" class="text-xs text-rose-500 hover:text-rose-700 font-bold"><i class="fas fa-trash-alt mr-1"></i>Limpar</button>
+                        </div>
+                        
+                        <div id="log-container" class="flex-1 overflow-y-auto bg-slate-950 rounded-xl p-4 text-[11px] font-mono text-emerald-400 space-y-1.5 shadow-inner">
+                            <div class="text-slate-500">Aguardando inicialização do sistema...</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+/* Parte III */
+
+    <div id="modal-produto" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4 sm:p-8">
+        <div class="bg-slate-50 w-full max-w-7xl h-full max-h-[95vh] rounded-2xl shadow-2xl flex flex-col overflow-hidden animate-[slideIn_0.2s_ease-out]">
+            
+            <div class="bg-white border-b border-slate-200 px-6 py-4 flex flex-col gap-4 shrink-0">
+                <div class="flex justify-between items-start">
+                    <div class="flex items-center gap-4">
+                        <div class="w-14 h-14 rounded-lg bg-indigo-50 border border-indigo-100 flex items-center justify-center text-indigo-400 text-2xl">
+                            <i class="fas fa-box"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-black text-2xl text-slate-800 leading-tight" id="m-nome">Nome do Produto</h3>
+                            <div class="flex items-center gap-3 mt-1">
+                                <span class="text-sm font-bold text-indigo-600 font-mono bg-indigo-50 px-2 py-0.5 rounded" id="m-sku">SKU-000</span>
+                                <span class="text-xs text-slate-400" id="m-cat-display">Categoria: N/A</span>
+                                <span class="text-xs font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-100"><span id="m-estoque-display">0</span> em estoque</span>
+                            </div>
+                        </div>
+                    </div>
+                    <button onclick="fecharModal()" class="text-slate-400 hover:text-rose-500 transition text-2xl bg-slate-50 hover:bg-rose-50 w-10 h-10 rounded-full flex items-center justify-center"><i class="fas fa-times"></i></button>
+                </div>
+
+                <div class="flex gap-2 overflow-x-auto pb-1 hide-scrollbar">
+                    <button onclick="switchModalTab('geral')" id="mtab-geral" class="px-4 py-2 rounded-lg bg-indigo-600 text-white font-bold text-sm shadow-md transition whitespace-nowrap"><i class="fas fa-chart-pie mr-1"></i> Visão Geral</button>
+                    <button onclick="switchModalTab('desc')" id="mtab-desc" class="px-4 py-2 rounded-lg bg-transparent text-slate-500 font-bold text-sm hover:bg-slate-100 transition whitespace-nowrap"><i class="fas fa-pen-nib mr-1"></i> Descrição & I.A.</button>
+                    <button onclick="switchModalTab('precos')" id="mtab-precos" class="px-4 py-2 rounded-lg bg-transparent text-slate-500 font-bold text-sm hover:bg-slate-100 transition whitespace-nowrap"><i class="fas fa-tags mr-1"></i> Preços & Mkt</button>
+                    <button onclick="switchModalTab('log')" id="mtab-log" class="px-4 py-2 rounded-lg bg-transparent text-slate-500 font-bold text-sm hover:bg-slate-100 transition whitespace-nowrap"><i class="fas fa-truck mr-1"></i> Logística</button>
+                    <button onclick="switchModalTab('fisc')" id="mtab-fisc" class="px-4 py-2 rounded-lg bg-transparent text-slate-500 font-bold text-sm hover:bg-slate-100 transition whitespace-nowrap"><i class="fas fa-file-invoice-dollar mr-1"></i> Fiscal</button>
+                    <button onclick="switchModalTab('radar')" id="mtab-radar" class="px-4 py-2 rounded-lg bg-transparent text-slate-500 font-bold text-sm hover:bg-slate-100 transition whitespace-nowrap border border-slate-200"><i class="fas fa-radar text-indigo-500 mr-1"></i> Radar Espião</button>
+                </div>
+            </div>
+            
+            <div class="flex-1 overflow-y-auto p-6 bg-slate-50/50" id="modal-content-area">
+                
+                <div id="m-view-geral" class="block space-y-6">
+                    <div class="grid grid-cols-4 gap-4">
+                        <div class="glass-panel p-4 rounded-xl">
+                            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Custo Base Total</p>
+                            <p class="text-2xl font-black text-rose-500" id="m-custo-total-display">R$ 0,00</p>
+                        </div>
+                        <div class="glass-panel p-4 rounded-xl">
+                            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Preço Bling Atual</p>
+                            <p class="text-2xl font-black text-indigo-600" id="m-preco-display">R$ 0,00</p>
+                        </div>
+                        <div class="glass-panel p-4 rounded-xl border-emerald-200 bg-emerald-50/30">
+                            <p class="text-[10px] font-bold text-emerald-600 uppercase tracking-wider mb-1">Margem Bruta (Atual)</p>
+                            <p class="text-2xl font-black text-emerald-600" id="m-margem-display">0.0%</p>
+                        </div>
+                        <div class="glass-panel p-4 rounded-xl border-amber-200 bg-amber-50/30">
+                            <p class="text-[10px] font-bold text-amber-600 uppercase tracking-wider mb-1">Preço Sugerido (Fórmula)</p>
+                            <p class="text-2xl font-black text-amber-600" id="m-sugerido-display">R$ 0,00</p>
+                        </div>
+                    </div>
+
+                    <div class="glass-panel p-6 rounded-xl">
+                        <h4 class="font-bold text-slate-800 mb-4 border-b pb-2">Edição Rápida</h4>
+                        <div class="grid grid-cols-4 gap-6">
+                            <div><label class="text-xs font-bold text-slate-500 mb-1 block">Categoria Bling</label><input type="text" id="m-cat" class="ios-input w-full"></div>
+                            <div><label class="text-xs font-bold text-slate-500 mb-1 block">Estoque Atual</label><input type="number" id="m-estoque" class="ios-input w-full font-bold"></div>
+                            <div><label class="text-xs font-bold text-slate-500 mb-1 block">Custo de Compra (R$)</label><input type="number" id="m-custo" class="ios-input w-full font-bold text-rose-600" oninput="recalcularModalGeral()"></div>
+                            <div><label class="text-xs font-bold text-slate-500 mb-1 block">Preço de Venda (R$)</label><input type="number" id="m-preco" class="ios-input w-full font-black text-indigo-600" oninput="recalcularModalGeral()"></div>
+                        </div>
+                        <p class="text-xs text-slate-400 mt-4"><i class="fas fa-info-circle mr-1"></i> O Custo Base Total inclui o Custo de Compra + Embalagem + Frete. A Margem é calculada sobre o Preço de Venda.</p>
+                    </div>
+                </div>
+
+                <div id="m-view-desc" class="hidden space-y-6">
+                    <div class="grid grid-cols-2 gap-6">
+                        <div class="space-y-4">
+                            <div class="glass-panel p-5 rounded-xl">
+                                <label class="text-xs font-bold text-slate-500 uppercase mb-2 block">Título / Descrição Curta (Max 200 char)</label>
+                                <textarea id="m-desc-curta" rows="2" class="ios-input w-full resize-none font-medium text-slate-700"></textarea>
+                                
+                                <label class="text-xs font-bold text-slate-500 uppercase mb-2 mt-4 block">Descrição Complementar / Detalhada</label>
+                                <textarea id="m-desc-comp" rows="12" class="ios-input w-full resize-none text-sm font-mono text-slate-600 leading-relaxed"></textarea>
+                            </div>
+                        </div>
+
+                        <div class="space-y-4">
+                            <div class="glass-panel p-5 rounded-xl border-indigo-200 bg-indigo-50/30">
+                                <h4 class="font-bold text-indigo-800 mb-4 flex items-center gap-2"><i class="fas fa-sparkles text-amber-400"></i> Estúdio Criativo I.A.</h4>
+                                
+                                <label class="text-[10px] font-bold text-slate-500 uppercase block mb-1">Instrução Específica para este produto</label>
+                                <textarea id="m-ia-inst" rows="2" class="ios-input w-full mb-3 text-xs" placeholder="Ex: Destacar que serve para pulseiras e colares..."></textarea>
+                                
+                                <label class="text-[10px] font-bold text-slate-500 uppercase block mb-1">Contexto Extra</label>
+                                <textarea id="m-ia-ctx" rows="2" class="ios-input w-full mb-4 text-xs" placeholder="Ex: Produto importado, não perde a cor..."></textarea>
+
+                                <div class="grid grid-cols-2 gap-3 mb-4">
+                                    <button onclick="gerarIAPrompt('curta')" class="bg-indigo-600 text-white font-bold py-2 rounded-lg text-xs shadow hover:bg-indigo-700 transition">Gerar Título (Curta)</button>
+                                    <button onclick="gerarIAPrompt('comp')" class="bg-slate-800 text-white font-bold py-2 rounded-lg text-xs shadow hover:bg-slate-900 transition">Gerar Detalhada</button>
+                                </div>
+
+                                <div class="bg-slate-900 rounded-lg p-4 relative group">
+                                    <p class="text-[10px] text-emerald-400 font-mono mb-2">// Output Gemini</p>
+                                    <div id="m-ia-output" class="text-xs text-slate-300 font-mono h-32 overflow-y-auto">Aguardando comando...</div>
+                                    <div class="absolute top-3 right-3 flex gap-2 opacity-0 group-hover:opacity-100 transition">
+                                        <button onclick="aplicarIA('m-desc-curta')" class="bg-indigo-500 text-white text-[10px] px-2 py-1 rounded font-bold hover:bg-indigo-400" title="Aplicar no Título">← Título</button>
+                                        <button onclick="aplicarIA('m-desc-comp')" class="bg-indigo-500 text-white text-[10px] px-2 py-1 rounded font-bold hover:bg-indigo-400" title="Aplicar na Detalhada">← Detalhada</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="m-view-precos" class="hidden space-y-6">
+                    <div class="flex justify-between items-end mb-4">
+                        <p class="text-sm text-slate-600 font-medium">Edite as taxas específicas deste produto. Elas sobrescrevem as taxas globais.<br>A margem mostrada é baseada no Preço Bling Atual (R$ <span id="m-preco-ref" class="font-bold text-indigo-600">0,00</span>).</p>
+                    </div>
+                    
+                    <div id="m-container-marketplaces" class="grid grid-cols-2 lg:grid-cols-3 gap-4">
+                        </div>
+                </div>
+
+                <div id="m-view-log" class="hidden space-y-6">
+                    <div class="grid grid-cols-2 gap-6">
+                        <div class="glass-panel p-6 rounded-xl">
+                            <h4 class="font-bold text-slate-800 mb-4 border-b pb-2"><i class="fas fa-ruler-combined text-indigo-500 mr-2"></i> Dimensões Físicas</h4>
+                            <p class="text-xs text-slate-500 mb-4">Necessárias para o cálculo de frete nos marketplaces.</p>
+                            
+                            <div class="grid grid-cols-2 gap-4">
+                                <div><label class="text-[10px] font-bold text-slate-500 uppercase block mb-1">Altura (cm)</label><input type="number" id="m-altura" class="ios-input w-full" step="0.1"></div>
+                                <div><label class="text-[10px] font-bold text-slate-500 uppercase block mb-1">Largura (cm)</label><input type="number" id="m-largura" class="ios-input w-full" step="0.1"></div>
+                                <div><label class="text-[10px] font-bold text-slate-500 uppercase block mb-1">Profundidade (cm)</label><input type="number" id="m-prof" class="ios-input w-full" step="0.1"></div>
+                                <div><label class="text-[10px] font-bold text-slate-500 uppercase block mb-1">Peso Bruto (kg)</label><input type="number" id="m-peso" class="ios-input w-full" step="0.01"></div>
+                            </div>
+                        </div>
+
+                        <div class="glass-panel p-6 rounded-xl">
+                            <h4 class="font-bold text-slate-800 mb-4 border-b pb-2"><i class="fas fa-box-open text-amber-500 mr-2"></i> Custos Logísticos Específicos</h4>
+                            <p class="text-xs text-slate-500 mb-4">Se preenchido, ignora o custo global de embalagem e frete para este SKU.</p>
+                            
+                            <div class="space-y-4">
+                                <div><label class="text-[10px] font-bold text-slate-500 uppercase block mb-1">Custo de Embalagem Extra (R$)</label><input type="number" id="m-emb-extra" class="ios-input w-full" placeholder="0.00 = Usa Global" step="0.01"></div>
+                                <div><label class="text-[10px] font-bold text-slate-500 uppercase block mb-1">Frete Fixo Próprio (R$)</label><input type="number" id="m-frete-extra" class="ios-input w-full" placeholder="0.00 = Usa Global" step="0.01"></div>
+                                <div><label class="text-[10px] font-bold text-slate-500 uppercase block mb-1">Prazo de Produção/Entrega (Dias)</label><input type="number" id="m-prazo" class="ios-input w-full" value="0" step="1"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="m-view-fisc" class="hidden space-y-6">
+                    <div class="glass-panel p-6 rounded-xl max-w-4xl mx-auto">
+                        <h4 class="font-bold text-slate-800 mb-4 border-b pb-2"><i class="fas fa-file-invoice-dollar text-emerald-500 mr-2"></i> Dados Tributários (Bling)</h4>
+                        <p class="text-xs text-slate-500 mb-6">Informações para emissão correta de Notas Fiscais.</p>
+                        
+                        <div class="grid grid-cols-3 gap-6 mb-6">
+                            <div><label class="text-[10px] font-bold text-slate-500 uppercase block mb-1">NCM</label><input type="text" id="m-ncm" class="ios-input w-full font-mono text-sm" placeholder="0000.00.00"></div>
+                            <div>
+                                <label class="text-[10px] font-bold text-slate-500 uppercase block mb-1">Origem</label>
+                                <select id="m-origem" class="ios-input w-full text-sm">
+                                    <option value="0">0 - Nacional</option>
+                                    <option value="1">1 - Estrangeira Importada</option>
+                                    <option value="2">2 - Estrangeira Interna</option>
+                                    <option value="3">3 - Nacional (>40% Importado)</option>
+                                </select>
+                            </div>
+                            <div><label class="text-[10px] font-bold text-slate-500 uppercase block mb-1">CFOP Padrão</label><input type="text" id="m-cfop" class="ios-input w-full font-mono text-sm" placeholder="5102"></div>
+                        </div>
+
+                        <div class="grid grid-cols-4 gap-4 bg-slate-50 p-4 rounded-lg border border-slate-200">
+                            <div><label class="text-[10px] font-bold text-slate-500 uppercase block mb-1">CST / CSOSN</label><input type="text" id="m-cst" class="ios-input w-full text-sm" placeholder="102"></div>
+                            <div><label class="text-[10px] font-bold text-slate-500 uppercase block mb-1">ICMS (%)</label><input type="number" id="m-icms" class="ios-input w-full text-sm" step="0.1" value="0"></div>
+                            <div><label class="text-[10px] font-bold text-slate-500 uppercase block mb-1">PIS (%)</label><input type="number" id="m-pis" class="ios-input w-full text-sm" step="0.01" value="0"></div>
+                            <div><label class="text-[10px] font-bold text-slate-500 uppercase block mb-1">COFINS (%)</label><input type="number" id="m-cofins" class="ios-input w-full text-sm" step="0.01" value="0"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="m-view-radar" class="hidden space-y-6">
+                    <div class="grid grid-cols-3 gap-6 h-[50vh]">
+                        <div class="glass-panel p-6 rounded-xl flex flex-col h-full">
+                            <h4 class="font-bold text-slate-800 mb-2"><i class="fas fa-satellite-dish text-indigo-600 mr-2"></i> Radar de Concorrência</h4>
+                            <p class="text-xs text-slate-500 mb-4">Insira os links dos concorrentes diretos para este SKU. O sistema usa Scraper para burlar bloqueios e extrair o preço base do JSON-LD.</p>
+                            <textarea id="m-radar-urls" class="ios-input w-full flex-1 font-mono text-xs whitespace-pre resize-none mb-4" placeholder="Cole os links aqui (um por linha)..."></textarea>
+                            <button onclick="acionarRadarModal()" id="btn-radar-modal" class="w-full bg-slate-800 text-white font-bold py-3 rounded-lg shadow-lg hover:bg-slate-900 transition flex items-center justify-center gap-2"><i class="fas fa-search-dollar"></i> Iniciar Varredura</button>
+                        </div>
+
+                        <div class="col-span-2 glass-panel p-6 rounded-xl bg-slate-900 flex flex-col h-full overflow-hidden">
+                            <h4 class="font-bold text-white mb-4 border-b border-slate-700 pb-2">Resultados do Radar</h4>
+                            <div id="m-radar-resultados" class="flex-1 overflow-y-auto space-y-3 pr-2">
+                                <div class="text-slate-500 text-sm flex flex-col items-center justify-center h-full">
+                                    <i class="fas fa-radar text-4xl mb-3 opacity-20"></i>
+                                    Aguardando alvos para varredura...
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            
+            <div class="bg-white border-t border-slate-200 px-6 py-4 flex justify-between items-center shrink-0">
+                <div class="text-xs text-slate-400 font-medium"><i class="fas fa-cloud text-indigo-400 mr-1"></i> As alterações feitas aqui afetarão a próxima sincronização com o Bling.</div>
+                <div class="flex gap-3">
+                    <button onclick="fecharModal()" class="px-6 py-2.5 text-slate-600 font-bold hover:bg-slate-100 rounded-lg transition border border-slate-200">Cancelar</button>
+                    <button onclick="salvarModalCompleto()" class="px-8 py-2.5 bg-emerald-600 text-white font-bold rounded-lg hover:bg-emerald-700 transition shadow-lg shadow-emerald-600/30 flex items-center gap-2"><i class="fas fa-save"></i> Salvar Produto</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    /* Parte IV */
+
+    
     
     </body>
 </html>
