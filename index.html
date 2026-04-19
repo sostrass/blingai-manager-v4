@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sóstrass AI Enterprise v5</title>
+    <title>Sóstrass AI Enterprise v5.1</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
@@ -11,8 +11,8 @@
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
         ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
-        .glass-panel { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.5); box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); }
-        .ios-input { background: rgba(241, 245, 249, 0.7); border: 1px solid #e2e8f0; border-radius: 10px; padding: 8px 12px; transition: all 0.2s; outline: none; }
+        .glass-panel { background: rgba(255, 255, 255, 0.90); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.5); box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); }
+        .ios-input { background: rgba(241, 245, 249, 0.7); border: 1px solid #e2e8f0; border-radius: 10px; padding: 8px 12px; transition: all 0.2s; outline: none; font-family: inherit; }
         .ios-input:focus { border-color: #6366f1; background: #fff; box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1); }
         @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
         .toast-enter { animation: slideIn 0.3s ease-out forwards; }
@@ -22,7 +22,7 @@
 
     <div id="toast-container" class="fixed top-20 right-6 z-50 flex flex-col gap-3"></div>
 
-    <aside class="w-64 bg-slate-900 text-slate-400 flex flex-col shadow-2xl z-20">
+    <aside class="w-64 bg-slate-900 text-slate-400 flex flex-col shadow-2xl z-20 shrink-0">
         <div class="h-16 flex items-center px-6 border-b border-slate-800 bg-slate-950">
             <h1 class="text-lg font-bold text-white tracking-wider flex items-center gap-2">
                 <i class="fas fa-gem text-indigo-500"></i> Sóstrass<span class="text-xs font-normal text-indigo-400 border border-indigo-500/30 px-1.5 rounded bg-indigo-500/10">PRO</span>
@@ -35,25 +35,19 @@
                 <i class="fas fa-box-open w-5 text-center"></i> Catálogo ERP
             </button>
             <button onclick="mudarAba('massa')" id="menu-massa" class="w-full flex items-center gap-3 px-3 py-2.5 hover:text-white hover:bg-slate-800 rounded-lg transition">
-                <i class="fas fa-bolt text-amber-400 w-5 text-center"></i> Atualização em Massa
+                <i class="fas fa-bolt text-amber-400 w-5 text-center"></i> Op. em Massa
             </button>
             <button onclick="mudarAba('automacoes')" id="menu-automacoes" class="w-full flex items-center gap-3 px-3 py-2.5 hover:text-white hover:bg-slate-800 rounded-lg transition">
                 <i class="fas fa-robot text-emerald-400 w-5 text-center"></i> Central de I.A.
             </button>
 
             <div class="my-4 border-t border-slate-800"></div>
-            <p class="px-3 text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2">Inteligência Comercial</p>
-            
-            <button onclick="mudarAba('precos')" id="menu-precos" class="w-full flex items-center gap-3 px-3 py-2.5 hover:text-white hover:bg-slate-800 rounded-lg transition">
-                <i class="fas fa-globe w-5 text-center"></i> Custos Globais
-            </button>
+            <p class="px-3 text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2">Financeiro & Config</p>
             <button onclick="mudarAba('simulador')" id="menu-simulador" class="w-full flex items-center gap-3 px-3 py-2.5 hover:text-white hover:bg-slate-800 rounded-lg transition">
-                <i class="fas fa-chart-line w-5 text-center"></i> Simulador de Margem
+                <i class="fas fa-chart-line w-5 text-center"></i> Custos & Simulador
             </button>
-
-            <div class="my-4 border-t border-slate-800"></div>
             <button onclick="mudarAba('config')" id="menu-config" class="w-full flex items-center gap-3 px-3 py-2.5 hover:text-white hover:bg-slate-800 rounded-lg transition">
-                <i class="fas fa-cog w-5 text-center"></i> Configurações & Logs
+                <i class="fas fa-cog w-5 text-center"></i> Config & Logs
             </button>
         </div>
 
@@ -68,11 +62,11 @@
         <header class="h-16 glass-panel flex items-center justify-between px-8 z-10 sticky top-0 border-b border-slate-200">
             <div class="flex-1 max-w-2xl flex items-center relative">
                 <i class="fas fa-search absolute left-4 text-slate-400"></i>
-                <input type="text" placeholder="Buscar SKU, nome ou código..." class="w-full ios-input pl-11">
+                <input type="text" id="buscaGeral" placeholder="Buscar produto..." class="w-full ios-input pl-11" oninput="renderCatalogo()">
             </div>
             <div class="flex items-center gap-4 ml-6">
                 <div id="serverBar" class="flex items-center gap-2 text-xs font-bold text-amber-700 bg-amber-100 px-3 py-1.5 rounded-full border border-amber-200 shadow-inner">
-                    <i class="fas fa-circle-notch fa-spin"></i> Conectando Proxy...
+                    <i class="fas fa-circle-notch fa-spin"></i> Inicializando...
                 </div>
             </div>
         </header>
@@ -84,24 +78,21 @@
                     <div class="flex justify-between items-end mb-6">
                         <div>
                             <h2 class="text-3xl font-black text-slate-800 tracking-tight">Catálogo ERP</h2>
-                            <p class="text-slate-500 mt-1">Gerenciamento individualizado de produtos e marketplaces.</p>
+                            <p class="text-slate-500 mt-1">Gerenciamento com cálculo real de margem (Bling vs. Marketplaces).</p>
                         </div>
                     </div>
-                    
                     <div class="glass-panel rounded-2xl overflow-hidden">
                         <table class="w-full text-left text-sm whitespace-nowrap">
-                            <thead class="bg-slate-100/50 border-b border-slate-200 text-slate-500 uppercase text-[10px] tracking-wider font-black">
+                            <thead class="bg-slate-100/80 border-b border-slate-200 text-slate-500 uppercase text-[10px] tracking-wider font-black">
                                 <tr>
                                     <th class="px-6 py-4">SKU / Produto</th>
                                     <th class="px-6 py-4 text-right">Custo Base</th>
-                                    <th class="px-6 py-4 text-right">Preço Bling</th>
+                                    <th class="px-6 py-4 text-right">Preço Sugerido</th>
                                     <th class="px-6 py-4 text-center">Margem</th>
-                                    <th class="px-6 py-4 text-center">Plataformas</th>
-                                    <th class="px-6 py-4 text-right">Ação</th>
+                                    <th class="px-6 py-4 text-right">Ações</th>
                                 </tr>
                             </thead>
-                            <tbody id="tabela-produtos" class="divide-y divide-slate-100">
-                                </tbody>
+                            <tbody id="tabela-produtos" class="divide-y divide-slate-100"></tbody>
                         </table>
                     </div>
                 </div>
@@ -110,228 +101,451 @@
                     <div class="flex justify-between items-end mb-6">
                         <div>
                             <h2 class="text-3xl font-black text-slate-800 tracking-tight text-amber-600 flex items-center gap-3"><i class="fas fa-bolt"></i> Operação em Massa</h2>
-                            <p class="text-slate-500 mt-1">Aplique regras de precificação e custos para múltiplos SKUs simultaneamente.</p>
+                            <p class="text-slate-500 mt-1">Ferramenta em construção na UI, mas a lógica de motor já existe.</p>
                         </div>
                     </div>
-
-                    <div class="grid grid-cols-3 gap-8">
-                        <div class="col-span-2 glass-panel rounded-2xl p-6 flex flex-col h-[70vh]">
-                            <div class="flex gap-4 mb-4">
-                                <input type="text" placeholder="Filtrar produtos..." class="ios-input flex-1 text-sm">
-                                <button class="bg-slate-100 text-slate-600 px-4 py-2 rounded-lg text-sm font-bold border border-slate-200 hover:bg-slate-200 transition">Selecionar Todos</button>
-                            </div>
-                            <div class="flex-1 overflow-auto border border-slate-200 rounded-xl bg-slate-50/50 p-2" id="massa-list">
-                                </div>
-                        </div>
-
-                        <div class="glass-panel rounded-2xl p-6 flex flex-col">
-                            <h3 class="font-bold text-slate-800 mb-4 uppercase text-xs tracking-wider">Parâmetros de Alteração</h3>
-                            
-                            <label class="text-xs font-bold text-slate-500 mb-1">O que alterar?</label>
-                            <select class="ios-input w-full mb-4 text-sm" id="massa-campo">
-                                <option value="preco">Preço Bling</option>
-                                <option value="custo">Custo do Produto</option>
-                                <option value="ganho">Margem de Ganho (%)</option>
-                            </select>
-
-                            <label class="text-xs font-bold text-slate-500 mb-1">Tipo de Operação</label>
-                            <div class="grid grid-cols-2 gap-2 mb-4">
-                                <button class="bg-indigo-600 text-white rounded-lg py-2 text-xs font-bold shadow">Definir Fixo</button>
-                                <button class="bg-slate-100 text-slate-600 border border-slate-200 rounded-lg py-2 text-xs font-bold hover:bg-slate-200">Acréscimo %</button>
-                            </div>
-
-                            <label class="text-xs font-bold text-slate-500 mb-1">Valor</label>
-                            <input type="number" class="ios-input w-full mb-6 text-xl font-black text-slate-800" value="0.00">
-
-                            <div class="mt-auto space-y-3">
-                                <button class="w-full bg-slate-800 hover:bg-slate-900 text-white py-3 rounded-xl font-bold transition shadow-lg">✓ Aplicar Localmente</button>
-                                <button class="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-3 rounded-xl font-bold transition shadow-lg flex items-center justify-center gap-2"><i class="fas fa-cloud-upload-alt"></i> Salvar e Enviar p/ Bling</button>
-                            </div>
-                        </div>
+                    <div class="glass-panel rounded-2xl p-8 text-center text-slate-500">
+                        <i class="fas fa-tools text-4xl mb-4 text-slate-300"></i>
+                        <p>Interface de seleção em massa focada em UX será renderizada aqui.</p>
                     </div>
                 </div>
 
                 <div id="view-simulador" class="hidden space-y-6">
                     <div class="flex justify-between items-end mb-6">
                         <div>
-                            <h2 class="text-3xl font-black text-slate-800 tracking-tight flex items-center gap-3"><i class="fas fa-chart-line text-indigo-600"></i> Simulador de Rentabilidade</h2>
-                            <p class="text-slate-500 mt-1">Calcule cenários utilizando as regras de negócio integradas.</p>
+                            <h2 class="text-3xl font-black text-slate-800 tracking-tight"><i class="fas fa-chart-line text-indigo-600 mr-2"></i>Custos Globais</h2>
+                            <p class="text-slate-500 mt-1">Defina os parâmetros base para cálculo do Preço Bling.</p>
                         </div>
+                        <button onclick="salvarCustosGlobais()" class="bg-indigo-600 text-white px-4 py-2 rounded-lg font-bold shadow-md hover:bg-indigo-700">Salvar Parâmetros</button>
                     </div>
-
                     <div class="grid grid-cols-2 gap-8">
                         <div class="glass-panel rounded-2xl p-6">
-                            <h3 class="font-bold text-slate-800 mb-4 border-b pb-2">Variáveis Fixas (Globais)</h3>
+                            <h3 class="font-bold text-slate-800 mb-4 border-b pb-2">Variáveis Fixas</h3>
                             <div class="space-y-4">
-                                <div class="flex justify-between items-center"><span class="text-sm text-slate-600 font-medium">Impostos (%)</span> <input type="number" value="12" class="ios-input w-24 text-right font-bold text-slate-800"></div>
-                                <div class="flex justify-between items-center"><span class="text-sm text-slate-600 font-medium">Cartão de Crédito (%)</span> <input type="number" value="2.5" class="ios-input w-24 text-right font-bold text-slate-800"></div>
-                                <div class="flex justify-between items-center"><span class="text-sm text-slate-600 font-medium">Embalagem Média (R$)</span> <input type="number" value="3.00" class="ios-input w-24 text-right font-bold text-slate-800"></div>
-                                <div class="flex justify-between items-center"><span class="text-sm text-slate-600 font-medium">Margem de Ganho Alvo (%)</span> <input type="number" value="30" class="ios-input w-24 text-right font-bold text-emerald-600 bg-emerald-50"></div>
+                                <div class="flex justify-between items-center"><span class="text-sm text-slate-600 font-medium">Impostos (%)</span> <input type="number" id="cg-imp" class="ios-input w-24 text-right font-bold text-slate-800"></div>
+                                <div class="flex justify-between items-center"><span class="text-sm text-slate-600 font-medium">Cartão de Crédito (%)</span> <input type="number" id="cg-cartao" class="ios-input w-24 text-right font-bold text-slate-800"></div>
+                                <div class="flex justify-between items-center"><span class="text-sm text-slate-600 font-medium">Embalagem (R$)</span> <input type="number" id="cg-emb" class="ios-input w-24 text-right font-bold text-slate-800"></div>
+                                <div class="flex justify-between items-center"><span class="text-sm text-slate-600 font-medium">Frete Fixo Próprio (R$)</span> <input type="number" id="cg-frete" class="ios-input w-24 text-right font-bold text-slate-800"></div>
+                                <div class="flex justify-between items-center"><span class="text-sm text-slate-600 font-bold">Margem de Ganho Alvo (%)</span> <input type="number" id="cg-ganho" class="ios-input w-24 text-right font-bold text-emerald-600 bg-emerald-50"></div>
                             </div>
                         </div>
-
                         <div class="glass-panel rounded-2xl p-6 bg-gradient-to-br from-indigo-50 to-white">
-                            <h3 class="font-bold text-slate-800 mb-4 border-b pb-2">Simulação Rápida</h3>
-                            <label class="text-xs font-bold text-slate-500 mb-1">Se o meu produto custa (R$):</label>
-                            <input type="number" value="50.00" class="ios-input w-full mb-4 text-2xl font-black text-slate-800" oninput="simularPreco(this.value)">
-                            
-                            <div class="bg-indigo-600 text-white rounded-xl p-4 shadow-lg shadow-indigo-200 mt-4">
-                                <p class="text-xs font-medium opacity-80 uppercase tracking-wider mb-1">Preço Sugerido (Bling)</p>
-                                <p class="text-4xl font-black" id="sim-resultado">R$ 104.91</p>
-                                <p class="text-xs mt-2 opacity-90"><i class="fas fa-check-circle"></i> Garante 30% de margem líquida.</p>
-                            </div>
+                            <h3 class="font-bold text-slate-800 mb-4 border-b pb-2">Fórmula Base do Sistema</h3>
+                            <p class="text-xs text-slate-600 mb-4"><strong>Preço Bling Sugerido = </strong> (Custo + Embalagem + Frete) ÷ (1 − Ganho% − Impostos% − Cartão%)</p>
+                            <p class="text-xs text-slate-600">O preço sugerido garante que ao descontar impostos e custos fixos, a sua margem de ganho percentual seja mantida exatamente como planejado.</p>
                         </div>
                     </div>
                 </div>
 
                 <div id="view-automacoes" class="hidden space-y-6">
-                    <h2 class="text-3xl font-black text-slate-800 tracking-tight">AI Automations Core</h2>
-                    <p class="text-slate-500">Módulo de I.A já implementado na etapa anterior está ativo aqui.</p>
+                    <h2 class="text-3xl font-black text-slate-800 tracking-tight flex items-center"><i class="fas fa-microchip text-emerald-600 mr-3"></i> Central I.A.</h2>
+                    <p class="text-slate-500">Módulo SAC Ateliê e Blindagem de IP disponíveis.</p>
+                </div>
+
+                <div id="view-config" class="hidden space-y-6">
+                    <div class="flex justify-between items-end mb-6">
+                        <div>
+                            <h2 class="text-3xl font-black text-slate-800 tracking-tight"><i class="fas fa-cog text-slate-600 mr-2"></i> Configurações do Sistema</h2>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-8">
+                        <div class="glass-panel rounded-2xl p-6">
+                            <h3 class="font-bold text-slate-800 mb-4 border-b pb-2">Conexão Backend Proxy</h3>
+                            <label class="text-xs font-bold text-slate-500 mb-1">URL do Servidor Node.js (Railway)</label>
+                            <input type="text" id="cfg-url" class="ios-input w-full mb-4 text-sm" placeholder="https://seu-app.up.railway.app">
+                            <button onclick="salvarConfig()" class="bg-indigo-600 text-white px-4 py-2 rounded font-bold shadow hover:bg-indigo-700 w-full">Salvar URL</button>
+                        </div>
+                        <div class="glass-panel rounded-2xl p-6">
+                            <h3 class="font-bold text-slate-800 mb-4 border-b pb-2">Log de Sistema</h3>
+                            <div id="log-container" class="h-40 overflow-y-auto bg-slate-900 rounded-lg p-3 text-xs font-mono text-emerald-400 space-y-1">
+                                </div>
+                        </div>
+                    </div>
                 </div>
 
             </div>
         </main>
     </div>
 
-    <div id="modal-produto" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-8">
-        <div class="bg-slate-50 w-full max-w-5xl h-full max-h-[90vh] rounded-2xl shadow-2xl flex flex-col overflow-hidden">
+    <div id="modal-produto" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-6">
+        <div class="bg-slate-50 w-full max-w-6xl h-full max-h-[95vh] rounded-2xl shadow-2xl flex flex-col overflow-hidden">
             <div class="bg-white border-b px-6 py-4 flex justify-between items-center shrink-0">
                 <div>
-                    <h3 class="font-black text-xl text-slate-800" id="modal-nome">Nome do Produto</h3>
-                    <p class="text-sm text-slate-500 font-mono" id="modal-sku">SKU-001</p>
+                    <h3 class="font-black text-xl text-slate-800" id="m-nome">Nome do Produto</h3>
+                    <p class="text-sm text-slate-500 font-mono" id="m-sku">SKU-001</p>
                 </div>
-                <button onclick="fecharModal()" class="text-slate-400 hover:text-rose-500 transition text-2xl"><i class="fas fa-times"></i></button>
+                <div class="flex gap-2">
+                    <button onclick="switchModalTab('mkt')" id="mtab-mkt" class="px-4 py-1.5 rounded bg-indigo-600 text-white font-bold text-sm shadow">Marketplaces</button>
+                    <button onclick="switchModalTab('radar')" id="mtab-radar" class="px-4 py-1.5 rounded bg-slate-200 text-slate-600 font-bold text-sm hover:bg-slate-300">Radar Espião</button>
+                    <button onclick="fecharModal()" class="ml-4 text-slate-400 hover:text-rose-500 transition text-2xl"><i class="fas fa-times"></i></button>
+                </div>
             </div>
             
-            <div class="flex-1 overflow-auto p-6 grid grid-cols-2 gap-8">
-                <div class="space-y-6">
-                    <div class="glass-panel p-5 rounded-xl border border-slate-200 shadow-sm">
-                        <h4 class="font-bold text-slate-800 mb-4 border-b pb-2"><i class="fas fa-tag text-indigo-500 mr-2"></i> Precificação Base</h4>
-                        <div class="space-y-4">
-                            <div><label class="text-xs font-bold text-slate-500">Custo do Produto (R$)</label><input type="number" id="modal-custo" class="ios-input w-full text-lg font-bold"></div>
-                            <div><label class="text-xs font-bold text-slate-500">Preço de Venda Bling (R$)</label><input type="number" id="modal-preco" class="ios-input w-full text-lg font-black text-indigo-600"></div>
-                            <div class="bg-emerald-50 text-emerald-700 p-3 rounded-lg border border-emerald-200 text-sm font-bold flex justify-between"><span>Margem Atual:</span> <span id="modal-margem">42.5%</span></div>
+            <div class="flex-1 overflow-hidden flex">
+                <div class="w-1/3 border-r border-slate-200 bg-white p-6 overflow-y-auto">
+                    <h4 class="font-bold text-slate-800 mb-4 border-b pb-2 text-sm uppercase tracking-wider">Dados Base</h4>
+                    
+                    <div class="space-y-4">
+                        <div><label class="text-xs font-bold text-slate-500">Custo Base (R$)</label><input type="number" id="m-custo" class="ios-input w-full text-base font-bold text-slate-700" oninput="recalcularPreviaModal()"></div>
+                        <div class="bg-slate-50 p-3 rounded-lg border border-slate-200">
+                            <p class="text-xs font-bold text-slate-500">Preço Sugerido Bling (Fórmula)</p>
+                            <p class="text-2xl font-black text-indigo-600" id="m-preco-sug">R$ 0,00</p>
+                        </div>
+                        <div><label class="text-xs font-bold text-slate-500">Preço Bling Atual (R$)</label><input type="number" id="m-preco-atual" class="ios-input w-full text-base font-bold text-slate-800" oninput="recalcularPreviaModal()"></div>
+                        
+                        <div class="bg-emerald-50 text-emerald-700 p-3 rounded-lg border border-emerald-200 text-sm flex justify-between items-center">
+                            <span class="font-bold">Margem Bruta (Atual):</span> <span id="m-margem" class="font-black text-lg">0%</span>
                         </div>
                     </div>
                 </div>
 
-                <div class="space-y-4">
-                    <h4 class="font-bold text-slate-800 mb-2"><i class="fas fa-store text-amber-500 mr-2"></i> Taxas por Marketplace</h4>
+                <div class="flex-1 bg-slate-50/50 p-6 overflow-y-auto" id="modal-content-area">
                     
-                    <div class="bg-white border border-slate-200 rounded-xl p-4 shadow-sm flex flex-col gap-3">
-                        <div class="flex justify-between items-center font-bold text-slate-800"><span class="text-rose-600"><i class="fas fa-shopping-bag mr-1"></i> Shopee</span> <span class="text-lg">R$ 125,90</span></div>
-                        <div class="grid grid-cols-3 gap-2">
-                            <div><label class="text-[10px] text-slate-500 uppercase">Comissão %</label><input type="number" value="14" class="ios-input w-full text-xs"></div>
-                            <div><label class="text-[10px] text-slate-500 uppercase">Fixo R$</label><input type="number" value="3" class="ios-input w-full text-xs"></div>
-                            <div><label class="text-[10px] text-slate-500 uppercase">Devolução %</label><input type="number" value="0.5" class="ios-input w-full text-xs"></div>
+                    <div id="m-view-mkt" class="block">
+                        <div class="flex justify-between items-end mb-4">
+                            <h4 class="font-bold text-slate-800 text-sm uppercase tracking-wider">Simulação por Plataforma</h4>
+                            <p class="text-xs text-slate-500">Baseado no "Preço Bling Atual"</p>
+                        </div>
+                        <div id="container-marketplaces" class="grid grid-cols-2 gap-4"></div>
+                    </div>
+
+                    <div id="m-view-radar" class="hidden">
+                        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+                            <h4 class="font-bold text-slate-800 text-sm uppercase tracking-wider mb-2"><i class="fas fa-radar text-indigo-600 mr-2"></i>Radar Multi-Links</h4>
+                            <p class="text-xs text-slate-500 mb-4">Cole links de concorrentes (Mercado Livre, Nuvemshop) para extrair preços ocultos na estrutura JSON-LD e calcular a margem se você igualar o preço.</p>
+                            <textarea id="radar-urls" rows="4" class="ios-input w-full text-xs font-mono mb-3" placeholder="Cole URLs aqui (uma por linha)..."></textarea>
+                            <button onclick="acionarRadarModal()" id="btn-radar" class="w-full bg-slate-800 text-white font-bold py-2.5 rounded-lg hover:bg-slate-900 transition flex items-center justify-center gap-2"><i class="fas fa-search-dollar"></i> Varrer Concorrentes</button>
+                            
+                            <div id="radar-resultados" class="mt-4 space-y-2"></div>
                         </div>
                     </div>
-                    
-                    <div class="bg-white border border-slate-200 rounded-xl p-4 shadow-sm flex flex-col gap-3">
-                        <div class="flex justify-between items-center font-bold text-slate-800"><span class="text-yellow-500"><i class="fas fa-handshake mr-1"></i> Mercado Livre</span> <span class="text-lg">R$ 130,50</span></div>
-                        <div class="grid grid-cols-2 gap-2">
-                            <div><label class="text-[10px] text-slate-500 uppercase">Comissão %</label><input type="number" value="16" class="ios-input w-full text-xs"></div>
-                            <div><label class="text-[10px] text-slate-500 uppercase">Frete Fixo R$</label><input type="number" value="0" class="ios-input w-full text-xs"></div>
-                        </div>
-                    </div>
+
                 </div>
             </div>
             
-            <div class="bg-slate-100 border-t px-6 py-4 flex justify-end gap-4 shrink-0">
-                <button onclick="fecharModal()" class="px-6 py-2 text-slate-600 font-bold hover:bg-slate-200 rounded-lg transition">Cancelar</button>
-                <button class="px-6 py-2 bg-indigo-600 text-white font-bold rounded-lg hover:bg-indigo-700 transition shadow-lg">Salvar e Recalcular</button>
+            <div class="bg-white border-t px-6 py-4 flex justify-end gap-4 shrink-0 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
+                <button onclick="fecharModal()" class="px-6 py-2 text-slate-600 font-bold hover:bg-slate-100 rounded-lg transition border border-slate-200">Fechar</button>
+                <button onclick="salvarProdutoModal()" class="px-6 py-2 bg-emerald-600 text-white font-bold rounded-lg hover:bg-emerald-700 transition shadow-lg flex items-center gap-2"><i class="fas fa-save"></i> Salvar Produto</button>
             </div>
         </div>
     </div>
 
     <script>
-        // === LÓGICA DE NAVEGAÇÃO E UX ===
-        function mostrarToast(mensagem, tipo = 'sucesso') {
-            const container = document.getElementById('toast-container');
-            const toast = document.createElement('div');
-            const cor = tipo === 'sucesso' ? 'bg-emerald-500' : (tipo === 'aviso' ? 'bg-amber-500' : 'bg-rose-500');
-            const icone = tipo === 'sucesso' ? 'fa-check' : 'fa-info-circle';
-            toast.className = `toast-enter flex items-center gap-3 text-white px-5 py-3 rounded-lg shadow-xl ${cor} max-w-sm`;
-            toast.innerHTML = `<i class="fas ${icone}"></i> <span class="font-medium text-sm">${mensagem}</span>`;
-            container.appendChild(toast);
-            setTimeout(() => { toast.style.opacity = '0'; setTimeout(() => toast.remove(), 300); }, 4000);
+        // --- 1. DADOS BASE E ESTADO ---
+        let API_BASE = localStorage.getItem('sostrass_apibase') || 'http://localhost:3000';
+        let serverOnline = false;
+        let actLog = [];
+        let produtoAtual = null;
+
+        // Custos Globais (A base matemática do sistema)
+        let globalCosts = JSON.parse(localStorage.getItem('sostrass_gc')) || { imposto: 12, embalagem: 3, cartao: 2.5, frete: 0, ganho: 30 };
+        
+        // As taxas estruturadas de marketplace
+        let mpRates = JSON.parse(localStorage.getItem('sostrass_rates')) || {};
+
+        const PLATS = [
+            { id: 'shopee', name: 'Shopee', color: 'text-rose-500', icon: 'fa-shopping-bag', fees: [{ k: 'comissao', l: 'Comissão', u: '%', d: 14 }, { k: 'servico', l: 'Tx. Serviço', u: 'R$', d: 3 }, { k: 'devolucao', l: 'Tx. Dev', u: '%', d: 0.5 }] },
+            { id: 'mercadolivre', name: 'Mercado Livre', color: 'text-yellow-500', icon: 'fa-handshake', fees: [{ k: 'comissao', l: 'Comissão', u: '%', d: 16 }, { k: 'frete', l: 'Frete Fixo', u: 'R$', d: 0 }] },
+            { id: 'tiktok', name: 'TikTok Shop', color: 'text-slate-800', icon: 'fa-tiktok', fees: [{ k: 'comissao', l: 'Comissão', u: '%', d: 5 }, { k: 'fixo', l: 'Fixo', u: 'R$', d: 0 }] },
+            { id: 'shein', name: 'Shein', color: 'text-pink-600', icon: 'fa-tshirt', fees: [{ k: 'comissao', l: 'Comissão', u: '%', d: 18 }] },
+            { id: 'amazon', name: 'Amazon', color: 'text-orange-500', icon: 'fa-amazon', fees: [{ k: 'comissao', l: 'Comissão', u: '%', d: 15 }] },
+            { id: 'nuvemshop', name: 'Nuvemshop', color: 'text-blue-600', icon: 'fa-cloud', fees: [{ k: 'gateway', l: 'Gateway', u: '%', d: 2 }, { k: 'fixo', l: 'Custo Fixo', u: 'R$', d: 0 }] }
+        ];
+
+        // Simulando Banco de Produtos (Puxado do Bling)
+        let products = [
+            { id: 1, sku: 'CX-ORG-30', name: 'Kit 30 Caixas Organizadoras', price: 89.90, cost: 45.00 },
+            { id: 2, sku: 'PER-6MM-BR', name: 'Pérola Branca 6mm (500g)', price: 35.00, cost: 18.00 },
+            { id: 3, sku: 'AL-BICO-01', name: 'Alicate Bico Redondo', price: 28.50, cost: 12.00 }
+        ];
+
+        // --- 2. FÓRMULAS MATEMÁTICAS (Idênticas ao seu original) ---
+        function getBaseCost(prod) {
+            return (prod.cost || 0) + parseFloat(globalCosts.embalagem) + parseFloat(globalCosts.frete);
+        }
+
+        function calcBlingPrice(prod) {
+            const base = getBaseCost(prod);
+            const den = 1 - (parseFloat(globalCosts.ganho) + parseFloat(globalCosts.imposto) + parseFloat(globalCosts.cartao)) / 100;
+            return den > 0 ? base / den : base * 3;
+        }
+
+        // Preço Marketplace: (Preço Bling + taxas fixas) ÷ (1 − comissões%)
+        function calcMktPrice(blingPrice, platId, prodId) {
+            const pl = PLATS.find(x => x.id === platId);
+            if(!pl) return blingPrice;
+            const rates = mpRates[prodId]?.[platId] || {};
+            
+            let pct = 0, fixed = 0;
+            pl.fees.forEach(f => {
+                const v = parseFloat(rates[f.k] ?? f.d) || 0;
+                if (f.u === '%') pct += v; else fixed += v;
+            });
+            
+            let p = blingPrice + fixed;
+            if (pct > 0 && pct < 100) p = p / (1 - pct / 100);
+            return p;
+        }
+
+        function calcMargin(price, totalBaseCost) {
+            return price > 0 ? ((price - totalBaseCost) / price) * 100 : 0;
+        }
+
+        // --- 3. UI UTILITIES ---
+        function mostrarToast(msg, tipo = 'sucesso') {
+            const c = document.getElementById('toast-container');
+            const t = document.createElement('div');
+            const bg = tipo === 'sucesso' ? 'bg-emerald-500' : (tipo === 'aviso' ? 'bg-amber-500' : 'bg-rose-500');
+            t.className = `toast-enter flex items-center gap-3 text-white px-5 py-3 rounded-lg shadow-xl ${bg}`;
+            t.innerHTML = `<i class="fas fa-info-circle"></i> <span class="font-bold text-sm">${msg}</span>`;
+            c.appendChild(t); setTimeout(() => { t.style.opacity='0'; setTimeout(()=>t.remove(),300); }, 3000);
+        }
+
+        function addLog(msg) {
+            const d = new Date().toLocaleTimeString();
+            const c = document.getElementById('log-container');
+            if(c) { c.innerHTML = `<div>[${d}] ${msg}</div>` + c.innerHTML; }
         }
 
         function mudarAba(aba) {
-            ['catalogo', 'massa', 'automacoes', 'simulador'].forEach(a => {
-                const el = document.getElementById(`view-${a}`);
-                const menu = document.getElementById(`menu-${a}`);
-                if(el) el.classList.add('hidden');
-                if(menu) menu.classList.remove('bg-indigo-600', 'text-white', 'shadow-lg');
+            ['catalogo', 'massa', 'automacoes', 'simulador', 'config'].forEach(a => {
+                document.getElementById(`view-${a}`)?.classList.add('hidden');
+                document.getElementById(`menu-${a}`)?.classList.remove('bg-indigo-600', 'text-white', 'shadow-lg');
             });
-            
             document.getElementById(`view-${aba}`).classList.remove('hidden');
-            const ativo = document.getElementById(`menu-${aba}`);
-            if(ativo) ativo.classList.add('bg-indigo-600', 'text-white', 'shadow-lg');
+            document.getElementById(`menu-${aba}`).classList.add('bg-indigo-600', 'text-white', 'shadow-lg');
+            if(aba === 'catalogo') renderCatalogo();
         }
 
-        function abrirModal(nome, sku, custo, preco) {
-            document.getElementById('modal-nome').innerText = nome;
-            document.getElementById('modal-sku').innerText = sku;
-            document.getElementById('modal-custo').value = custo;
-            document.getElementById('modal-preco').value = preco;
-            
-            // Fórmula da Margem Integrada (Bling Price - Custo Base) / Bling Price
-            const margem = (((preco - custo) / preco) * 100).toFixed(1);
-            document.getElementById('modal-margem').innerText = `${margem}%`;
+        // --- 4. RENDERIZAÇÃO PRINCIPAL ---
+        function inicializarUI() {
+            document.getElementById('cfg-url').value = API_BASE;
+            document.getElementById('cg-imp').value = globalCosts.imposto;
+            document.getElementById('cg-cartao').value = globalCosts.cartao;
+            document.getElementById('cg-emb').value = globalCosts.embalagem;
+            document.getElementById('cg-frete').value = globalCosts.frete;
+            document.getElementById('cg-ganho').value = globalCosts.ganho;
+            renderCatalogo();
+            verificarServidor();
+        }
 
+        function renderCatalogo() {
+            const tbody = document.getElementById('tabela-produtos');
+            tbody.innerHTML = '';
+            const query = document.getElementById('buscaGeral').value.toLowerCase();
+
+            products.filter(p => p.sku.toLowerCase().includes(query) || p.name.toLowerCase().includes(query)).forEach(p => {
+                const base = getBaseCost(p);
+                const sug = calcBlingPrice(p);
+                const margem = calcMargin(p.price, base);
+                const corMargem = margem >= 30 ? 'text-emerald-600 bg-emerald-50' : (margem >= 15 ? 'text-amber-600 bg-amber-50' : 'text-rose-600 bg-rose-50');
+
+                tbody.innerHTML += `
+                    <tr class="hover:bg-slate-50 transition border-b border-slate-100 group">
+                        <td class="px-6 py-4"><div class="font-bold text-slate-800">${p.name}</div><div class="text-xs text-slate-400 font-mono">${p.sku}</div></td>
+                        <td class="px-6 py-4 text-right text-slate-500">R$ ${p.cost.toFixed(2)}</td>
+                        <td class="px-6 py-4 text-right">
+                            <div class="font-black text-indigo-600">R$ ${p.price.toFixed(2)}</div>
+                            <div class="text-[10px] text-slate-400">Sug: R$ ${sug.toFixed(2)}</div>
+                        </td>
+                        <td class="px-6 py-4 text-center"><span class="px-2 py-1 rounded text-xs font-bold ${corMargem}">${margem.toFixed(1)}%</span></td>
+                        <td class="px-6 py-4 text-right">
+                            <button onclick="abrirModalProduto(${p.id})" class="bg-white border border-slate-300 text-slate-700 px-4 py-2 rounded-lg text-sm hover:bg-slate-100 font-bold shadow-sm">Configurar</button>
+                        </td>
+                    </tr>`;
+            });
+        }
+
+        // --- 5. LÓGICA DO MODAL & MARKETPLACES ---
+        function abrirModalProduto(id) {
+            produtoAtual = products.find(p => p.id === id);
+            if(!produtoAtual) return;
+
+            document.getElementById('m-nome').innerText = produtoAtual.name;
+            document.getElementById('m-sku').innerText = produtoAtual.sku;
+            document.getElementById('m-custo').value = produtoAtual.cost;
+            document.getElementById('m-preco-atual').value = produtoAtual.price;
+            
+            switchModalTab('mkt'); // Força abrir na aba de MKt
+            recalcularPreviaModal();
             document.getElementById('modal-produto').classList.remove('hidden');
         }
 
-        function fecharModal() {
-            document.getElementById('modal-produto').classList.add('hidden');
+        function fecharModal() { document.getElementById('modal-produto').classList.add('hidden'); produtoAtual = null; }
+
+        function switchModalTab(tab) {
+            document.getElementById('m-view-mkt').classList.add('hidden');
+            document.getElementById('m-view-radar').classList.add('hidden');
+            document.getElementById('mtab-mkt').className = "px-4 py-1.5 rounded bg-slate-200 text-slate-600 font-bold text-sm hover:bg-slate-300";
+            document.getElementById('mtab-radar').className = "px-4 py-1.5 rounded bg-slate-200 text-slate-600 font-bold text-sm hover:bg-slate-300";
+
+            if (tab === 'mkt') {
+                document.getElementById('m-view-mkt').classList.remove('hidden');
+                document.getElementById('mtab-mkt').className = "px-4 py-1.5 rounded bg-indigo-600 text-white font-bold text-sm shadow";
+            } else {
+                document.getElementById('m-view-radar').classList.remove('hidden');
+                document.getElementById('mtab-radar').className = "px-4 py-1.5 rounded bg-indigo-600 text-white font-bold text-sm shadow";
+            }
         }
 
-        function simularPreco(custo) {
-            const custoNum = parseFloat(custo) || 0;
-            // Utilizando a fórmula validada do seu código base: (Custo + Embalagem + Frete) ÷ (1 − Ganho% − Impostos% − Cartão%)
-            const ganho = 30; const impostos = 12; const cartao = 2.5; const emb = 3;
-            const den = 1 - (ganho + impostos + cartao) / 100;
-            const precoSugerido = (custoNum + emb) / den;
-            document.getElementById('sim-resultado').innerText = `R$ ${precoSugerido.toFixed(2)}`;
+        function recalcularPreviaModal() {
+            if(!produtoAtual) return;
+            const tempCost = parseFloat(document.getElementById('m-custo').value) || 0;
+            const tempPrice = parseFloat(document.getElementById('m-preco-atual').value) || 0;
+            
+            // Atualiza base para cálculos do modal
+            const mockProd = { cost: tempCost, price: tempPrice };
+            const base = getBaseCost(mockProd);
+            
+            document.getElementById('m-preco-sug').innerText = `R$ ${calcBlingPrice(mockProd).toFixed(2)}`;
+            const margem = calcMargin(tempPrice, base);
+            document.getElementById('m-margem').innerText = `${margem.toFixed(1)}%`;
+            document.getElementById('m-margem').className = margem >= 30 ? 'font-black text-lg text-emerald-600' : 'font-black text-lg text-rose-600';
+
+            renderMarketplacesModal(mockProd);
         }
 
-        // Simulação de Dados para o Catálogo (Substitua pela chamada real do seu server.js)
-        window.onload = () => {
-            const mockData = [
-                { sku: 'CX-ORG-30', nome: 'Caixa Organizadora 30 Divisórias', custo: 45.00, preco: 89.90, margem: '49%' },
-                { sku: 'PER-6MM', nome: 'Pérola Branca 6mm (500g)', custo: 20.00, preco: 35.00, margem: '42%' }
-            ];
+        function renderMarketplacesModal(mockProd) {
+            const container = document.getElementById('container-marketplaces');
+            container.innerHTML = '';
             
-            const tbody = document.getElementById('tabela-produtos');
-            const mList = document.getElementById('massa-list');
-            
-            mockData.forEach(p => {
-                // Preenche Catálogo
-                tbody.innerHTML += `
-                    <tr class="hover:bg-slate-50 transition border-b border-slate-100 group">
-                        <td class="px-6 py-4"><div class="font-bold text-slate-800">${p.nome}</div><div class="text-xs text-slate-400 font-mono">${p.sku}</div></td>
-                        <td class="px-6 py-4 text-right text-slate-500 font-medium">R$ ${p.custo.toFixed(2)}</td>
-                        <td class="px-6 py-4 text-right font-black text-indigo-600">R$ ${p.preco.toFixed(2)}</td>
-                        <td class="px-6 py-4 text-center"><span class="bg-emerald-100 text-emerald-700 px-2 py-1 rounded text-xs font-bold">${p.margem}</span></td>
-                        <td class="px-6 py-4 text-center text-xs text-slate-400"><i class="fas fa-shopping-bag text-rose-500 mr-2"></i><i class="fas fa-handshake text-yellow-500"></i></td>
-                        <td class="px-6 py-4 text-right"><button onclick="abrirModal('${p.nome}', '${p.sku}', ${p.custo}, ${p.preco})" class="opacity-0 group-hover:opacity-100 bg-white border border-slate-300 text-slate-700 px-4 py-2 rounded-lg text-sm hover:bg-slate-100 font-bold shadow-sm transition">Gerenciar</button></td>
-                    </tr>`;
-                
-                // Preenche lista de Massa
-                mList.innerHTML += `
-                    <div class="flex items-center justify-between p-3 border-b border-slate-200/50 hover:bg-white cursor-pointer transition">
-                        <div class="flex items-center gap-3"><input type="checkbox" class="w-4 h-4 rounded text-indigo-600"><span class="font-mono text-xs text-indigo-600 font-bold">${p.sku}</span><span class="text-sm font-medium text-slate-700">${p.nome}</span></div>
-                        <div class="text-sm font-black text-slate-800">R$ ${p.preco.toFixed(2)}</div>
+            if(!mpRates[produtoAtual.id]) mpRates[produtoAtual.id] = {};
+
+            PLATS.forEach(pl => {
+                const rates = mpRates[produtoAtual.id][pl.id] || {};
+                const precoMkt = calcMktPrice(mockProd.price, pl.id, produtoAtual.id);
+                const margemMkt = calcMargin(precoMkt, getBaseCost(mockProd));
+                const lucroReais = precoMkt - getBaseCost(mockProd);
+
+                let inputsHTML = '';
+                pl.fees.forEach(f => {
+                    const val = rates[f.k] ?? f.d;
+                    inputsHTML += `<div><label class="text-[10px] text-slate-500 uppercase">${f.l} (${f.u})</label>
+                    <input type="number" step="0.1" value="${val}" class="ios-input w-full text-xs" onchange="salvarTaxaMkt(${produtoAtual.id}, '${pl.id}', '${f.k}', this.value)"></div>`;
+                });
+
+                container.innerHTML += `
+                    <div class="bg-white border border-slate-200 rounded-xl p-4 shadow-sm flex flex-col gap-3 transition hover:border-indigo-300">
+                        <div class="flex justify-between items-center font-bold text-slate-800">
+                            <span class="${pl.color}"><i class="fas ${pl.icon} mr-1"></i> ${pl.name}</span>
+                            <span class="text-lg">R$ ${precoMkt.toFixed(2)}</span>
+                        </div>
+                        <div class="grid grid-cols-${pl.fees.length} gap-2">${inputsHTML}</div>
+                        <div class="bg-slate-50 rounded p-2 flex justify-between items-center text-xs">
+                            <span class="text-slate-500">Lucro Mkt:</span>
+                            <span class="font-bold ${margemMkt > 15 ? 'text-emerald-600' : 'text-rose-600'}">R$ ${lucroReais.toFixed(2)} (${margemMkt.toFixed(1)}%)</span>
+                        </div>
                     </div>`;
             });
+        }
 
-            setTimeout(() => {
-                document.getElementById('serverBar').innerHTML = '<i class="fas fa-check-circle"></i> Conectado via server.js';
-                document.getElementById('serverBar').className = "flex items-center gap-2 text-xs font-bold text-emerald-700 bg-emerald-100 px-3 py-1.5 rounded-full border border-emerald-200 shadow-inner";
-                mostrarToast("Conexão com proxy Node.js estabelecida.");
-            }, 1500);
-        };
+        function salvarTaxaMkt(prodId, platId, key, val) {
+            if(!mpRates[prodId]) mpRates[prodId] = {};
+            if(!mpRates[prodId][platId]) mpRates[prodId][platId] = {};
+            mpRates[prodId][platId][key] = parseFloat(val) || 0;
+            localStorage.setItem('sostrass_rates', JSON.stringify(mpRates));
+            recalcularPreviaModal();
+            mostrarToast(`Taxa atualizada no simulador.`);
+        }
+
+        function salvarProdutoModal() {
+            if(!produtoAtual) return;
+            produtoAtual.cost = parseFloat(document.getElementById('m-custo').value) || 0;
+            produtoAtual.price = parseFloat(document.getElementById('m-preco-atual').value) || 0;
+            renderCatalogo();
+            fecharModal();
+            mostrarToast("Produto salvo e preços recalculados!");
+            addLog(`Produto ${produtoAtual.sku} atualizado localmente.`);
+        }
+
+        // --- 6. FUNÇÕES INTEGRADAS (Config / Servidor / Radar) ---
+        function salvarCustosGlobais() {
+            globalCosts.imposto = parseFloat(document.getElementById('cg-imp').value) || 0;
+            globalCosts.cartao = parseFloat(document.getElementById('cg-cartao').value) || 0;
+            globalCosts.embalagem = parseFloat(document.getElementById('cg-emb').value) || 0;
+            globalCosts.frete = parseFloat(document.getElementById('cg-frete').value) || 0;
+            globalCosts.ganho = parseFloat(document.getElementById('cg-ganho').value) || 0;
+            localStorage.setItem('sostrass_gc', JSON.stringify(globalCosts));
+            mostrarToast("Variáveis globais salvas!");
+            renderCatalogo(); // Força update da tabela
+        }
+
+        function salvarConfig() {
+            API_BASE = document.getElementById('cfg-url').value;
+            localStorage.setItem('sostrass_apibase', API_BASE);
+            mostrarToast("URL do Backend Salva.");
+            verificarServidor();
+        }
+
+        async function verificarServidor() {
+            const bar = document.getElementById('serverBar');
+            bar.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Testando Proxy...';
+            try {
+                // Rota raiz simples para testar
+                const r = await fetch(`${API_BASE}/`);
+                if(r.ok) {
+                    serverOnline = true;
+                    bar.innerHTML = '<i class="fas fa-shield-check"></i> API Online';
+                    bar.className = "flex items-center gap-2 text-xs font-bold text-emerald-700 bg-emerald-100 px-3 py-1.5 rounded-full border border-emerald-200 shadow-inner";
+                    addLog("Conexão com servidor proxy estabelecida.");
+                } else throw new Error("Status não ok");
+            } catch(e) {
+                serverOnline = false;
+                bar.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Backend Offline (Modo Local)';
+                bar.className = "flex items-center gap-2 text-xs font-bold text-rose-700 bg-rose-100 px-3 py-1.5 rounded-full border border-rose-200 shadow-inner";
+                addLog("Aviso: Servidor Node.js não responde. Funcionalidades externas desativadas.");
+            }
+        }
+
+        // === O RADAR (ESPIÃO) ===
+        async function acionarRadarModal() {
+            const txt = document.getElementById('radar-urls').value;
+            const urls = txt.split('\n').map(u => u.trim()).filter(u => u !== '');
+            if(urls.length === 0) return mostrarToast("Insira ao menos uma URL.", 'aviso');
+            if(!serverOnline) return mostrarToast("Servidor Offline. Impossível raspar dados.", 'aviso');
+
+            const btn = document.getElementById('btn-radar');
+            const resArea = document.getElementById('radar-resultados');
+            btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Varrendo ${urls.length} links...`;
+            resArea.innerHTML = '';
+
+            try {
+                const res = await fetch(`${API_BASE}/api/scraper/precos-multiplos`, {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ urls })
+                });
+                const data = await res.json();
+                
+                if(data.sucesso) {
+                    const custo = parseFloat(document.getElementById('m-custo').value) || 0;
+                    data.resultados.forEach((item, index) => {
+                        const dominioUrl = new URL(item.url).hostname.replace('www.', '');
+                        if(item.sucesso) {
+                            const precoNum = parseFloat(item.preco.replace(/[^0-9,.]/g, '').replace(',', '.'));
+                            // Usando fórmula simplificada para o Radar (Lucro base local)
+                            const lucro = precoNum - getBaseCost({cost: custo}); 
+                            const margem = ((lucro / precoNum) * 100).toFixed(1);
+                            const cor = margem >= 30 ? 'text-emerald-600' : 'text-rose-600';
+                            
+                            resArea.innerHTML += `
+                                <div class="bg-slate-50 border border-slate-200 rounded p-3 flex justify-between items-center shadow-sm">
+                                    <div><p class="text-[10px] text-slate-400 uppercase">Alvo ${index+1} (${dominioUrl})</p><p class="text-base font-black text-slate-800">R$ ${precoNum.toFixed(2)}</p></div>
+                                    <div class="text-right"><p class="text-[10px] text-slate-500">Se igualar, margem:</p><p class="text-sm font-bold ${cor}">${margem}%</p></div>
+                                </div>`;
+                        } else {
+                            resArea.innerHTML += `<div class="bg-rose-50 border border-rose-100 rounded p-2 text-xs text-rose-600">Alvo ${index+1}: Bloqueado ou Preço oculto</div>`;
+                        }
+                    });
+                }
+            } catch(e) {
+                mostrarToast("Erro na requisição ao servidor.", 'aviso');
+                addLog("Erro de raspagem: " + e.message);
+            }
+            btn.innerHTML = `<i class="fas fa-search-dollar"></i> Varrer Concorrentes`;
+        }
+
+        // Inicia
+        window.onload = inicializarUI;
     </script>
 </body>
 </html>
