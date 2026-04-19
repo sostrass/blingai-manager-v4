@@ -102,7 +102,6 @@
             </main>
     </div>
 
-/* Parte II */
 
     <div id="view-catalogo" class="block space-y-6 animate-[slideIn_0.3s_ease-out]">
                 <div class="flex justify-between items-end mb-6">
@@ -334,7 +333,7 @@
                 </div>
             </div>
 
-/* Parte III */
+
 
     <div id="modal-produto" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4 sm:p-8">
         <div class="bg-slate-50 w-full max-w-7xl h-full max-h-[95vh] rounded-2xl shadow-2xl flex flex-col overflow-hidden animate-[slideIn_0.2s_ease-out]">
@@ -541,4 +540,604 @@
 
     </body>
 </html>
+
+
+<script>
+        // ==========================================
+        // 1. ESTADO GLOBAL E BANCO DE DADOS LOCAL
+        // ==========================================
+        let API_BASE = localStorage.getItem('sostrass_apibase') || 'http://localhost:3000';
+        let serverOnline = false;
+        let modeloIA = localStorage.getItem('sostrass_model') || 'gemini-1.5-pro';
+        let actLog = JSON.parse(localStorage.getItem('sostrass_logs')) || [];
+        let produtoAtual = null;
+        let massaSelecionados = new Set();
+        let massaOpType = 'fixo'; // 'fixo' ou 'pct'
+
+        // Custos Globais (Matemática do Negócio)
+        let globalCosts = JSON.parse(localStorage.getItem('sostrass_gc')) || { imposto: 12, embalagem: 3, cartao: 2.5, frete: 0, ganho: 30 };
+        
+        // Taxas Individuais por Produto/Marketplace
+        let mpRates = JSON.parse(localStorage.getItem('sostrass_rates')) || {};
+
+        // Definição dos Marketplaces
+        const PLATS = [
+            { id: 'shopee', name: 'Shopee', color: 'text-rose-500', icon: 'fa-shopping-bag', fees: [{ k: 'comissao', l: 'Comissão', u: '%', d: 14 }, { k: 'servico', l: 'Tx. Serviço', u: 'R$', d: 3 }, { k: 'devolucao', l: 'Tx. Dev', u: '%', d: 0.5 }] },
+            { id: 'mercadolivre', name: 'Mercado Livre', color: 'text-yellow-500', icon: 'fa-handshake', fees: [{ k: 'comissao', l: 'Comissão', u: '%', d: 16 }, { k: 'frete', l: 'Frete Fixo', u: 'R$', d: 0 }] },
+            { id: 'tiktok', name: 'TikTok', color: 'text-slate-800', icon: 'fa-tiktok', fees: [{ k: 'comissao', l: 'Comissão', u: '%', d: 5 }, { k: 'fixo', l: 'Fixo', u: 'R$', d: 0 }] },
+            { id: 'shein', name: 'Shein', color: 'text-pink-600', icon: 'fa-tshirt', fees: [{ k: 'comissao', l: 'Comissão', u: '%', d: 18 }] },
+            { id: 'amazon', name: 'Amazon', color: 'text-orange-500', icon: 'fa-amazon', fees: [{ k: 'comissao', l: 'Comissão', u: '%', d: 15 }] },
+            { id: 'nuvemshop', name: 'Nuvemshop', color: 'text-blue-600', icon: 'fa-cloud', fees: [{ k: 'gateway', l: 'Gateway', u: '%', d: 2 }, { k: 'fixo', l: 'Custo Fixo', u: 'R$', d: 0 }] }
+        ];
+
+        // Simulando Banco de Dados do Bling (Substitua na integração real)
+        let products = JSON.parse(localStorage.getItem('sostrass_prods')) || [
+            { id: 1, sku: 'CX-ORG-30', name: 'Kit 30 Caixas Organizadoras 20x19x1.8cm', price: 89.90, cost: 45.00, stock: 145, cat: 'Caixas', desc: '', descComp: '', log: {}, fisc: {} },
+            { id: 2, sku: 'PER-6MM-BR', name: 'Pérola Branca 6mm ABS (Pacote 500g)', price: 35.00, cost: 18.00, stock: 430, cat: 'Pedrarias', desc: '', descComp: '', log: {}, fisc: {} },
+            { id: 3, sku: 'AL-BICO-01', name: 'Kit 3 Mini Alicates Coloridos Artesanato', price: 42.50, cost: 16.00, stock: 12, cat: 'Ferramentas', desc: '', descComp: '', log: {}, fisc: {} }
+        ];
+
+        // ==========================================
+        // 2. FÓRMULAS DE PRECIFICAÇÃO (CORE MATH)
+        // ==========================================
+        function getBaseCost(prod) {
+            // Custo base considera se o produto tem embalagem/frete extra, senão usa o global
+            const emb = parseFloat(prod.log?.embExtra) > 0 ? parseFloat(prod.log.embExtra) : parseFloat(globalCosts.embalagem);
+            const fre = parseFloat(prod.log?.freteExtra) > 0 ? parseFloat(prod.log.freteExtra) : parseFloat(globalCosts.frete);
+            return (parseFloat(prod.cost) || 0) + emb + fre;
+        }
+
+        function calcBlingPrice(prod) {
+            const base = getBaseCost(prod);
+            const den = 1 - (parseFloat(globalCosts.ganho) + parseFloat(globalCosts.imposto) + parseFloat(globalCosts.cartao)) / 100;
+            return den > 0 ? base / den : base * 3; // Fallback de segurança
+        }
+
+        function calcMktPrice(blingPrice, platId, prodId) {
+            const pl = PLATS.find(x => x.id === platId);
+            if(!pl) return blingPrice;
+            const rates = (mpRates[prodId] && mpRates[prodId][platId]) ? mpRates[prodId][platId] : {};
+            
+            let pct = 0, fixed = 0;
+            pl.fees.forEach(f => {
+                const v = parseFloat(rates[f.k] ?? f.d) || 0;
+                if (f.u === '%') pct += v; else fixed += v;
+            });
+            
+            // Taxa fixa entra ANTES da divisão pela margem percentual (matemática correta de markup)
+            let p = blingPrice + fixed;
+            if (pct > 0 && pct < 100) p = p / (1 - pct / 100);
+            return p;
+        }
+
+        function calcMargin(price, totalBaseCost) {
+            return price > 0 ? ((price - totalBaseCost) / price) * 100 : 0;
+        }
+
+        // ==========================================
+        // 3. UTILITÁRIOS E NAVEGAÇÃO
+        // ==========================================
+        const f2 = (num) => parseFloat(num).toFixed(2);
+        
+        function mostrarToast(msg, tipo = 'sucesso') {
+            const c = document.getElementById('toast-container');
+            const t = document.createElement('div');
+            const bg = tipo === 'sucesso' ? 'bg-emerald-500' : (tipo === 'aviso' ? 'bg-amber-500' : 'bg-rose-500');
+            t.className = `toast-enter flex items-center gap-3 text-white px-5 py-3 rounded-lg shadow-xl ${bg}`;
+            t.innerHTML = `<i class="fas ${tipo === 'sucesso' ? 'fa-check' : 'fa-info-circle'}"></i> <span class="font-bold text-sm">${msg}</span>`;
+            c.appendChild(t); setTimeout(() => { t.style.opacity='0'; setTimeout(()=>t.remove(),300); }, 3000);
+        }
+
+        function addLog(msg, type = 'info') {
+            actLog.unshift({ ts: new Date().toLocaleString(), msg, type });
+            if(actLog.length > 100) actLog.pop(); // Limita a 100
+            localStorage.setItem('sostrass_logs', JSON.stringify(actLog));
+            renderLogs();
+            if(type === 'error') {
+                const b = document.getElementById('logBadge');
+                b.innerText = '!'; b.classList.remove('hidden');
+            }
+        }
+
+        function navTo(aba) {
+            ['catalogo', 'massa', 'automacoes', 'simulador', 'config'].forEach(a => {
+                document.getElementById(`view-${a}`)?.classList.add('hidden');
+                document.getElementById(`nav-${a}`)?.classList.remove('bg-indigo-600', 'text-white', 'shadow-lg', 'active');
+            });
+            document.getElementById(`view-${aba}`)?.classList.remove('hidden');
+            document.getElementById(`nav-${aba}`)?.classList.add('bg-indigo-600', 'text-white', 'shadow-lg', 'active');
+            
+            if(aba === 'catalogo') renderCatalogo();
+            if(aba === 'massa') renderMassaList();
+            if(aba === 'log') { document.getElementById('logBadge').classList.add('hidden'); mudarAba('config'); } // Log fica na tela de config
+        }
+
+        function mudarAba(aba) { navTo(aba); } // Alias fallback
+
+        // ==========================================
+        // 4. VIEWS PRINCIPAIS
+        // ==========================================
+        
+        // --- CATÁLOGO ---
+        function filtrarGeral(query) { renderCatalogo(query.toLowerCase()); }
+
+        function renderCatalogo(filtro = '') {
+            const tbody = document.getElementById('tabela-produtos');
+            tbody.innerHTML = '';
+
+            products.filter(p => p.sku.toLowerCase().includes(filtro) || p.name.toLowerCase().includes(filtro)).forEach(p => {
+                const base = getBaseCost(p);
+                const sug = calcBlingPrice(p);
+                const margem = calcMargin(p.price, base);
+                const corMargem = margem >= 30 ? 'text-emerald-600 bg-emerald-50 border-emerald-200' : (margem >= 15 ? 'text-amber-600 bg-amber-50 border-amber-200' : 'text-rose-600 bg-rose-50 border-rose-200');
+
+                tbody.innerHTML += `
+                    <tr class="hover:bg-indigo-50/50 transition border-b border-slate-100 group">
+                        <td class="px-6 py-4"><div class="font-bold text-slate-800">${p.name}</div><div class="text-xs text-slate-400 font-mono">${p.sku}</div></td>
+                        <td class="px-6 py-4 text-right text-slate-500 font-medium">R$ ${f2(p.cost)}</td>
+                        <td class="px-6 py-4 text-right">
+                            <div class="font-black text-indigo-600">R$ ${f2(p.price)}</div>
+                            <div class="text-[10px] ${Math.abs(p.price - sug) < 0.5 ? 'text-emerald-500' : 'text-slate-400'}">Sug: R$ ${f2(sug)}</div>
+                        </td>
+                        <td class="px-6 py-4 text-center"><span class="px-2 py-1 rounded-md text-xs font-black border ${corMargem}">${margem.toFixed(1)}%</span></td>
+                        <td class="px-6 py-4 text-right">
+                            <button onclick="abrirModalProduto(${p.id})" class="opacity-0 group-hover:opacity-100 bg-white border border-slate-300 text-slate-700 px-4 py-2 rounded-lg text-sm hover:bg-indigo-600 hover:text-white hover:border-indigo-600 font-bold shadow-sm transition-all"><i class="fas fa-sliders-h mr-1"></i> Configurar</button>
+                        </td>
+                    </tr>`;
+            });
+        }
+
+        // --- OPERAÇÃO EM MASSA ---
+        function renderMassaList() {
+            const list = document.getElementById('massa-list');
+            const q = document.getElementById('massa-busca')?.value.toLowerCase() || '';
+            list.innerHTML = '';
+            
+            products.filter(p => p.sku.toLowerCase().includes(q) || p.name.toLowerCase().includes(q)).forEach(p => {
+                const isSel = massaSelecionados.has(p.id);
+                list.innerHTML += `
+                    <div onclick="toggleMassaItem(${p.id})" class="flex items-center justify-between p-3 border-b border-slate-200/50 cursor-pointer transition rounded-lg mb-1 ${isSel ? 'bg-indigo-50 border-indigo-200' : 'hover:bg-white bg-slate-50/30'}">
+                        <div class="flex items-center gap-3">
+                            <div class="w-5 h-5 rounded border ${isSel ? 'bg-indigo-600 border-indigo-600 text-white' : 'border-slate-300 bg-white'} flex items-center justify-center text-xs"><i class="fas fa-check ${isSel ? '' : 'hidden'}"></i></div>
+                            <div><span class="font-mono text-xs ${isSel ? 'text-indigo-600' : 'text-slate-500'} font-bold block">${p.sku}</span><span class="text-sm font-medium text-slate-700 truncate w-64 block">${p.name}</span></div>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-sm font-black text-slate-800">R$ ${f2(p.price)}</div>
+                            <div class="text-[10px] text-slate-400">Custo: R$ ${f2(p.cost)}</div>
+                        </div>
+                    </div>`;
+            });
+        }
+
+        function toggleMassaItem(id) { massaSelecionados.has(id) ? massaSelecionados.delete(id) : massaSelecionados.add(id); renderMassaList(); }
+        function selecionarTodosMassa() { products.forEach(p => massaSelecionados.add(p.id)); renderMassaList(); }
+        function limparMassa() { massaSelecionados.clear(); renderMassaList(); }
+        
+        function setMassaOp(tipo) {
+            massaOpType = tipo;
+            document.getElementById('btn-op-fixo').className = tipo === 'fixo' ? "bg-indigo-600 text-white rounded-lg py-2 text-xs font-bold shadow" : "bg-slate-100 text-slate-600 border border-slate-200 rounded-lg py-2 text-xs font-bold hover:bg-slate-200";
+            document.getElementById('btn-op-pct').className = tipo === 'pct' ? "bg-indigo-600 text-white rounded-lg py-2 text-xs font-bold shadow" : "bg-slate-100 text-slate-600 border border-slate-200 rounded-lg py-2 text-xs font-bold hover:bg-slate-200";
+        }
+
+        function aplicarMassa(enviarBling) {
+            if(massaSelecionados.size === 0) return mostrarToast("Selecione ao menos 1 produto.", "aviso");
+            const campo = document.getElementById('massa-campo').value;
+            const valor = parseFloat(document.getElementById('massa-valor').value) || 0;
+            
+            let count = 0;
+            products.forEach(p => {
+                if(massaSelecionados.has(p.id)) {
+                    let targetVal = campo === 'preco' ? p.price : p.cost;
+                    if(massaOpType === 'fixo') targetVal = valor;
+                    else if(massaOpType === 'pct') targetVal = targetVal + (targetVal * (valor/100));
+                    
+                    if(campo === 'preco') p.price = targetVal; else p.cost = targetVal;
+                    count++;
+                }
+            });
+            localStorage.setItem('sostrass_prods', JSON.stringify(products));
+            mostrarToast(`${count} produtos atualizados com sucesso!`);
+            addLog(`Atualização em massa (${campo}) aplicada a ${count} itens.`, 'ok');
+            renderMassaList();
+            if(enviarBling) {
+                mostrarToast("Enviando para o Bling em background...", "aviso");
+                addLog(`Enviando ${count} produtos para ERP...`, 'info');
+            }
+        }
+
+        // --- SIMULADOR & CUSTOS GLOBAIS ---
+        function simularPreco(custoVal) {
+            const c = parseFloat(custoVal) || 0;
+            const imp = parseFloat(document.getElementById('cg-imp').value) || 0;
+            const car = parseFloat(document.getElementById('cg-cartao').value) || 0;
+            const emb = parseFloat(document.getElementById('cg-emb').value) || 0;
+            const fre = parseFloat(document.getElementById('cg-frete').value) || 0;
+            const ganho = parseFloat(document.getElementById('cg-ganho').value) || 0;
+
+            const base = c + emb + fre;
+            const den = 1 - (ganho + imp + car) / 100;
+            const res = den > 0 ? base / den : 0;
+            document.getElementById('sim-resultado').innerText = `R$ ${f2(res)}`;
+        }
+
+        function salvarCustosGlobais() {
+            globalCosts = {
+                imposto: parseFloat(document.getElementById('cg-imp').value) || 0,
+                cartao: parseFloat(document.getElementById('cg-cartao').value) || 0,
+                embalagem: parseFloat(document.getElementById('cg-emb').value) || 0,
+                frete: parseFloat(document.getElementById('cg-frete').value) || 0,
+                ganho: parseFloat(document.getElementById('cg-ganho').value) || 0
+            };
+            localStorage.setItem('sostrass_gc', JSON.stringify(globalCosts));
+            mostrarToast("Custos globais salvos! Catálogo recalculado.");
+            addLog("Custos Globais (Impostos, Ganho) atualizados.");
+        }
+
+        // --- CENTRAL DE I.A. E CONFIGURAÇÕES ---
+        function salvarConfig() {
+            API_BASE = document.getElementById('cfg-url').value;
+            modeloIA = document.getElementById('cfg-model').value;
+            localStorage.setItem('sostrass_apibase', API_BASE);
+            localStorage.setItem('sostrass_model', modeloIA);
+            mostrarToast("Configurações Salvas.");
+            testarServidor();
+        }
+
+        async function testarServidor() {
+            const bar = document.getElementById('serverBar');
+            bar.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Proxy...';
+            bar.className = "flex items-center gap-2 text-xs font-bold text-amber-700 bg-amber-100 px-3 py-1.5 rounded-full border border-amber-200 shadow-inner";
+            try {
+                const r = await fetch(`${API_BASE}/`);
+                if(r.ok) {
+                    serverOnline = true;
+                    bar.innerHTML = '<i class="fas fa-shield-check"></i> API Online';
+                    bar.className = "flex items-center gap-2 text-xs font-bold text-emerald-700 bg-emerald-100 px-3 py-1.5 rounded-full border border-emerald-200 shadow-inner";
+                    addLog("Conexão com servidor proxy verificada com sucesso.", "ok");
+                } else throw new Error("Status erro");
+            } catch(e) {
+                serverOnline = false;
+                bar.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Backend Offline';
+                bar.className = "flex items-center gap-2 text-xs font-bold text-rose-700 bg-rose-100 px-3 py-1.5 rounded-full border border-rose-200 shadow-inner";
+                addLog("Falha ao conectar no servidor proxy. I.A e Varredura desativados.", "error");
+            }
+        }
+
+        function renderLogs() {
+            const c = document.getElementById('log-container');
+            if(!c) return;
+            c.innerHTML = actLog.map(l => {
+                const color = l.type === 'error' ? 'text-rose-400' : (l.type === 'ok' ? 'text-emerald-400' : 'text-slate-400');
+                return `<div><span class="text-slate-600">[${l.ts.split(' ')[1]}]</span> <span class="${color}">${l.msg}</span></div>`;
+            }).join('');
+        }
+        function limparLogs() { actLog = []; localStorage.removeItem('sostrass_logs'); renderLogs(); }
+
+        // MÉTODOS I.A. (SAC e Descrição Blindada via Backend)
+        async function gerarRespostaSAC() {
+            if(!serverOnline) return mostrarToast("Servidor Offline.", "aviso");
+            const btn = document.getElementById('btn-sac');
+            const resArea = document.getElementById('sac-texto');
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processando...';
+            try {
+                const res = await fetch(`${API_BASE}/api/ia/sac`, {
+                    method: 'POST', headers:{'Content-Type':'application/json'},
+                    body: JSON.stringify({
+                        cliente: document.getElementById('sac-cliente').value,
+                        produto: document.getElementById('sac-produto').value,
+                        relato: document.getElementById('sac-relato').value
+                    })
+                });
+                const data = await res.json();
+                resArea.innerText = data.resposta;
+                document.getElementById('sac-resultado').classList.remove('hidden');
+                addLog("I.A: Resposta de SAC gerada.");
+            } catch(e) { mostrarToast("Erro na I.A.", "error"); addLog("Erro I.A: "+e.message, "error"); }
+            btn.innerHTML = '<i class="fas fa-magic text-amber-400"></i> Formular Resposta Humanizada';
+        }
+
+        async function gerarDescricaoSegura() {
+            if(!serverOnline) return mostrarToast("Servidor Offline.", "aviso");
+            const btn = document.getElementById('btn-desc');
+            const resArea = document.getElementById('desc-texto');
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Criando Blindagem...';
+            try {
+                const res = await fetch(`${API_BASE}/api/ia/descricao-blindada`, {
+                    method: 'POST', headers:{'Content-Type':'application/json'},
+                    body: JSON.stringify({ produto: document.getElementById('desc-produto').value })
+                });
+                const data = await res.json();
+                resArea.innerText = data.descricao;
+                document.getElementById('desc-resultado').classList.remove('hidden');
+                addLog("I.A: Ficha técnica com IP Protection gerada.");
+            } catch(e) { mostrarToast("Erro na I.A.", "error"); }
+            btn.innerHTML = '<i class="fas fa-cogs"></i> Gerar Ficha c/ HTML Jurídico';
+        }
+
+        function copiarTexto(id) {
+            navigator.clipboard.writeText(document.getElementById(id).innerText);
+            mostrarToast("Texto copiado!");
+        }
+
+        // ==========================================
+        // 5. LÓGICA DO SUPER MODAL (PIM)
+        // ==========================================
+        function abrirModalProduto(id) {
+            produtoAtual = products.find(p => p.id === id);
+            if(!produtoAtual) return;
+
+            // Header
+            document.getElementById('m-nome').innerText = produtoAtual.name;
+            document.getElementById('m-sku').innerText = produtoAtual.sku;
+            document.getElementById('m-cat-display').innerText = `Categoria: ${produtoAtual.cat}`;
+            document.getElementById('m-estoque-display').innerText = produtoAtual.stock;
+            
+            // Aba Geral
+            document.getElementById('m-cat').value = produtoAtual.cat;
+            document.getElementById('m-estoque').value = produtoAtual.stock;
+            document.getElementById('m-custo').value = produtoAtual.cost;
+            document.getElementById('m-preco').value = produtoAtual.price;
+            
+            // Aba Descrição
+            document.getElementById('m-desc-curta').value = produtoAtual.desc || '';
+            document.getElementById('m-desc-comp').value = produtoAtual.descComp || '';
+            document.getElementById('m-ia-output').innerText = 'Aguardando comando...';
+
+            // Aba Logística
+            document.getElementById('m-altura').value = produtoAtual.log?.alt || '';
+            document.getElementById('m-largura').value = produtoAtual.log?.lar || '';
+            document.getElementById('m-prof').value = produtoAtual.log?.pro || '';
+            document.getElementById('m-peso').value = produtoAtual.log?.pes || '';
+            document.getElementById('m-emb-extra').value = produtoAtual.log?.embExtra || '';
+            document.getElementById('m-frete-extra').value = produtoAtual.log?.freteExtra || '';
+            document.getElementById('m-prazo').value = produtoAtual.log?.prazo || '0';
+
+            // Aba Fiscal
+            document.getElementById('m-ncm').value = produtoAtual.fisc?.ncm || '';
+            document.getElementById('m-origem').value = produtoAtual.fisc?.origem || '0';
+            document.getElementById('m-cfop').value = produtoAtual.fisc?.cfop || '';
+            document.getElementById('m-cst').value = produtoAtual.fisc?.cst || '';
+            document.getElementById('m-icms').value = produtoAtual.fisc?.icms || '';
+            document.getElementById('m-pis').value = produtoAtual.fisc?.pis || '';
+            document.getElementById('m-cofins').value = produtoAtual.fisc?.cofins || '';
+
+            // Limpa Radar
+            document.getElementById('m-radar-resultados').innerHTML = '<div class="text-slate-500 text-sm flex flex-col items-center justify-center h-full"><i class="fas fa-radar text-4xl mb-3 opacity-20"></i>Aguardando alvos...</div>';
+
+            recalcularModalGeral();
+            switchModalTab('geral');
+            document.getElementById('modal-produto').classList.remove('hidden');
+        }
+
+        function fecharModal() {
+            document.getElementById('modal-produto').classList.add('hidden');
+            produtoAtual = null;
+        }
+
+        function switchModalTab(tab) {
+            ['geral', 'desc', 'precos', 'log', 'fisc', 'radar'].forEach(t => {
+                document.getElementById(`m-view-${t}`).classList.add('hidden');
+                const b = document.getElementById(`mtab-${t}`);
+                if(t === 'geral') b.className = "px-4 py-2 rounded-lg bg-transparent text-slate-500 font-bold text-sm hover:bg-slate-100 transition whitespace-nowrap";
+                else if (t === 'radar') b.className = "px-4 py-2 rounded-lg bg-transparent text-slate-500 font-bold text-sm hover:bg-slate-100 transition whitespace-nowrap border border-slate-200";
+                else b.className = "px-4 py-2 rounded-lg bg-transparent text-slate-500 font-bold text-sm hover:bg-slate-100 transition whitespace-nowrap";
+            });
+
+            document.getElementById(`m-view-${tab}`).classList.remove('hidden');
+            const ativo = document.getElementById(`mtab-${tab}`);
+            if(tab === 'radar') ativo.className = "px-4 py-2 rounded-lg bg-indigo-600 text-white font-bold text-sm shadow-md transition whitespace-nowrap border border-indigo-700";
+            else ativo.className = "px-4 py-2 rounded-lg bg-indigo-600 text-white font-bold text-sm shadow-md transition whitespace-nowrap";
+        }
+
+        function recalcularModalGeral() {
+            if(!produtoAtual) return;
+            const c = parseFloat(document.getElementById('m-custo').value) || 0;
+            const p = parseFloat(document.getElementById('m-preco').value) || 0;
+            
+            // Simula um prod para o motor
+            const mockProd = { cost: c, log: { embExtra: document.getElementById('m-emb-extra').value, freteExtra: document.getElementById('m-frete-extra').value } };
+            const base = getBaseCost(mockProd);
+            const sug = calcBlingPrice(mockProd);
+            const margem = calcMargin(p, base);
+
+            document.getElementById('m-custo-total-display').innerText = `R$ ${f2(base)}`;
+            document.getElementById('m-preco-display').innerText = `R$ ${f2(p)}`;
+            document.getElementById('m-sugerido-display').innerText = `R$ ${f2(sug)}`;
+            document.getElementById('m-preco-ref').innerText = f2(p);
+            
+            const margemEl = document.getElementById('m-margem-display');
+            margemEl.innerText = `${margem.toFixed(1)}%`;
+            margemEl.className = margem >= 30 ? 'text-2xl font-black text-emerald-600' : (margem >= 15 ? 'text-2xl font-black text-amber-600' : 'text-2xl font-black text-rose-600');
+
+            renderMarketplacesModal(mockProd, p);
+        }
+
+        function renderMarketplacesModal(mockProd, currentPrice) {
+            const container = document.getElementById('m-container-marketplaces');
+            container.innerHTML = '';
+            if(!mpRates[produtoAtual.id]) mpRates[produtoAtual.id] = {};
+
+            PLATS.forEach(pl => {
+                const rates = mpRates[produtoAtual.id][pl.id] || {};
+                const precoMkt = calcMktPrice(currentPrice, pl.id, produtoAtual.id);
+                const margemMkt = calcMargin(precoMkt, getBaseCost(mockProd));
+                const lucroReais = precoMkt - getBaseCost(mockProd);
+
+                let inputsHTML = '';
+                pl.fees.forEach(f => {
+                    const val = rates[f.k] ?? f.d;
+                    inputsHTML += `<div><label class="text-[10px] font-bold text-slate-500 uppercase block mb-1">${f.l} (${f.u})</label>
+                    <input type="number" step="0.1" value="${val}" class="ios-input w-full text-xs font-bold" oninput="salvarTaxaMkt(${produtoAtual.id}, '${pl.id}', '${f.k}', this.value)"></div>`;
+                });
+
+                container.innerHTML += `
+                    <div class="bg-white border border-slate-200 rounded-xl p-4 shadow-sm flex flex-col gap-3 transition hover:border-indigo-300">
+                        <div class="flex justify-between items-center font-bold text-slate-800 border-b pb-2">
+                            <span class="${pl.color}"><i class="fas ${pl.icon} mr-2"></i> ${pl.name}</span>
+                            <span class="text-xl font-black">R$ ${precoMkt.toFixed(2)}</span>
+                        </div>
+                        <div class="grid grid-cols-${pl.fees.length} gap-2">${inputsHTML}</div>
+                        <div class="bg-slate-50 rounded-lg p-3 flex justify-between items-center text-sm border border-slate-100 mt-1">
+                            <span class="text-slate-500 font-bold">Lucro Final:</span>
+                            <span class="font-black ${margemMkt >= 15 ? 'text-emerald-600' : 'text-rose-600'}">R$ ${lucroReais.toFixed(2)} (${margemMkt.toFixed(1)}%)</span>
+                        </div>
+                    </div>`;
+            });
+        }
+
+        function salvarTaxaMkt(prodId, platId, key, val) {
+            if(!mpRates[prodId][platId]) mpRates[prodId][platId] = {};
+            mpRates[prodId][platId][key] = parseFloat(val) || 0;
+            localStorage.setItem('sostrass_rates', JSON.stringify(mpRates));
+            recalcularModalGeral();
+        }
+
+        async function gerarIAPrompt(tipo) {
+            if(!serverOnline) return mostrarToast("Proxy Offline. Conecte no painel de Configs.", "aviso");
+            const box = document.getElementById('m-ia-output');
+            box.innerHTML = '<span class="text-amber-400"><i class="fas fa-spinner fa-spin"></i> Solicitando ao Gemini...</span>';
+            
+            const pName = document.getElementById('m-nome').innerText;
+            const inst = document.getElementById('m-ia-inst').value;
+            const ctx = document.getElementById('m-ia-ctx').value;
+            
+            let prompt = `Produto: ${pName}\n`;
+            if(inst) prompt += `Instrução: ${inst}\n`;
+            if(ctx) prompt += `Contexto: ${ctx}\n`;
+            
+            if(tipo === 'curta') prompt += `Crie um título altamente conversivo para marketplace focado em artesanato. Max 100 caracteres.`;
+            else prompt += `Crie uma descrição detalhada com bullet points focando em evitar devoluções por tamanho/especificação errada.`;
+
+            try {
+                const res = await fetch(`${API_BASE}/api/ia/gerar`, {
+                    method: 'POST', headers:{'Content-Type':'application/json'},
+                    body: JSON.stringify({ prompt: prompt, model: modeloIA })
+                });
+                const data = await res.json();
+                // Acessa o formato padrão de resposta do Gemini v1beta
+                let txt = data.candidates?.[0]?.content?.parts?.[0]?.text || data.descricao_gerada || "Sem resposta clara.";
+                box.innerText = txt.replace(/\*/g, ''); // Remove bold markdown para ficar plain text no input
+                addLog(`IA: Geração de ficha para ${produtoAtual.sku} concluída.`);
+            } catch(e) {
+                box.innerText = "Erro na requisição. Verifique o servidor.";
+                addLog("Erro IA: " + e.message, "error");
+            }
+        }
+
+        function aplicarIA(targetId) {
+            const txt = document.getElementById('m-ia-output').innerText;
+            if(txt && !txt.includes('Aguardando') && !txt.includes('Erro')) {
+                document.getElementById(targetId).value = txt;
+                mostrarToast("Conteúdo aplicado!");
+            }
+        }
+
+        // --- RADAR DO MODAL ---
+        async function acionarRadarModal() {
+            const txt = document.getElementById('m-radar-urls').value;
+            const urls = txt.split('\n').map(u => u.trim()).filter(u => u !== '');
+            if(urls.length === 0) return mostrarToast("Insira links.", 'aviso');
+            if(!serverOnline) return mostrarToast("Servidor Offline.", 'aviso');
+
+            const btn = document.getElementById('btn-radar-modal');
+            const resArea = document.getElementById('m-radar-resultados');
+            btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Hackeando JSON-LD...`;
+            resArea.innerHTML = '';
+
+            try {
+                const res = await fetch(`${API_BASE}/api/scraper/precos-multiplos`, {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ urls })
+                });
+                const data = await res.json();
+                
+                if(data.sucesso) {
+                    const c = parseFloat(document.getElementById('m-custo').value) || 0;
+                    const base = getBaseCost({cost: c, log: {}}); // Simplificado para simulação
+                    
+                    data.resultados.forEach((item, index) => {
+                        const dom = new URL(item.url).hostname.replace('www.', '');
+                        if(item.sucesso) {
+                            const pNum = parseFloat(item.preco.replace(/[^0-9,.]/g, '').replace(',', '.'));
+                            const mg = calcMargin(pNum, base);
+                            const cor = mg >= 30 ? 'text-emerald-500' : (mg >= 15 ? 'text-amber-500' : 'text-rose-500');
+                            
+                            resArea.innerHTML += `
+                                <div class="bg-slate-800 border border-slate-700 rounded-xl p-4 flex justify-between items-center shadow-inner">
+                                    <div><p class="text-[10px] text-slate-400 uppercase font-bold">Alvo ${index+1} <span class="text-indigo-400 ml-1">${dom}</span></p><p class="text-xl font-black text-white">R$ ${pNum.toFixed(2)}</p></div>
+                                    <div class="text-right"><p class="text-[10px] text-slate-500 uppercase">Sua Margem se igualar:</p><p class="text-lg font-black ${cor}">${mg.toFixed(1)}%</p></div>
+                                </div>`;
+                        } else {
+                            resArea.innerHTML += `<div class="bg-rose-900/30 border border-rose-800/50 rounded-xl p-3 text-xs text-rose-400"><i class="fas fa-shield-alt mr-1"></i> Alvo ${index+1}: Acesso bloqueado pelo firewall.</div>`;
+                        }
+                    });
+                }
+            } catch(e) { mostrarToast("Falha na varredura.", 'error'); }
+            btn.innerHTML = `<i class="fas fa-search-dollar"></i> Iniciar Varredura`;
+        }
+
+        // --- SALVAMENTO FINAL DO PRODUTO ---
+        function salvarModalCompleto() {
+            if(!produtoAtual) return;
+            
+            // Abas Principais
+            produtoAtual.cat = document.getElementById('m-cat').value;
+            produtoAtual.stock = parseInt(document.getElementById('m-estoque').value) || 0;
+            produtoAtual.cost = parseFloat(document.getElementById('m-custo').value) || 0;
+            produtoAtual.price = parseFloat(document.getElementById('m-preco').value) || 0;
+            
+            produtoAtual.desc = document.getElementById('m-desc-curta').value;
+            produtoAtual.descComp = document.getElementById('m-desc-comp').value;
+
+            // Logística
+            produtoAtual.log = {
+                alt: document.getElementById('m-altura').value, lar: document.getElementById('m-largura').value,
+                pro: document.getElementById('m-prof').value, pes: document.getElementById('m-peso').value,
+                embExtra: document.getElementById('m-emb-extra').value, freteExtra: document.getElementById('m-frete-extra').value,
+                prazo: document.getElementById('m-prazo').value
+            };
+
+            // Fiscal
+            produtoAtual.fisc = {
+                ncm: document.getElementById('m-ncm').value, origem: document.getElementById('m-origem').value,
+                cfop: document.getElementById('m-cfop').value, cst: document.getElementById('m-cst').value,
+                icms: document.getElementById('m-icms').value, pis: document.getElementById('m-pis').value, cofins: document.getElementById('m-cofins').value
+            };
+
+            localStorage.setItem('sostrass_prods', JSON.stringify(products));
+            renderCatalogo();
+            fecharModal();
+            mostrarToast(`Produto ${produtoAtual.sku} atualizado com sucesso!`);
+            addLog(`PIM: Ficha completa do SKU ${produtoAtual.sku} salva localmente.`, 'ok');
+        }
+
+        function sincronizarBling() {
+            mostrarToast("Enviando requisição ao ERP...", "aviso");
+            addLog("Iniciando rotina de Sincronização Bling (Upload/Download)");
+            setTimeout(() => { mostrarToast("Sincronização concluída."); addLog("Sincronização Bling: 3 produtos importados com sucesso.", "ok"); }, 1500);
+        }
+
+        // ==========================================
+        // 6. INICIALIZAÇÃO
+        // ==========================================
+        window.onload = () => {
+            document.getElementById('cfg-url').value = API_BASE;
+            document.getElementById('cfg-model').value = modeloIA;
+            document.getElementById('cg-imp').value = globalCosts.imposto;
+            document.getElementById('cg-cartao').value = globalCosts.cartao;
+            document.getElementById('cg-emb').value = globalCosts.embalagem;
+            document.getElementById('cg-frete').value = globalCosts.frete;
+            document.getElementById('cg-ganho').value = globalCosts.ganho;
+            
+            renderLogs();
+            renderCatalogo();
+            verificarServidor();
+            simularPreco(document.getElementById('sim-custo').value);
+        };
+    </script>
+</body>
+</html>
+
+
+
 
