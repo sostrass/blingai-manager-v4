@@ -6,7 +6,6 @@
     <title>Sóstrass AI Enterprise v6.0</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
         * { box-sizing: border-box; font-family: 'Inter', system-ui, sans-serif; }
@@ -14,36 +13,22 @@
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
         ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        
         .glass-panel { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.6); box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); }
-        .ios-input { background: rgba(241, 245, 249, 0.7); border: 1px solid #e2e8f0; border-radius: 10px; padding: 8px 12px; transition: all 0.2s; outline: none; color: #1e293b; font-size: 13px; font-family: inherit; }
+        .ios-input { background: rgba(241, 245, 249, 0.7); border: 1px solid #e2e8f0; border-radius: 10px; padding: 10px 14px; transition: all 0.2s; outline: none; color: #1e293b; font-size: 13px; font-family: inherit; }
         .ios-input:focus { border-color: #6366f1; background: #fff; box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15); }
+        
         @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
         .toast-enter { animation: slideIn 0.3s ease-out forwards; }
         
-        /* Custom Scrollbars */
-        ::-webkit-scrollbar { width: 6px; height: 6px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
-        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
-
-        /* Glassmorphism & Enterprise UI */
-        .glass-panel { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.6); box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); }
-        .ios-input { background: rgba(241, 245, 249, 0.7); border: 1px solid #e2e8f0; border-radius: 10px; padding: 10px 14px; transition: all 0.2s; outline: none; color: #1e293b; font-size: 13px; }
-        .ios-input:focus { border-color: #6366f1; background: #fff; box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15); }
-        
-        /* Animations */
-        @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
-        .toast-enter { animation: slideIn 0.3s ease-out forwards; }
-        
-        /* Drag & Drop */
-        .drag-zone { display: flex; flex-direction: column; gap: 8px; }
+        /* Drag & Drop Panels */
         .drag-panel { transition: border-color 0.15s, opacity 0.15s; }
         .drag-panel.dragging { opacity: 0.5; border: 2px dashed #6366f1; }
         .drag-panel.drag-over { border-color: #22d3a5; background: rgba(34, 211, 165, 0.04); }
         .dp-handle { cursor: grab; user-select: none; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #e2e8f0; padding: 10px 16px; background: rgba(248, 250, 252, 0.5); border-radius: 12px 12px 0 0; }
         .dp-handle:active { cursor: grabbing; }
 
-       /* Tooltips */
+        /* Tooltips */
         .tip { position: relative; display: inline-flex; }
         .tip .tip-text { display: none; position: absolute; bottom: calc(100% + 5px); left: 50%; transform: translateX(-50%); background: #1e293b; border: 1px solid #334155; border-radius: 8px; padding: 8px 12px; font-size: 11px; color: #cbd5e1; z-index: 200; line-height: 1.5; min-width: 220px; white-space: normal; pointer-events: none; text-align: center; }
         .tip:hover .tip-text { display: block; }
@@ -63,26 +48,23 @@
         
         <div class="flex-1 overflow-y-auto py-6 px-3 space-y-1">
             <p class="px-3 text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2">Operacional</p>
-            <button onclick="navTo('catalogo')" id="nav-catalogo" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 text-white bg-indigo-600 rounded-lg font-medium transition shadow-lg shadow-indigo-900/20 active">
+            <button onclick="navTo('catalogo')" id="nav-catalogo" class="w-full flex items-center gap-3 px-3 py-2.5 text-white bg-indigo-600 rounded-lg font-medium transition shadow-lg shadow-indigo-900/20">
                 <i class="fas fa-box-open w-5 text-center"></i> Catálogo ERP
             </button>
-            <button onclick="navTo('massa')" id="nav-massa" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 hover:text-white hover:bg-slate-800 rounded-lg transition">
+            <button onclick="navTo('massa')" id="nav-massa" class="w-full flex items-center gap-3 px-3 py-2.5 hover:text-white hover:bg-slate-800 rounded-lg transition">
                 <i class="fas fa-bolt text-amber-400 w-5 text-center"></i> Op. em Massa
             </button>
-            <button onclick="navTo('automacoes')" id="nav-automacoes" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 hover:text-white hover:bg-slate-800 rounded-lg transition">
+            <button onclick="navTo('automacoes')" id="nav-automacoes" class="w-full flex items-center gap-3 px-3 py-2.5 hover:text-white hover:bg-slate-800 rounded-lg transition">
                 <i class="fas fa-robot text-emerald-400 w-5 text-center"></i> Central de I.A.
             </button>
 
             <div class="my-4 border-t border-slate-800"></div>
             <p class="px-3 text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2">Estratégia & Sistema</p>
-            <button onclick="navTo('simulador')" id="nav-simulador" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 hover:text-white hover:bg-slate-800 rounded-lg transition">
+            <button onclick="navTo('simulador')" id="nav-simulador" class="w-full flex items-center gap-3 px-3 py-2.5 hover:text-white hover:bg-slate-800 rounded-lg transition">
                 <i class="fas fa-globe w-5 text-center"></i> Precificação Global
             </button>
-            <button onclick="navTo('log')" id="nav-log" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 hover:text-white hover:bg-slate-800 rounded-lg transition">
-                <i class="fas fa-clipboard-list w-5 text-center"></i> Log de Atividades <span id="logBadge" class="hidden ml-auto bg-rose-500 text-white text-[9px] px-2 py-0.5 rounded-full font-bold"></span>
-            </button>
-            <button onclick="navTo('config')" id="nav-config" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 hover:text-white hover:bg-slate-800 rounded-lg transition">
-                <i class="fas fa-cog w-5 text-center"></i> Configurações
+            <button onclick="navTo('config')" id="nav-config" class="w-full flex items-center gap-3 px-3 py-2.5 hover:text-white hover:bg-slate-800 rounded-lg transition">
+                <i class="fas fa-cog w-5 text-center"></i> Config & Logs
             </button>
         </div>
 
@@ -94,33 +76,28 @@
     </aside>
 
     <div class="flex-1 flex flex-col min-w-0 relative">
-        
         <header class="h-16 glass-panel flex items-center justify-between px-8 z-10 sticky top-0 border-b border-slate-200">
             <div class="flex-1 max-w-2xl flex items-center relative">
                 <i class="fas fa-search absolute left-4 text-slate-400"></i>
-                <input type="text" id="buscaUniversal" placeholder="Buscar por SKU, nome ou código de barras..." class="w-full ios-input pl-11" oninput="filtrarGeral(this.value)">
+                <input type="text" id="buscaUniversal" placeholder="Buscar por SKU, nome ou código..." class="w-full ios-input pl-11" oninput="renderCatalogo(this.value)">
             </div>
             <div class="flex items-center gap-4 ml-6">
-                <div id="serverBar" class="flex items-center gap-2 text-xs font-bold text-amber-700 bg-amber-100 px-3 py-1.5 rounded-full border border-amber-200 shadow-inner transition-colors">
-                    <i class="fas fa-circle-notch fa-spin"></i> Conectando Proxy...
+                <div id="serverBar" class="flex items-center gap-2 text-xs font-bold text-amber-700 bg-amber-100 px-3 py-1.5 rounded-full border border-amber-200 shadow-inner">
+                    <i class="fas fa-circle-notch fa-spin"></i> Proxy...
                 </div>
             </div>
         </header>
 
         <main class="flex-1 overflow-auto p-8 relative" id="main-container">
             
-            </main>
-    </div>
-
-
-    <div id="view-catalogo" class="block space-y-6 animate-[slideIn_0.3s_ease-out]">
+            <div id="view-catalogo" class="block space-y-6 animate-[slideIn_0.3s_ease-out]">
                 <div class="flex justify-between items-end mb-6">
                     <div>
                         <h2 class="text-3xl font-black text-slate-800 tracking-tight">Catálogo ERP</h2>
-                        <p class="text-slate-500 mt-1">Gerenciamento com cálculo real de margem (Bling vs. Marketplaces).</p>
+                        <p class="text-slate-500 mt-1">Gerenciamento individualizado e cálculo real de margem.</p>
                     </div>
                 </div>
-                <div class="glass-panel rounded-2xl overflow-hidden">
+                <div class="glass-panel rounded-2xl overflow-hidden shadow-sm">
                     <table class="w-full text-left text-sm whitespace-nowrap">
                         <thead class="bg-slate-100/80 border-b border-slate-200 text-slate-500 uppercase text-[10px] tracking-wider font-black">
                             <tr>
@@ -131,13 +108,12 @@
                                 <th class="px-6 py-4 text-right">Ações</th>
                             </tr>
                         </thead>
-                        <tbody id="tabela-produtos" class="divide-y divide-slate-100">
-                            </tbody>
+                        <tbody id="tabela-produtos" class="divide-y divide-slate-100"></tbody>
                     </table>
                 </div>
             </div>
 
-                <div id="view-massa" class="hidden space-y-6">
+            <div id="view-massa" class="hidden space-y-6">
                 <div class="flex justify-between items-end mb-6">
                     <div>
                         <h2 class="text-3xl font-black text-slate-800 tracking-tight text-amber-600 flex items-center gap-3"><i class="fas fa-bolt"></i> Atualização em Massa</h2>
@@ -155,30 +131,25 @@
                             <button onclick="massaSelAll()" class="bg-slate-100 text-slate-600 px-3 py-1.5 rounded-lg text-sm font-bold border border-slate-200 hover:bg-slate-200">Sel. Todos</button>
                             <button onclick="massaSelNone()" class="bg-white text-slate-500 px-3 py-1.5 rounded-lg text-sm font-bold border border-slate-200 hover:bg-slate-50">Limpar</button>
                         </div>
-                        
                         <div class="bg-slate-800 text-slate-300 text-[10px] uppercase tracking-wider font-bold p-3 grid grid-cols-[30px_80px_1fr_80px_80px_60px_100px] gap-2 items-center">
-                            <span></span><span>SKU</span><span>Produto</span><span class="text-right">Preço Bling</span><span class="text-right">Custo Base</span><span class="text-right">Margem</span><span>Plataformas</span>
+                            <span></span><span>SKU</span><span>Produto</span><span class="text-right">Preço Bling</span><span class="text-right">Custo Base</span><span class="text-right">Margem</span><span>Marketplaces</span>
                         </div>
-                        
-                        <div class="flex-1 overflow-y-auto bg-white border border-slate-200 border-t-0 rounded-b-2xl shadow-sm" id="massa-list">
-                            </div>
+                        <div class="flex-1 overflow-y-auto bg-white border border-slate-200 border-t-0 rounded-b-2xl shadow-sm" id="massa-list"></div>
                     </div>
 
-                    <div class="glass-panel rounded-2xl p-6 flex flex-col">
+                    <div class="glass-panel rounded-2xl p-6 flex flex-col relative overflow-hidden">
+                        <div class="absolute top-0 left-0 w-full h-1 bg-amber-400"></div>
                         <div class="text-[10px] text-slate-400 uppercase font-bold tracking-wider mb-4">✏️ O que editar?</div>
                         
                         <div class="flex flex-wrap gap-2 mb-4">
                             <button class="px-3 py-1.5 rounded-lg text-xs font-bold border border-indigo-600 bg-indigo-600 text-white" id="btn-m-preco" onclick="setMassaMode('preco')">💰 Preço Bling</button>
                             <button class="px-3 py-1.5 rounded-lg text-xs font-bold border border-slate-200 bg-slate-50 text-slate-600" id="btn-m-custo" onclick="setMassaMode('custo')">💸 Custo</button>
-                            <button class="px-3 py-1.5 rounded-lg text-xs font-bold border border-slate-200 bg-slate-50 text-slate-600" id="btn-m-ganho" onclick="setMassaMode('ganho')">📈 % Ganho</button>
                         </div>
 
                         <div class="text-[10px] text-slate-400 uppercase font-bold tracking-wider mb-2">Tipo de operação</div>
                         <div class="flex bg-slate-100 rounded-lg border border-slate-200 overflow-hidden mb-4">
-                            <button class="flex-1 py-2 text-xs font-bold bg-indigo-600 text-white" id="btn-op-set" onclick="setMassaOp('set')">Definir</button>
-                            <button class="flex-1 py-2 text-xs font-bold text-slate-600 hover:bg-slate-200" id="btn-op-addpct" onclick="setMassaOp('addpct')">+ %</button>
-                            <button class="flex-1 py-2 text-xs font-bold text-slate-600 hover:bg-slate-200" id="btn-op-subpct" onclick="setMassaOp('subpct')">− %</button>
-                            <button class="flex-1 py-2 text-xs font-bold text-slate-600 hover:bg-slate-200" id="btn-op-addfix" onclick="setMassaOp('addfix')">+ R$</button>
+                            <button class="flex-1 py-2 text-xs font-bold bg-indigo-600 text-white" id="btn-op-set" onclick="setMassaOp('set')">Definir Fixo</button>
+                            <button class="flex-1 py-2 text-xs font-bold text-slate-600 hover:bg-slate-200" id="btn-op-addpct" onclick="setMassaOp('addpct')">Acréscimo %</button>
                         </div>
 
                         <div class="flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-lg p-3 mb-6">
@@ -188,9 +159,7 @@
                         </div>
 
                         <div class="text-[10px] text-slate-400 uppercase font-bold tracking-wider mb-2">👁 Prévia (<span id="massa-count-prev">0</span> itens)</div>
-                        <div id="massa-preview" class="flex-1 overflow-y-auto text-xs text-slate-500 mb-4 bg-slate-50 p-2 rounded border border-slate-100">
-                            Selecione produtos para ver o impacto.
-                        </div>
+                        <div id="massa-preview" class="flex-1 overflow-y-auto text-xs text-slate-500 mb-4 bg-slate-50 p-2 rounded border border-slate-100">Selecione produtos para ver o impacto.</div>
 
                         <div class="grid grid-cols-2 gap-2 mt-auto">
                             <button onclick="applyMassa(false)" class="bg-indigo-600 hover:bg-indigo-700 text-white py-2.5 rounded-lg font-bold text-xs transition shadow-md">✓ Aplicar Local</button>
@@ -198,61 +167,119 @@
                         </div>
                     </div>
                 </div>
+            </div>
+
+            <div id="view-simulador" class="hidden space-y-6">
+                <div class="flex justify-between items-end mb-6">
+                    <div>
+                        <h2 class="text-3xl font-black text-slate-800 tracking-tight flex items-center gap-3"><i class="fas fa-globe text-indigo-600"></i> Precificação Global</h2>
+                        <p class="text-slate-500 mt-1">Defina os parâmetros base. O sistema usa estes valores para sugerir o Preço Bling ideal.</p>
+                    </div>
+                    <button onclick="salvarCustosGlobais()" class="bg-indigo-600 text-white px-6 py-2.5 rounded-lg font-bold shadow-lg hover:bg-indigo-700 transition">Salvar Parâmetros</button>
+                </div>
+                <div class="grid grid-cols-2 gap-8">
+                    <div class="glass-panel rounded-2xl p-6 relative overflow-hidden">
+                        <div class="absolute top-0 left-0 w-full h-1 bg-indigo-500"></div>
+                        <h3 class="font-bold text-slate-800 mb-4 border-b border-slate-200/50 pb-2">Variáveis Fixas do Negócio</h3>
+                        <div class="space-y-4 mt-4">
+                            <div class="flex justify-between items-center"><span class="text-sm text-slate-600 font-medium">Impostos (%)</span> <input type="number" id="cg-imp" step="0.5" class="ios-input w-24 text-right font-bold text-slate-800" oninput="simularPreco(document.getElementById('sim-custo').value)"></div>
+                            <div class="flex justify-between items-center"><span class="text-sm text-slate-600 font-medium">Taxa de Cartão Média (%)</span> <input type="number" id="cg-cartao" step="0.1" class="ios-input w-24 text-right font-bold text-slate-800" oninput="simularPreco(document.getElementById('sim-custo').value)"></div>
+                            <div class="flex justify-between items-center"><span class="text-sm text-slate-600 font-medium">Embalagem por Pedido (R$)</span> <input type="number" id="cg-emb" step="0.5" class="ios-input w-24 text-right font-bold text-slate-800" oninput="simularPreco(document.getElementById('sim-custo').value)"></div>
+                            <div class="flex justify-between items-center"><span class="text-sm text-slate-600 font-medium">Frete Fixo Próprio (R$)</span> <input type="number" id="cg-frete" step="0.5" class="ios-input w-24 text-right font-bold text-slate-800" oninput="simularPreco(document.getElementById('sim-custo').value)"></div>
+                            <div class="flex justify-between items-center pt-2"><span class="text-sm text-slate-800 font-black">Margem de Lucro Alvo (%)</span> <input type="number" id="cg-ganho" step="1" class="ios-input w-24 text-right font-black text-emerald-600 bg-emerald-50 border-emerald-200" oninput="simularPreco(document.getElementById('sim-custo').value)"></div>
+                        </div>
+                    </div>
+                    <div class="glass-panel rounded-2xl p-6 bg-gradient-to-br from-indigo-50/50 to-white relative overflow-hidden">
+                        <div class="absolute top-0 left-0 w-full h-1 bg-emerald-400"></div>
+                        <h3 class="font-bold text-slate-800 mb-4 border-b border-slate-200/50 pb-2">Simulador de Prova Real</h3>
+                        <label class="text-xs font-bold text-slate-500 mb-1">Se o meu produto custa (R$):</label>
+                        <input type="number" id="sim-custo" value="50.00" class="ios-input w-full mb-4 text-2xl font-black text-slate-800" oninput="simularPreco(this.value)">
+                        <div class="bg-indigo-600 text-white rounded-xl p-5 shadow-lg shadow-indigo-200/50 mt-4 relative overflow-hidden">
+                            <i class="fas fa-calculator absolute -right-4 -bottom-4 text-6xl text-white opacity-10"></i>
+                            <p class="text-xs font-medium opacity-80 uppercase tracking-wider mb-1">Preço Sugerido (Bling)</p>
+                            <p class="text-4xl font-black tracking-tight" id="sim-resultado">R$ 0,00</p>
+                            <p class="text-xs mt-3 opacity-90 font-medium"><i class="fas fa-check-circle text-emerald-300 mr-1"></i> Cobre o custo, a embalagem, o frete, dilui os impostos e garante a margem alvo exata.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="view-automacoes" class="hidden space-y-6">
+                <div class="flex justify-between items-end mb-6">
+                    <div><h2 class="text-3xl font-black text-slate-800 tracking-tight flex items-center gap-3"><i class="fas fa-microchip text-emerald-600"></i> AI Automations Core</h2><p class="text-slate-500 mt-1">Gerenciamento de respostas a avaliações e blindagem de anúncios.</p></div>
+                </div>
+                <div class="grid grid-cols-2 gap-8">
+                    <div class="glass-panel rounded-2xl shadow-lg border-t-4 border-t-amber-400 overflow-hidden flex flex-col">
+                        <div class="bg-white/50 px-6 py-4 border-b border-slate-200/50 flex justify-between items-center"><h3 class="font-black text-slate-800"><i class="fas fa-comments text-amber-500 mr-2"></i> Consultor Parceiro (SAC)</h3><span class="bg-amber-100 text-amber-700 text-[10px] font-bold px-2 py-1 rounded-md uppercase tracking-wider">Modo Ateliê</span></div>
+                        <div class="p-6 flex-1 space-y-4">
+                            <div><label class="text-xs font-bold text-slate-500 uppercase">Nome do Cliente</label><input type="text" id="sac-cliente" placeholder="Ex: Cláudia987" class="ios-input w-full mt-1"></div>
+                            <div><label class="text-xs font-bold text-slate-500 uppercase">Produto Adquirido</label><input type="text" id="sac-produto" placeholder="Ex: Kit Alicates Coloridos" class="ios-input w-full mt-1"></div>
+                            <div><label class="text-xs font-bold text-slate-500 uppercase">Relato do Cliente</label><textarea id="sac-relato" rows="3" placeholder="Cole o que o cliente escreveu aqui..." class="ios-input w-full mt-1 resize-none"></textarea></div>
+                            <button onclick="gerarRespostaSAC()" id="btn-sac" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-3 rounded-xl transition shadow-lg flex items-center justify-center gap-2"><i class="fas fa-magic text-amber-400"></i> Formular Resposta Humanizada</button>
+                            <div id="sac-resultado" class="hidden mt-4 bg-slate-800 p-4 rounded-xl relative group">
+                                <p class="text-xs font-mono text-amber-400 mb-2">// Retorno da I.A.</p><p id="sac-texto" class="text-sm text-slate-200 leading-relaxed font-sans"></p>
+                                <button onclick="copiarTexto('sac-texto')" class="absolute top-4 right-4 text-slate-400 hover:text-white transition opacity-0 group-hover:opacity-100 bg-slate-700/50 p-2 rounded"><i class="fas fa-copy"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="glass-panel rounded-2xl shadow-lg border-t-4 border-t-indigo-500 overflow-hidden flex flex-col">
+                        <div class="bg-white/50 px-6 py-4 border-b border-slate-200/50 flex justify-between items-center"><h3 class="font-black text-slate-800"><i class="fas fa-shield-alt text-indigo-500 mr-2"></i> Descrições Blindadas</h3><span class="bg-indigo-100 text-indigo-700 text-[10px] font-bold px-2 py-1 rounded-md uppercase tracking-wider">Anti-Plágio IP</span></div>
+                        <div class="p-6 flex-1 space-y-4">
+                            <div><label class="text-xs font-bold text-slate-500 uppercase">Nome / Ficha Técnica Curta</label><textarea id="desc-produto" rows="2" placeholder="Ex: Caixa 30 Divisórias, 20x19cm..." class="ios-input w-full mt-1 resize-none"></textarea></div>
+                            <div class="bg-indigo-50/50 border border-indigo-100 rounded-lg p-3 flex gap-3 items-start"><i class="fas fa-info-circle text-indigo-500 mt-0.5"></i><p class="text-xs text-slate-600">A I.A. gerará uma descrição focada em medidas exatas e embutirá o código HTML jurídico de proteção da Sóstrass no final.</p></div>
+                            <button onclick="gerarDescricaoSegura()" id="btn-desc" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-xl transition shadow-lg flex items-center justify-center gap-2"><i class="fas fa-cogs"></i> Gerar Ficha c/ HTML Jurídico</button>
+                            <div id="desc-resultado" class="hidden mt-4 bg-slate-900 border border-slate-700 p-4 rounded-xl relative group">
+                                <div class="flex justify-between items-center mb-2"><p class="text-xs font-mono text-emerald-400">root@sostrass-ai:~# output gerado</p><button onclick="copiarTexto('desc-texto')" class="text-slate-400 hover:text-white transition opacity-0 group-hover:opacity-100 bg-slate-700/50 p-1.5 rounded"><i class="fas fa-copy"></i></button></div>
+                                <div id="desc-texto" class="text-xs text-slate-300 font-mono leading-relaxed h-40 overflow-y-auto whitespace-pre-wrap"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
             <div id="view-config" class="hidden space-y-6">
                 <div class="flex justify-between items-end mb-6">
-                    <div>
-                        <h2 class="text-3xl font-black text-slate-800 tracking-tight"><i class="fas fa-cog text-slate-600 mr-2"></i> Configurações & Logs</h2>
-                        <p class="text-slate-500 mt-1">Gestão da infraestrutura Backend, I.A. e auditoria do sistema.</p>
-                    </div>
+                    <div><h2 class="text-3xl font-black text-slate-800 tracking-tight"><i class="fas fa-cog text-slate-600 mr-2"></i> Configurações & Logs</h2><p class="text-slate-500 mt-1">Gestão da infraestrutura Backend, I.A. e auditoria do sistema.</p></div>
                 </div>
-                
                 <div class="grid grid-cols-2 gap-8">
                     <div class="glass-panel rounded-2xl p-6 relative overflow-hidden">
                         <div class="absolute top-0 left-0 w-full h-1 bg-slate-800"></div>
-                        <h3 class="font-bold text-slate-800 mb-4 border-b border-slate-200/50 pb-2"><i class="fas fa-server mr-2"></i>Conexões</h3>
+                        <h3 class="font-bold text-slate-800 mb-4 border-b border-slate-200/50 pb-2"><i class="fas fa-server mr-2"></i>Conexões e Backend Proxy</h3>
+                        <div class="bg-emerald-50 border border-emerald-200 rounded-lg p-3 text-xs text-emerald-700 mb-4">✓ <strong>Arquitetura segura:</strong> Chaves API protegidas no servidor backend.</div>
                         
-                        <div class="bg-emerald-50 border border-emerald-200 rounded-lg p-3 text-xs text-emerald-700 mb-4">
-                            ✓ <strong>Arquitetura segura:</strong> Chaves API protegidas no servidor backend.
-                        </div>
+                        <label class="text-xs font-bold text-slate-500 mb-1">URL do Servidor Node.js (Railway)</label>
+                        <input type="text" id="cfgApiBase" class="ios-input w-full mb-4 font-mono text-sm" placeholder="https://seu-app.up.railway.app">
                         
-                        <label class="text-xs font-bold text-slate-500 mb-1">URL do Servidor Node.js</label>
-                        <input type="text" id="cfgApiBase" class="ios-input w-full mb-4 font-mono text-sm" placeholder="http://localhost:3000">
-                        
-                        <label class="text-xs font-bold text-slate-500 mb-1 block">Modelo Gemini <div class="tip"><span class="tip-icon">?</span><div class="tip-text">Modelos 'Flash' são mais rápidos e baratos. 'Pro' é melhor para descrições longas complexas.</div></div></label>
+                        <label class="text-xs font-bold text-slate-500 mb-1 block">Modelo Gemini <div class="tip"><span class="tip-icon">?</span><div class="tip-text">Modelos 'Flash' são mais rápidos e baratos. 'Pro' é mais lento mas escreve textos melhores.</div></div></label>
                         <select id="cfgModel" class="ios-input w-full mb-4 text-sm">
                             <option value="gemini-2.5-flash-preview-05-14">Gemini 2.5 Flash (Recomendado)</option>
                             <option value="gemini-2.0-flash">Gemini 2.0 Flash (Rápido)</option>
                             <option value="gemini-1.5-pro">Gemini 1.5 Pro (Potente)</option>
                         </select>
-
                         <div class="flex gap-2">
-                            <button onclick="saveCfg()" class="flex-1 bg-slate-800 text-white py-2.5 rounded-lg font-bold hover:bg-slate-900 transition shadow">💾 Salvar Config</button>
+                            <button onclick="saveCfg()" class="flex-1 bg-slate-800 text-white py-2.5 rounded-lg font-bold hover:bg-slate-900 transition shadow">💾 Salvar Configuração</button>
                             <button onclick="testarServidor()" class="bg-slate-200 text-slate-700 px-4 py-2.5 rounded-lg font-bold hover:bg-slate-300 transition" title="Testar Servidor"><i class="fas fa-satellite-dish"></i></button>
                         </div>
                     </div>
-
                     <div class="glass-panel rounded-2xl p-6 relative overflow-hidden flex flex-col h-[60vh]">
                         <div class="absolute top-0 left-0 w-full h-1 bg-slate-400"></div>
                         <div class="flex justify-between items-center border-b border-slate-200/50 pb-2 mb-4 shrink-0">
-                            <h3 class="font-bold text-slate-800"><i class="fas fa-clipboard-list mr-2"></i>Auditoria</h3>
-                            <button onclick="if(confirm('Limpar logs?')){actLog=[];saveLogs();renderLogE('all');}" class="text-xs text-rose-500 hover:text-rose-700 font-bold"><i class="fas fa-trash-alt mr-1"></i>Limpar</button>
+                            <h3 class="font-bold text-slate-800"><i class="fas fa-clipboard-list mr-2"></i>Auditoria do Sistema</h3>
+                            <button onclick="limparLogs()" class="text-xs text-rose-500 hover:text-rose-700 font-bold"><i class="fas fa-trash-alt mr-1"></i>Limpar</button>
                         </div>
-                        
                         <div class="flex gap-2 mb-3 shrink-0">
                             <button onclick="renderLogE('all')" class="bg-slate-100 text-slate-600 px-3 py-1 rounded text-xs font-bold hover:bg-slate-200">Todos</button>
                             <button onclick="renderLogE('ok')" class="bg-emerald-50 text-emerald-600 px-3 py-1 rounded text-xs font-bold border border-emerald-200">✓ OK</button>
                             <button onclick="renderLogE('err')" class="bg-rose-50 text-rose-600 px-3 py-1 rounded text-xs font-bold border border-rose-200">✕ Erros</button>
-                            <button onclick="renderLogE('info')" class="bg-indigo-50 text-indigo-600 px-3 py-1 rounded text-xs font-bold border border-indigo-200">ℹ Info</button>
                         </div>
-                        
                         <div id="log-container" class="flex-1 overflow-y-auto bg-slate-950 rounded-xl p-4 text-[11px] font-mono space-y-2 shadow-inner">
                             </div>
                     </div>
                 </div>
             </div>
 
-
+        </main>
+    </div>
 
     <div id="modal-produto" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4 sm:p-8">
         <div class="bg-slate-50 w-full max-w-7xl h-full max-h-[95vh] rounded-2xl shadow-2xl flex flex-col overflow-hidden animate-[slideIn_0.2s_ease-out]">
@@ -260,9 +287,7 @@
             <div class="bg-white border-b border-slate-200 px-6 py-4 flex flex-col gap-4 shrink-0">
                 <div class="flex justify-between items-start">
                     <div class="flex items-center gap-4">
-                        <div class="w-14 h-14 rounded-lg bg-indigo-50 border border-indigo-100 flex items-center justify-center text-indigo-400 text-2xl">
-                            <i class="fas fa-box"></i>
-                        </div>
+                        <div class="w-14 h-14 rounded-lg bg-indigo-50 border border-indigo-100 flex items-center justify-center text-indigo-400 text-2xl"><i class="fas fa-box"></i></div>
                         <div>
                             <h3 class="font-black text-2xl text-slate-800 leading-tight" id="m-nome">Nome do Produto</h3>
                             <div class="flex items-center gap-3 mt-1">
@@ -289,22 +314,10 @@
                 
                 <div id="m-view-geral" class="block space-y-6">
                     <div class="grid grid-cols-4 gap-4">
-                        <div class="glass-panel p-4 rounded-xl">
-                            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Custo Base Total</p>
-                            <p class="text-2xl font-black text-rose-500" id="m-custo-total-display">R$ 0,00</p>
-                        </div>
-                        <div class="glass-panel p-4 rounded-xl">
-                            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Preço Bling Atual</p>
-                            <p class="text-2xl font-black text-indigo-600" id="m-preco-display">R$ 0,00</p>
-                        </div>
-                        <div class="glass-panel p-4 rounded-xl border-emerald-200 bg-emerald-50/30">
-                            <p class="text-[10px] font-bold text-emerald-600 uppercase tracking-wider mb-1">Margem Bruta (Atual)</p>
-                            <p class="text-2xl font-black text-emerald-600" id="m-margem-display">0.0%</p>
-                        </div>
-                        <div class="glass-panel p-4 rounded-xl border-amber-200 bg-amber-50/30">
-                            <p class="text-[10px] font-bold text-amber-600 uppercase tracking-wider mb-1">Preço Sugerido (Fórmula)</p>
-                            <p class="text-2xl font-black text-amber-600" id="m-sugerido-display">R$ 0,00</p>
-                        </div>
+                        <div class="glass-panel p-4 rounded-xl"><p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Custo Base Total</p><p class="text-2xl font-black text-rose-500" id="m-custo-total-display">R$ 0,00</p></div>
+                        <div class="glass-panel p-4 rounded-xl"><p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Preço Bling Atual</p><p class="text-2xl font-black text-indigo-600" id="m-preco-display">R$ 0,00</p></div>
+                        <div class="glass-panel p-4 rounded-xl border-emerald-200 bg-emerald-50/30"><p class="text-[10px] font-bold text-emerald-600 uppercase tracking-wider mb-1">Margem Bruta (Atual)</p><p class="text-2xl font-black text-emerald-600" id="m-margem-display">0.0%</p></div>
+                        <div class="glass-panel p-4 rounded-xl border-amber-200 bg-amber-50/30"><p class="text-[10px] font-bold text-amber-600 uppercase tracking-wider mb-1">Preço Sugerido (Fórmula)</p><p class="text-2xl font-black text-amber-600" id="m-sugerido-display">R$ 0,00</p></div>
                     </div>
 
                     <div class="glass-panel p-6 rounded-xl">
@@ -325,33 +338,27 @@
                             <div class="glass-panel p-5 rounded-xl">
                                 <label class="text-xs font-bold text-slate-500 uppercase mb-2 block">Título / Descrição Curta (Max 200 char)</label>
                                 <textarea id="m-desc-curta" rows="2" class="ios-input w-full resize-none font-medium text-slate-700"></textarea>
-                                
                                 <label class="text-xs font-bold text-slate-500 uppercase mb-2 mt-4 block">Descrição Complementar / Detalhada</label>
                                 <textarea id="m-desc-comp" rows="12" class="ios-input w-full resize-none text-sm font-mono text-slate-600 leading-relaxed"></textarea>
                             </div>
                         </div>
-
                         <div class="space-y-4">
                             <div class="glass-panel p-5 rounded-xl border-indigo-200 bg-indigo-50/30">
                                 <h4 class="font-bold text-indigo-800 mb-4 flex items-center gap-2"><i class="fas fa-sparkles text-amber-400"></i> Estúdio Criativo I.A.</h4>
-                                
                                 <label class="text-[10px] font-bold text-slate-500 uppercase block mb-1">Instrução Específica para este produto</label>
                                 <textarea id="m-ia-inst" rows="2" class="ios-input w-full mb-3 text-xs" placeholder="Ex: Destacar que serve para pulseiras e colares..."></textarea>
-                                
                                 <label class="text-[10px] font-bold text-slate-500 uppercase block mb-1">Contexto Extra</label>
                                 <textarea id="m-ia-ctx" rows="2" class="ios-input w-full mb-4 text-xs" placeholder="Ex: Produto importado, não perde a cor..."></textarea>
-
                                 <div class="grid grid-cols-2 gap-3 mb-4">
                                     <button onclick="gerarIAPrompt('curta')" class="bg-indigo-600 text-white font-bold py-2 rounded-lg text-xs shadow hover:bg-indigo-700 transition">Gerar Título (Curta)</button>
                                     <button onclick="gerarIAPrompt('comp')" class="bg-slate-800 text-white font-bold py-2 rounded-lg text-xs shadow hover:bg-slate-900 transition">Gerar Detalhada</button>
                                 </div>
-
                                 <div class="bg-slate-900 rounded-lg p-4 relative group">
                                     <p class="text-[10px] text-emerald-400 font-mono mb-2">// Output Gemini</p>
                                     <div id="m-ia-output" class="text-xs text-slate-300 font-mono h-32 overflow-y-auto">Aguardando comando...</div>
                                     <div class="absolute top-3 right-3 flex gap-2 opacity-0 group-hover:opacity-100 transition">
-                                        <button onclick="aplicarIA('m-desc-curta')" class="bg-indigo-500 text-white text-[10px] px-2 py-1 rounded font-bold hover:bg-indigo-400" title="Aplicar no Título">← Título</button>
-                                        <button onclick="aplicarIA('m-desc-comp')" class="bg-indigo-500 text-white text-[10px] px-2 py-1 rounded font-bold hover:bg-indigo-400" title="Aplicar na Detalhada">← Detalhada</button>
+                                        <button onclick="aplicarIA('m-desc-curta')" class="bg-indigo-500 text-white text-[10px] px-2 py-1 rounded font-bold hover:bg-indigo-400">← Título</button>
+                                        <button onclick="aplicarIA('m-desc-comp')" class="bg-indigo-500 text-white text-[10px] px-2 py-1 rounded font-bold hover:bg-indigo-400">← Detalhada</button>
                                     </div>
                                 </div>
                             </div>
@@ -361,9 +368,8 @@
 
                 <div id="m-view-precos" class="hidden space-y-6">
                     <div class="flex justify-between items-end mb-4">
-                        <p class="text-sm text-slate-600 font-medium">Edite as taxas específicas deste produto. Elas sobrescrevem as taxas globais.<br>A margem mostrada é baseada no Preço Bling Atual (R$ <span id="m-preco-ref" class="font-bold text-indigo-600">0,00</span>).</p>
+                        <p class="text-sm text-slate-600 font-medium">Edite as taxas específicas deste produto. A matemática reflete o Preço Bling Atual (R$ <span id="m-preco-ref" class="font-bold text-indigo-600">0,00</span>). Arraste os blocos para reorganizar.</p>
                     </div>
-                    
                     <div id="m-container-marketplaces" class="grid grid-cols-2 lg:grid-cols-3 gap-4">
                         </div>
                 </div>
@@ -373,7 +379,6 @@
                         <div class="glass-panel p-6 rounded-xl">
                             <h4 class="font-bold text-slate-800 mb-4 border-b pb-2"><i class="fas fa-ruler-combined text-indigo-500 mr-2"></i> Dimensões Físicas</h4>
                             <p class="text-xs text-slate-500 mb-4">Necessárias para o cálculo de frete nos marketplaces.</p>
-                            
                             <div class="grid grid-cols-2 gap-4">
                                 <div><label class="text-[10px] font-bold text-slate-500 uppercase block mb-1">Altura (cm)</label><input type="number" id="m-altura" class="ios-input w-full" step="0.1"></div>
                                 <div><label class="text-[10px] font-bold text-slate-500 uppercase block mb-1">Largura (cm)</label><input type="number" id="m-largura" class="ios-input w-full" step="0.1"></div>
@@ -381,14 +386,12 @@
                                 <div><label class="text-[10px] font-bold text-slate-500 uppercase block mb-1">Peso Bruto (kg)</label><input type="number" id="m-peso" class="ios-input w-full" step="0.01"></div>
                             </div>
                         </div>
-
                         <div class="glass-panel p-6 rounded-xl">
                             <h4 class="font-bold text-slate-800 mb-4 border-b pb-2"><i class="fas fa-box-open text-amber-500 mr-2"></i> Custos Logísticos Específicos</h4>
                             <p class="text-xs text-slate-500 mb-4">Se preenchido, ignora o custo global de embalagem e frete para este SKU.</p>
-                            
                             <div class="space-y-4">
-                                <div><label class="text-[10px] font-bold text-slate-500 uppercase block mb-1">Custo de Embalagem Extra (R$)</label><input type="number" id="m-emb-extra" class="ios-input w-full" placeholder="0.00 = Usa Global" step="0.01"></div>
-                                <div><label class="text-[10px] font-bold text-slate-500 uppercase block mb-1">Frete Fixo Próprio (R$)</label><input type="number" id="m-frete-extra" class="ios-input w-full" placeholder="0.00 = Usa Global" step="0.01"></div>
+                                <div><label class="text-[10px] font-bold text-slate-500 uppercase block mb-1">Custo de Embalagem Extra (R$)</label><input type="number" id="m-emb-extra" class="ios-input w-full" placeholder="0.00 = Usa Global" step="0.01" oninput="recalcularModalGeral()"></div>
+                                <div><label class="text-[10px] font-bold text-slate-500 uppercase block mb-1">Frete Fixo Próprio (R$)</label><input type="number" id="m-frete-extra" class="ios-input w-full" placeholder="0.00 = Usa Global" step="0.01" oninput="recalcularModalGeral()"></div>
                                 <div><label class="text-[10px] font-bold text-slate-500 uppercase block mb-1">Prazo de Produção/Entrega (Dias)</label><input type="number" id="m-prazo" class="ios-input w-full" value="0" step="1"></div>
                             </div>
                         </div>
@@ -398,8 +401,6 @@
                 <div id="m-view-fisc" class="hidden space-y-6">
                     <div class="glass-panel p-6 rounded-xl max-w-4xl mx-auto">
                         <h4 class="font-bold text-slate-800 mb-4 border-b pb-2"><i class="fas fa-file-invoice-dollar text-emerald-500 mr-2"></i> Dados Tributários (Bling)</h4>
-                        <p class="text-xs text-slate-500 mb-6">Informações para emissão correta de Notas Fiscais.</p>
-                        
                         <div class="grid grid-cols-3 gap-6 mb-6">
                             <div><label class="text-[10px] font-bold text-slate-500 uppercase block mb-1">NCM</label><input type="text" id="m-ncm" class="ios-input w-full font-mono text-sm" placeholder="0000.00.00"></div>
                             <div>
@@ -413,7 +414,6 @@
                             </div>
                             <div><label class="text-[10px] font-bold text-slate-500 uppercase block mb-1">CFOP Padrão</label><input type="text" id="m-cfop" class="ios-input w-full font-mono text-sm" placeholder="5102"></div>
                         </div>
-
                         <div class="grid grid-cols-4 gap-4 bg-slate-50 p-4 rounded-lg border border-slate-200">
                             <div><label class="text-[10px] font-bold text-slate-500 uppercase block mb-1">CST / CSOSN</label><input type="text" id="m-cst" class="ios-input w-full text-sm" placeholder="102"></div>
                             <div><label class="text-[10px] font-bold text-slate-500 uppercase block mb-1">ICMS (%)</label><input type="number" id="m-icms" class="ios-input w-full text-sm" step="0.1" value="0"></div>
@@ -427,18 +427,14 @@
                     <div class="grid grid-cols-3 gap-6 h-[50vh]">
                         <div class="glass-panel p-6 rounded-xl flex flex-col h-full">
                             <h4 class="font-bold text-slate-800 mb-2"><i class="fas fa-satellite-dish text-indigo-600 mr-2"></i> Radar de Concorrência</h4>
-                            <p class="text-xs text-slate-500 mb-4">Insira os links dos concorrentes diretos para este SKU. O sistema usa Scraper para burlar bloqueios e extrair o preço base do JSON-LD.</p>
+                            <p class="text-xs text-slate-500 mb-4">Insira os links dos concorrentes diretos para este SKU. O sistema usa Scraper para extrair o preço base do JSON-LD.</p>
                             <textarea id="m-radar-urls" class="ios-input w-full flex-1 font-mono text-xs whitespace-pre resize-none mb-4" placeholder="Cole os links aqui (um por linha)..."></textarea>
                             <button onclick="acionarRadarModal()" id="btn-radar-modal" class="w-full bg-slate-800 text-white font-bold py-3 rounded-lg shadow-lg hover:bg-slate-900 transition flex items-center justify-center gap-2"><i class="fas fa-search-dollar"></i> Iniciar Varredura</button>
                         </div>
-
                         <div class="col-span-2 glass-panel p-6 rounded-xl bg-slate-900 flex flex-col h-full overflow-hidden">
                             <h4 class="font-bold text-white mb-4 border-b border-slate-700 pb-2">Resultados do Radar</h4>
                             <div id="m-radar-resultados" class="flex-1 overflow-y-auto space-y-3 pr-2">
-                                <div class="text-slate-500 text-sm flex flex-col items-center justify-center h-full">
-                                    <i class="fas fa-radar text-4xl mb-3 opacity-20"></i>
-                                    Aguardando alvos para varredura...
-                                </div>
+                                <div class="text-slate-500 text-sm flex flex-col items-center justify-center h-full"><i class="fas fa-radar text-4xl mb-3 opacity-20"></i>Aguardando alvos para varredura...</div>
                             </div>
                         </div>
                     </div>
@@ -453,18 +449,11 @@
                     <button onclick="salvarModalCompleto()" class="px-8 py-2.5 bg-emerald-600 text-white font-bold rounded-lg hover:bg-emerald-700 transition shadow-lg shadow-emerald-600/30 flex items-center gap-2"><i class="fas fa-save"></i> Salvar Produto</button>
                 </div>
             </div>
-
         </div>
     </div>
 
-    </body>
-</html>
-
-
-<script>
-        // ==========================================
-        // 1. ÍCONES NATIVOS (SVG) E ESTADOS GLOBAIS
-        // ==========================================
+    <script>
+        // --- ÍCONES SVG NATIVOS ---
         const PSVG = {
             shopee: `<svg viewBox="0 0 48 48"><rect width="48" height="48" rx="10" fill="#EE4D2D"/><path d="M24 8c-5.5 0-9.5 3.8-9.5 8.5 0 1.2.3 2.3.7 3.3H13c-1.7 0-3 1.4-3 3.1l1.5 14.5c.2 1.5 1.4 2.6 2.9 2.6h19.2c1.5 0 2.7-1.1 2.9-2.6L38 22.9c0-1.7-1.3-3.1-3-3.1h-2.2c.4-1 .7-2.1.7-3.3C33.5 11.8 29.5 8 24 8zm0 3c3.6 0 6.5 2.5 6.5 5.5 0 1.2-.4 2.3-1.1 3.3h-10.8c-.7-1-1.1-2.1-1.1-3.3C17.5 13.5 20.4 11 24 11zm-6 16a2 2 0 110 4 2 2 0 010-4zm12 0a2 2 0 110 4 2 2 0 010-4z" fill="#fff"/></svg>`,
             mercadolivre: `<svg viewBox="0 0 48 48"><rect width="48" height="48" rx="10" fill="#FFE600"/><ellipse cx="24" cy="24" rx="13" ry="13" fill="#333"/><path d="M17 23c0-3.9 3.1-7 7-7s7 3.1 7 7" fill="none" stroke="#FFE600" stroke-width="2.5" stroke-linecap="round"/><rect x="21" y="22" width="6" height="7" rx="1.5" fill="#FFE600"/></svg>`,
@@ -475,6 +464,7 @@
         };
         const getSvg = (id, sz=20) => `<div style="width:${sz}px;height:${sz}px;flex-shrink:0;">${PSVG[id] || ''}</div>`;
 
+        // --- ESTADOS ---
         let API_BASE = localStorage.getItem('sostrass_apibase') || 'http://localhost:3000';
         let serverOnline = false;
         let modeloIA = localStorage.getItem('sostrass_model') || 'gemini-2.5-flash-preview-05-14';
@@ -502,9 +492,7 @@
             { id: 3, sku: 'AL-BICO-01', name: 'Kit 3 Mini Alicates Coloridos Artesanato', price: 42.50, cost: 16.00, stock: 12, cat: 'Ferramentas', platforms: ['mercadolivre','nuvemshop'], desc: '', descComp: '', log: {}, fisc: {} }
         ];
 
-        // ==========================================
-        // 2. FÓRMULAS DE PRECIFICAÇÃO (MATEMÁTICA PURA)
-        // ==========================================
+        // --- MATEMÁTICA ---
         const f2 = n => parseFloat(n||0).toFixed(2);
         
         function getBaseCost(prod) {
@@ -533,16 +521,11 @@
             return p;
         }
 
-        function calcMargin(price, totalBaseCost) {
-            return price > 0 ? ((price - totalBaseCost) / price) * 100 : 0;
-        }
+        function calcMargin(price, totalBaseCost) { return price > 0 ? ((price - totalBaseCost) / price) * 100 : 0; }
 
-        // ==========================================
-        // 3. UI UTILITIES E DRAG & DROP
-        // ==========================================
+        // --- UX / LOGS ---
         function mostrarToast(msg, tipo = 'sucesso') {
-            const c = document.getElementById('toast-container');
-            const t = document.createElement('div');
+            const c = document.getElementById('toast-container'); const t = document.createElement('div');
             const bg = tipo === 'sucesso' ? 'bg-emerald-500' : (tipo === 'aviso' ? 'bg-amber-500' : 'bg-rose-500');
             t.className = `toast-enter flex items-center gap-3 text-white px-5 py-3 rounded-lg shadow-xl ${bg}`;
             t.innerHTML = `<i class="fas ${tipo === 'sucesso' ? 'fa-check' : 'fa-info-circle'}"></i> <span class="font-bold text-sm">${msg}</span>`;
@@ -554,13 +537,14 @@
             if(actLog.length > 200) actLog.pop();
             localStorage.setItem('sostrass_logs', JSON.stringify(actLog));
             if(document.getElementById('view-config').classList.contains('hidden') === false) renderLogE('all');
-            if(type === 'err') {
-                const b = document.getElementById('logBadge');
-                b.innerText = '!'; b.classList.remove('hidden');
-            }
+            if(type === 'err') { const b = document.getElementById('logBadge'); b.innerText = '!'; b.classList.remove('hidden'); }
+        }
+        function renderLogE(filtro) {
+            const c = document.getElementById('log-container'); if(!c) return;
+            c.innerHTML = actLog.filter(l => filtro === 'all' || l.type === filtro).map(l => `<div class="border-b border-slate-800 pb-1.5"><span class="text-slate-600">[${l.ts.split(' ')[1]}]</span> <span class="${l.type==='err'?'text-rose-400':(l.type==='ok'?'text-emerald-400':'text-slate-300')}">${l.msg}</span></div>`).join('');
         }
 
-        // DRAG & DROP LOGIC
+        // --- DRAG & DROP ---
         function initDragAndDrop() {
             const panels = document.querySelectorAll('.drag-panel');
             let draggedItem = null;
@@ -572,44 +556,22 @@
                     handle.addEventListener('mouseup', () => panel.setAttribute('draggable', false));
                 }
 
-                panel.addEventListener('dragstart', function(e) {
-                    draggedItem = this;
-                    setTimeout(() => this.classList.add('dragging'), 0);
-                });
-
-                panel.addEventListener('dragend', function() {
-                    this.classList.remove('dragging');
-                    this.setAttribute('draggable', false);
-                    draggedItem = null;
-                });
-
-                panel.addEventListener('dragover', function(e) {
-                    e.preventDefault();
-                    if (this !== draggedItem) this.classList.add('drag-over');
-                });
-
-                panel.addEventListener('dragleave', function() {
-                    this.classList.remove('drag-over');
-                });
-
+                panel.addEventListener('dragstart', function(e) { draggedItem = this; setTimeout(() => this.classList.add('dragging'), 0); });
+                panel.addEventListener('dragend', function() { this.classList.remove('dragging'); this.setAttribute('draggable', false); draggedItem = null; });
+                panel.addEventListener('dragover', function(e) { e.preventDefault(); if (this !== draggedItem) this.classList.add('drag-over'); });
+                panel.addEventListener('dragleave', function() { this.classList.remove('drag-over'); });
                 panel.addEventListener('drop', function(e) {
-                    e.preventDefault();
-                    this.classList.remove('drag-over');
+                    e.preventDefault(); this.classList.remove('drag-over');
                     if (this !== draggedItem && draggedItem) {
-                        const parent = this.parentNode;
-                        const allSiblings = [...parent.children];
-                        const draggedIndex = allSiblings.indexOf(draggedItem);
-                        const droppedIndex = allSiblings.indexOf(this);
-                        if (draggedIndex < droppedIndex) parent.insertBefore(draggedItem, this.nextSibling);
+                        const parent = this.parentNode; const allSiblings = [...parent.children];
+                        if (allSiblings.indexOf(draggedItem) < allSiblings.indexOf(this)) parent.insertBefore(draggedItem, this.nextSibling);
                         else parent.insertBefore(draggedItem, this);
                     }
                 });
             });
         }
 
-        // ==========================================
-        // 4. VIEWS PRINCIPAIS (Catálogo, Massa, Config)
-        // ==========================================
+        // --- NAVEGAÇÃO VIEWS ---
         function navTo(aba) {
             ['catalogo', 'massa', 'automacoes', 'simulador', 'config'].forEach(a => {
                 document.getElementById(`view-${a}`)?.classList.add('hidden');
@@ -624,57 +586,40 @@
             if(aba === 'config') renderLogE('all');
             if(aba === 'log') { document.getElementById('logBadge').classList.add('hidden'); navTo('config'); }
         }
-        function mudarAba(aba) { navTo(aba); } // Fallback
-
-        function filtrarGeral(query) { renderCatalogo(query.toLowerCase()); }
+        function mudarAba(aba) { navTo(aba); }
 
         function renderCatalogo(filtro = '') {
-            const tbody = document.getElementById('tabela-produtos');
-            if(!tbody) return;
+            const tbody = document.getElementById('tabela-produtos'); if(!tbody) return;
             tbody.innerHTML = '';
             
-            products.filter(p => p.sku.toLowerCase().includes(filtro) || p.name.toLowerCase().includes(filtro)).forEach(p => {
-                const base = getBaseCost(p);
-                const sug = calcBlingPrice(p);
-                const margem = calcMargin(p.price, base);
+            products.filter(p => p.sku.toLowerCase().includes(filtro.toLowerCase()) || p.name.toLowerCase().includes(filtro.toLowerCase())).forEach(p => {
+                const base = getBaseCost(p); const sug = calcBlingPrice(p); const margem = calcMargin(p.price, base);
                 const cor = margem >= 30 ? 'text-emerald-600 bg-emerald-50 border-emerald-200' : (margem >= 15 ? 'text-amber-600 bg-amber-50 border-amber-200' : 'text-rose-600 bg-rose-50 border-rose-200');
 
                 tbody.innerHTML += `
                     <tr class="hover:bg-indigo-50/40 transition border-b border-slate-100 group cursor-pointer" onclick="abrirModalProduto(${p.id})">
                         <td class="px-6 py-4"><div class="font-bold text-slate-800 truncate w-64" title="${p.name}">${p.name}</div><div class="text-xs text-slate-400 font-mono">${p.sku}</div></td>
                         <td class="px-6 py-4 text-right text-slate-500 font-medium">R$ ${f2(p.cost)}</td>
-                        <td class="px-6 py-4 text-right">
-                            <div class="font-black text-indigo-600">R$ ${f2(p.price)}</div>
-                            <div class="text-[10px] ${Math.abs(p.price - sug) < 0.5 ? 'text-emerald-500' : 'text-slate-400'}">Sug: R$ ${f2(sug)}</div>
-                        </td>
+                        <td class="px-6 py-4 text-right"><div class="font-black text-indigo-600">R$ ${f2(p.price)}</div><div class="text-[10px] ${Math.abs(p.price - sug) < 0.5 ? 'text-emerald-500' : 'text-slate-400'}">Sug: R$ ${f2(sug)}</div></td>
                         <td class="px-6 py-4 text-center"><span class="px-2 py-1 rounded-md text-xs font-black border ${cor}">${margem.toFixed(1)}%</span></td>
-                        <td class="px-6 py-4 text-right">
-                            <button class="opacity-0 group-hover:opacity-100 bg-white border border-slate-300 text-slate-700 px-3 py-1.5 rounded-lg text-sm hover:bg-indigo-600 hover:text-white font-bold shadow-sm transition-all"><i class="fas fa-sliders-h"></i> Configurar</button>
-                        </td>
+                        <td class="px-6 py-4 text-right"><button class="opacity-0 group-hover:opacity-100 bg-white border border-slate-300 text-slate-700 px-3 py-1.5 rounded-lg text-sm hover:bg-indigo-600 hover:text-white font-bold shadow-sm transition-all"><i class="fas fa-sliders-h"></i> Configurar</button></td>
                     </tr>`;
             });
         }
 
-        // --- ATUALIZAÇÃO EM MASSA ---
+        // --- MASSA ---
         function renderMassaList() {
-            const list = document.getElementById('massa-list');
-            if(!list) return;
+            const list = document.getElementById('massa-list'); if(!list) return;
             const q = document.getElementById('massa-busca')?.value.toLowerCase() || '';
             const catFil = document.getElementById('massa-cat')?.value || 'all';
             list.innerHTML = '';
             
-            // Popula categorias no select se estiver vazio
             const catSel = document.getElementById('massa-cat');
             if(catSel && catSel.options.length === 1) {
-                const cats = [...new Set(products.map(p => p.cat).filter(Boolean))];
-                cats.forEach(c => catSel.innerHTML += `<option value="${c}">${c}</option>`);
+                [...new Set(products.map(p => p.cat).filter(Boolean))].forEach(c => catSel.innerHTML += `<option value="${c}">${c}</option>`);
             }
 
-            products.filter(p => {
-                const matchQ = p.sku.toLowerCase().includes(q) || p.name.toLowerCase().includes(q);
-                const matchCat = catFil === 'all' || p.cat === catFil;
-                return matchQ && matchCat;
-            }).forEach(p => {
+            products.filter(p => (catFil === 'all' || p.cat === catFil) && (p.sku.toLowerCase().includes(q) || p.name.toLowerCase().includes(q))).forEach(p => {
                 const isSel = massaSelecionados.has(p.id);
                 const b = getBaseCost(p); const m = calcMargin(p.price, b);
                 const pIcons = (p.platforms||[]).map(id => getSvg(id, 14)).join('');
@@ -712,18 +657,14 @@
                 const btn = document.getElementById(`btn-op-${t}`);
                 if(btn) btn.className = t === tipo ? "flex-1 py-2 text-xs font-bold bg-indigo-600 text-white" : "flex-1 py-2 text-xs font-bold text-slate-600 hover:bg-slate-200";
             });
-            
             document.getElementById('mUnitPre').innerText = (tipo === 'set' || tipo === 'addfix') && massaCampo !== 'ganho' ? 'R$' : '';
             document.getElementById('mUnitPos').innerText = (tipo === 'addpct' || tipo === 'subpct') || massaCampo === 'ganho' ? '%' : '';
             renderMassaPreview();
         }
 
         function renderMassaPreview() {
-            const prev = document.getElementById('massa-preview');
-            const cnt = document.getElementById('massa-count-prev');
-            if(!prev || !cnt) return;
-            cnt.innerText = massaSelecionados.size;
-
+            const prev = document.getElementById('massa-preview'); const cnt = document.getElementById('massa-count-prev');
+            if(!prev || !cnt) return; cnt.innerText = massaSelecionados.size;
             if(massaSelecionados.size === 0) { prev.innerHTML = "Selecione produtos."; return; }
             
             const val = parseFloat(document.getElementById('massa-val').value) || 0;
@@ -732,11 +673,7 @@
             products.filter(p => massaSelecionados.has(p.id)).slice(0,10).forEach(p => {
                 let old = massaCampo === 'preco' ? p.price : (massaCampo === 'custo' ? p.cost : globalCosts.ganho);
                 let nv = old;
-                if(massaOpType === 'set') nv = val;
-                else if(massaOpType === 'addpct') nv = old + (old * (val/100));
-                else if(massaOpType === 'subpct') nv = old - (old * (val/100));
-                else if(massaOpType === 'addfix') nv = old + val;
-                
+                if(massaOpType === 'set') nv = val; else if(massaOpType === 'addpct') nv = old + (old * (val/100)); else if(massaOpType === 'subpct') nv = old - (old * (val/100)); else if(massaOpType === 'addfix') nv = old + val;
                 const up = nv > old;
                 html += `<div class="flex justify-between border-b border-slate-200/50 py-1"><span class="font-bold text-slate-700">${p.sku}</span> <span><span class="line-through opacity-50 mr-2">${f2(old)}</span> <span class="font-bold ${up?'text-emerald-600':'text-rose-600'}">${f2(nv)} ${up?'▲':'▼'}</span></span></div>`;
             });
@@ -747,68 +684,49 @@
         function applyMassa(enviarBling) {
             if(massaSelecionados.size === 0) return mostrarToast("Selecione produtos.", "aviso");
             const val = parseFloat(document.getElementById('massa-val').value) || 0;
-            
             let c = 0;
             products.forEach(p => {
                 if(massaSelecionados.has(p.id)) {
                     let target = massaCampo === 'preco' ? p.price : p.cost;
-                    if(massaOpType === 'set') target = val;
-                    else if(massaOpType === 'addpct') target = target + (target * (val/100));
-                    else if(massaOpType === 'subpct') target = target - (target * (val/100));
-                    else if(massaOpType === 'addfix') target = target + val;
-                    
+                    if(massaOpType === 'set') target = val; else if(massaOpType === 'addpct') target = target + (target * (val/100)); else if(massaOpType === 'subpct') target = target - (target * (val/100)); else if(massaOpType === 'addfix') target = target + val;
                     if(massaCampo === 'preco') p.price = target; else p.cost = target;
                     c++;
                 }
             });
-            localStorage.setItem('sostrass_prods', JSON.stringify(products));
-            mostrarToast(`${c} itens atualizados!`);
-            addLog(`Massa: ${massaCampo} via ${massaOpType} em ${c} itens.`, 'ok');
-            renderMassaList();
+            localStorage.setItem('sostrass_prods', JSON.stringify(products)); mostrarToast(`${c} itens atualizados!`); addLog(`Massa: ${massaCampo} via ${massaOpType} em ${c} itens.`, 'ok'); renderMassaList();
         }
 
-        // ==========================================
-        // 5. O SUPER MODAL DO PRODUTO (PIM)
-        // ==========================================
+        // --- MODAL DE PRODUTO ---
         function abrirModalProduto(id) {
-            produtoAtual = products.find(p => p.id === id);
-            if(!produtoAtual) return;
+            produtoAtual = products.find(p => p.id === id); if(!produtoAtual) return;
 
             document.getElementById('m-nome').innerText = produtoAtual.name;
             document.getElementById('m-sku').innerText = produtoAtual.sku;
             document.getElementById('m-cat-display').innerText = `Cat: ${produtoAtual.cat}`;
             document.getElementById('m-estoque-display').innerText = produtoAtual.stock;
             
-            // Popula Abas
-            document.getElementById('m-cat').value = produtoAtual.cat;
-            document.getElementById('m-estoque').value = produtoAtual.stock;
-            document.getElementById('m-custo').value = produtoAtual.cost;
-            document.getElementById('m-preco').value = produtoAtual.price;
+            document.getElementById('m-cat').value = produtoAtual.cat; document.getElementById('m-estoque').value = produtoAtual.stock;
+            document.getElementById('m-custo').value = produtoAtual.cost; document.getElementById('m-preco').value = produtoAtual.price;
             
-            document.getElementById('m-desc-curta').value = produtoAtual.desc || '';
-            document.getElementById('m-desc-comp').value = produtoAtual.descComp || '';
+            document.getElementById('m-desc-curta').value = produtoAtual.desc || ''; document.getElementById('m-desc-comp').value = produtoAtual.descComp || '';
             document.getElementById('m-ia-output').innerText = 'Aguardando comando...';
 
-            document.getElementById('m-altura').value = produtoAtual.log?.alt || '';
-            document.getElementById('m-largura').value = produtoAtual.log?.lar || '';
-            document.getElementById('m-prof').value = produtoAtual.log?.pro || '';
-            document.getElementById('m-peso').value = produtoAtual.log?.pes || '';
-            document.getElementById('m-emb-extra').value = produtoAtual.log?.embExtra || '';
-            document.getElementById('m-frete-extra').value = produtoAtual.log?.freteExtra || '';
+            document.getElementById('m-altura').value = produtoAtual.log?.alt || ''; document.getElementById('m-largura').value = produtoAtual.log?.lar || '';
+            document.getElementById('m-prof').value = produtoAtual.log?.pro || ''; document.getElementById('m-peso').value = produtoAtual.log?.pes || '';
+            document.getElementById('m-emb-extra').value = produtoAtual.log?.embExtra || ''; document.getElementById('m-frete-extra').value = produtoAtual.log?.freteExtra || '';
             document.getElementById('m-prazo').value = produtoAtual.log?.prazo || '0';
 
-            // Inicia Modal com Marketplaces renderizados via InnerHTML *uma única vez*
-            renderMarketplacesBase(); 
-            recalcularModalGeral(); 
-            switchModalTab('geral');
-            
+            document.getElementById('m-ncm').value = produtoAtual.fisc?.ncm || ''; document.getElementById('m-origem').value = produtoAtual.fisc?.origem || '0';
+            document.getElementById('m-cfop').value = produtoAtual.fisc?.cfop || ''; document.getElementById('m-cst').value = produtoAtual.fisc?.cst || '';
+            document.getElementById('m-icms').value = produtoAtual.fisc?.icms || ''; document.getElementById('m-pis').value = produtoAtual.fisc?.pis || ''; document.getElementById('m-cofins').value = produtoAtual.fisc?.cofins || '';
+
+            document.getElementById('m-radar-resultados').innerHTML = '<div class="text-slate-500 text-sm flex flex-col items-center justify-center h-full"><i class="fas fa-radar text-4xl mb-3 opacity-20"></i>Aguardando alvos...</div>';
+
+            renderMarketplacesBase(); recalcularModalGeral(); switchModalTab('geral');
             document.getElementById('modal-produto').classList.remove('hidden');
         }
 
-        function fecharModal() {
-            document.getElementById('modal-produto').classList.add('hidden');
-            produtoAtual = null;
-        }
+        function fecharModal() { document.getElementById('modal-produto').classList.add('hidden'); produtoAtual = null; }
 
         function switchModalTab(tab) {
             ['geral', 'desc', 'precos', 'log', 'fisc', 'radar'].forEach(t => {
@@ -823,40 +741,27 @@
 
         function recalcularModalGeral() {
             if(!produtoAtual) return;
-            const c = parseFloat(document.getElementById('m-custo').value) || 0;
-            const p = parseFloat(document.getElementById('m-preco').value) || 0;
-            
+            const c = parseFloat(document.getElementById('m-custo').value) || 0; const p = parseFloat(document.getElementById('m-preco').value) || 0;
             const mockProd = { cost: c, log: { embExtra: document.getElementById('m-emb-extra').value, freteExtra: document.getElementById('m-frete-extra').value } };
-            const base = getBaseCost(mockProd);
-            const sug = calcBlingPrice(mockProd);
-            const margem = calcMargin(p, base);
+            const base = getBaseCost(mockProd); const sug = calcBlingPrice(mockProd); const margem = calcMargin(p, base);
 
-            document.getElementById('m-custo-total-display').innerText = `R$ ${f2(base)}`;
-            document.getElementById('m-preco-display').innerText = `R$ ${f2(p)}`;
-            document.getElementById('m-sugerido-display').innerText = `R$ ${f2(sug)}`;
-            document.getElementById('m-preco-ref').innerText = f2(p);
+            document.getElementById('m-custo-total-display').innerText = `R$ ${f2(base)}`; document.getElementById('m-preco-display').innerText = `R$ ${f2(p)}`; document.getElementById('m-sugerido-display').innerText = `R$ ${f2(sug)}`; document.getElementById('m-preco-ref').innerText = f2(p);
             
             const mEl = document.getElementById('m-margem-display');
-            mEl.innerText = `${margem.toFixed(1)}%`;
-            mEl.className = margem >= 30 ? 'text-2xl font-black text-emerald-600' : 'text-2xl font-black text-rose-600';
+            mEl.innerText = `${margem.toFixed(1)}%`; mEl.className = margem >= 30 ? 'text-2xl font-black text-emerald-600' : (margem >= 15 ? 'text-2xl font-black text-amber-600' : 'text-2xl font-black text-rose-600');
 
-            // Atualiza os valores matemáticos das plataformas sem recriar os inputs
-            atualizarValoresMarketplaces(mockProd, p);
+            atualizarValoresMarketplaces(mockProd, p); // Atualiza textos de mkt silenciosamente (correção do bug)
         }
 
-        // Renderiza as caixas de marketplace uma vez quando abre o modal
         function renderMarketplacesBase() {
-            const container = document.getElementById('m-container-marketplaces');
-            container.innerHTML = '';
+            const container = document.getElementById('m-container-marketplaces'); container.innerHTML = '';
             if(!mpRates[produtoAtual.id]) mpRates[produtoAtual.id] = {};
 
             PLATS.forEach(pl => {
                 const rates = mpRates[produtoAtual.id][pl.id] || {};
                 let inputsHTML = '';
-                
                 pl.fees.forEach(f => {
                     const val = rates[f.k] ?? f.d;
-                    // Ao digitar, chama salvarTaxaMkt
                     inputsHTML += `<div><label class="text-[10px] font-bold text-slate-500 uppercase block mb-1">${f.l} (${f.u})</label>
                     <input type="number" step="0.1" value="${val}" class="ios-input w-full text-xs font-bold" oninput="salvarTaxaMkt(${produtoAtual.id}, '${pl.id}', '${f.k}', this.value)"></div>`;
                 });
@@ -873,138 +778,93 @@
                         </div>
                     </div>`;
             });
-            initDragAndDrop(); // Re-vincula os eventos de drag
+            initDragAndDrop();
         }
 
-        // A MÁGICA: Atualiza apenas os textos, mantendo o cursor do usuário intacto nos inputs
+        // A CORREÇÃO DO BUG DE DIGITAÇÃO: Altera apenas InnerText e não InnerHTML
         function atualizarValoresMarketplaces(mockProd, currentPrice) {
             PLATS.forEach(pl => {
                 const precoMkt = calcMktPrice(currentPrice, pl.id, produtoAtual.id);
                 const margemMkt = calcMargin(precoMkt, getBaseCost(mockProd));
                 const lucroReais = precoMkt - getBaseCost(mockProd);
 
-                const elPreco = document.getElementById(`p-mkt-${pl.id}`);
-                const elLucro = document.getElementById(`l-mkt-${pl.id}`);
-                
+                const elPreco = document.getElementById(`p-mkt-${pl.id}`); const elLucro = document.getElementById(`l-mkt-${pl.id}`);
                 if(elPreco) elPreco.innerText = `R$ ${precoMkt.toFixed(2)}`;
-                if(elLucro) {
-                    elLucro.innerText = `R$ ${lucroReais.toFixed(2)} (${margemMkt.toFixed(1)}%)`;
-                    elLucro.className = margemMkt >= 15 ? 'font-black text-emerald-600' : 'font-black text-rose-600';
-                }
+                if(elLucro) { elLucro.innerText = `R$ ${lucroReais.toFixed(2)} (${margemMkt.toFixed(1)}%)`; elLucro.className = margemMkt >= 15 ? 'font-black text-emerald-600' : 'font-black text-rose-600'; }
             });
         }
 
         function salvarTaxaMkt(prodId, platId, key, val) {
             if(!mpRates[prodId][platId]) mpRates[prodId][platId] = {};
             mpRates[prodId][platId][key] = parseFloat(val) || 0;
-            // Salva silenciosamente e apenas re-calcula os textos de resultado
             localStorage.setItem('sostrass_rates', JSON.stringify(mpRates));
-            recalcularModalGeral(); 
+            recalcularModalGeral();
         }
 
         function salvarModalCompleto() {
             if(!produtoAtual) return;
-            produtoAtual.cat = document.getElementById('m-cat').value;
-            produtoAtual.stock = parseInt(document.getElementById('m-estoque').value) || 0;
-            produtoAtual.cost = parseFloat(document.getElementById('m-custo').value) || 0;
-            produtoAtual.price = parseFloat(document.getElementById('m-preco').value) || 0;
-            produtoAtual.desc = document.getElementById('m-desc-curta').value;
-            produtoAtual.descComp = document.getElementById('m-desc-comp').value;
+            produtoAtual.cat = document.getElementById('m-cat').value; produtoAtual.stock = parseInt(document.getElementById('m-estoque').value) || 0;
+            produtoAtual.cost = parseFloat(document.getElementById('m-custo').value) || 0; produtoAtual.price = parseFloat(document.getElementById('m-preco').value) || 0;
+            produtoAtual.desc = document.getElementById('m-desc-curta').value; produtoAtual.descComp = document.getElementById('m-desc-comp').value;
 
-            produtoAtual.log = {
-                alt: document.getElementById('m-altura').value, lar: document.getElementById('m-largura').value,
-                pro: document.getElementById('m-prof').value, pes: document.getElementById('m-peso').value,
-                embExtra: document.getElementById('m-emb-extra').value, freteExtra: document.getElementById('m-frete-extra').value,
-                prazo: document.getElementById('m-prazo').value
-            };
-            localStorage.setItem('sostrass_prods', JSON.stringify(products));
-            renderCatalogo(); fecharModal();
-            mostrarToast(`Produto salvo!`); addLog(`PIM: Ficha ${produtoAtual.sku} atualizada.`, 'ok');
+            produtoAtual.log = { alt: document.getElementById('m-altura').value, lar: document.getElementById('m-largura').value, pro: document.getElementById('m-prof').value, pes: document.getElementById('m-peso').value, embExtra: document.getElementById('m-emb-extra').value, freteExtra: document.getElementById('m-frete-extra').value, prazo: document.getElementById('m-prazo').value };
+            produtoAtual.fisc = { ncm: document.getElementById('m-ncm').value, origem: document.getElementById('m-origem').value, cfop: document.getElementById('m-cfop').value, cst: document.getElementById('m-cst').value, icms: document.getElementById('m-icms').value, pis: document.getElementById('m-pis').value, cofins: document.getElementById('m-cofins').value };
+
+            localStorage.setItem('sostrass_prods', JSON.stringify(products)); renderCatalogo(); fecharModal();
+            mostrarToast(`Produto ${produtoAtual.sku} atualizado!`); addLog(`PIM: Ficha ${produtoAtual.sku} salva.`, 'ok');
         }
 
-        // ==========================================
-        // 6. I.A., RADAR E CONFIGURAÇÕES
-        // ==========================================
+        // --- I.A E RADAR ---
         async function gerarIAPrompt(tipo) {
             if(!serverOnline) return mostrarToast("Proxy Offline.", "aviso");
-            const box = document.getElementById('m-ia-output');
-            box.innerHTML = '<span class="text-amber-400"><i class="fas fa-spinner fa-spin"></i> Conectando ao Gemini...</span>';
-            
-            const prompt = `Produto: ${document.getElementById('m-nome').innerText}. Instrução: ${document.getElementById('m-ia-inst').value}. Contexto: ${document.getElementById('m-ia-ctx').value}. 
-            ${tipo === 'curta' ? 'Crie um título conversivo.' : 'Crie uma descrição detalhada com bullet points focada em medidas precisas.'}`;
-
-            try {
-                const res = await fetch(`${API_BASE}/api/ia/gerar`, { method: 'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ prompt, model: modeloIA }) });
-                const data = await res.json();
-                box.innerText = (data.candidates?.[0]?.content?.parts?.[0]?.text || data.descricao_gerada || "Sem resposta").replace(/\*/g, '');
-                addLog(`IA gerou conteúdo para ${produtoAtual.sku}`, "ok");
-            } catch(e) { box.innerText = "Erro na requisição."; addLog("Erro IA: " + e.message, "err"); }
+            const box = document.getElementById('m-ia-output'); box.innerHTML = '<span class="text-amber-400"><i class="fas fa-spinner fa-spin"></i> Conectando ao Gemini...</span>';
+            const prompt = `Produto: ${document.getElementById('m-nome').innerText}. Instrução: ${document.getElementById('m-ia-inst').value}. Contexto: ${document.getElementById('m-ia-ctx').value}. ${tipo === 'curta' ? 'Crie um título conversivo.' : 'Crie uma descrição detalhada com bullet points focada em medidas precisas.'}`;
+            try { const res = await fetch(`${API_BASE}/api/ia/gerar`, { method: 'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ prompt, model: modeloIA }) }); const data = await res.json();
+                box.innerText = (data.candidates?.[0]?.content?.parts?.[0]?.text || data.descricao_gerada || "Sem resposta").replace(/\*/g, ''); addLog(`IA gerou conteúdo para ${produtoAtual.sku}`, "ok");
+            } catch(e) { box.innerText = "Erro."; addLog("Erro IA", "err"); }
         }
 
-        function aplicarIA(targetId) {
-            document.getElementById(targetId).value = document.getElementById('m-ia-output').innerText;
-            mostrarToast("Conteúdo aplicado!");
-        }
+        function aplicarIA(targetId) { document.getElementById(targetId).value = document.getElementById('m-ia-output').innerText; mostrarToast("Aplicado!"); }
 
         async function acionarRadarModal() {
             const urls = document.getElementById('m-radar-urls').value.split('\n').map(u => u.trim()).filter(Boolean);
-            if(urls.length === 0) return mostrarToast("Insira links.", 'aviso');
-            if(!serverOnline) return mostrarToast("Servidor Offline.", 'aviso');
-
+            if(urls.length === 0) return mostrarToast("Insira links.", 'aviso'); if(!serverOnline) return mostrarToast("Servidor Offline.", 'aviso');
             const btn = document.getElementById('btn-radar-modal'); const resArea = document.getElementById('m-radar-resultados');
             btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Varrendo JSON-LD...`; resArea.innerHTML = '';
-
-            try {
-                const res = await fetch(`${API_BASE}/api/scraper/precos-multiplos`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ urls }) });
-                const data = await res.json();
-                if(data.sucesso) {
-                    const base = getBaseCost({cost: parseFloat(document.getElementById('m-custo').value) || 0, log: {}}); 
+            try { const res = await fetch(`${API_BASE}/api/scraper/precos-multiplos`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ urls }) }); const data = await res.json();
+                if(data.sucesso) { const base = getBaseCost({cost: parseFloat(document.getElementById('m-custo').value) || 0, log: {}}); 
                     data.resultados.forEach((item, i) => {
-                        if(item.sucesso) {
-                            const pNum = parseFloat(item.preco.replace(/[^0-9,.]/g, '').replace(',', '.'));
-                            const mg = calcMargin(pNum, base);
+                        if(item.sucesso) { const pNum = parseFloat(item.preco.replace(/[^0-9,.]/g, '').replace(',', '.')); const mg = calcMargin(pNum, base);
                             resArea.innerHTML += `<div class="bg-slate-800 rounded-xl p-4 flex justify-between shadow-inner"><div><p class="text-[10px] text-slate-400 font-bold">Alvo ${i+1}</p><p class="text-xl font-black text-white">R$ ${pNum.toFixed(2)}</p></div><div class="text-right"><p class="text-[10px] text-slate-500 uppercase">Sua Margem:</p><p class="text-lg font-black ${mg >= 30 ? 'text-emerald-500' : 'text-rose-500'}">${mg.toFixed(1)}%</p></div></div>`;
-                        } else {
-                            resArea.innerHTML += `<div class="bg-rose-900/30 p-3 text-xs text-rose-400 rounded-xl">Alvo ${i+1}: Bloqueado pelo Datadome.</div>`;
-                        }
+                        } else resArea.innerHTML += `<div class="bg-rose-900/30 p-3 text-xs text-rose-400 rounded-xl">Alvo ${i+1}: Bloqueado pelo Datadome.</div>`;
                     });
                 }
-            } catch(e) { mostrarToast("Falha.", 'err'); }
-            btn.innerHTML = `<i class="fas fa-search-dollar"></i> Iniciar Varredura`;
+            } catch(e) { mostrarToast("Falha.", 'err'); } btn.innerHTML = `<i class="fas fa-search-dollar"></i> Iniciar Varredura`;
         }
 
-        // Configs e Logs
+        // Configs
         function simularPreco(c) {
             const num = parseFloat(c)||0, imp=parseFloat(document.getElementById('cg-imp').value)||0, car=parseFloat(document.getElementById('cg-cartao').value)||0, emb=parseFloat(document.getElementById('cg-emb').value)||0, fre=parseFloat(document.getElementById('cg-frete').value)||0, ganho=parseFloat(document.getElementById('cg-ganho').value)||0;
-            const res = (1 - (ganho+imp+car)/100) > 0 ? (num+emb+fre) / (1 - (ganho+imp+car)/100) : 0;
-            document.getElementById('sim-resultado').innerText = `R$ ${f2(res)}`;
+            const res = (1 - (ganho+imp+car)/100) > 0 ? (num+emb+fre) / (1 - (ganho+imp+car)/100) : 0; document.getElementById('sim-resultado').innerText = `R$ ${f2(res)}`;
         }
         function salvarCustosGlobais() {
             globalCosts = { imposto: parseFloat(document.getElementById('cg-imp').value)||0, cartao: parseFloat(document.getElementById('cg-cartao').value)||0, embalagem: parseFloat(document.getElementById('cg-emb').value)||0, frete: parseFloat(document.getElementById('cg-frete').value)||0, ganho: parseFloat(document.getElementById('cg-ganho').value)||0 };
             localStorage.setItem('sostrass_gc', JSON.stringify(globalCosts)); mostrarToast("Globais salvos."); renderCatalogo();
         }
         function saveCfg() { API_BASE = document.getElementById('cfgApiBase').value; modeloIA = document.getElementById('cfgModel').value; localStorage.setItem('sostrass_apibase', API_BASE); localStorage.setItem('sostrass_model', modeloIA); mostrarToast("Conexão Salva."); testarServidor(); }
+        
         async function testarServidor() {
-            const bar = document.getElementById('serverBar'); bar.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Proxy...'; bar.className = "flex items-center gap-2 text-xs font-bold text-amber-700 bg-amber-100 px-3 py-1.5 rounded-full border border-amber-200 shadow-inner";
-            try { const r = await fetch(`${API_BASE}/`); if(r.ok) { serverOnline = true; bar.innerHTML = '<i class="fas fa-shield-check"></i> API Online'; bar.className = "flex items-center gap-2 text-xs font-bold text-emerald-700 bg-emerald-100 px-3 py-1.5 rounded-full border border-emerald-200 shadow-inner"; addLog("Proxy OK", "ok"); } else throw new Error("Err"); } 
-            catch(e) { serverOnline = false; bar.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Backend Offline'; bar.className = "flex items-center gap-2 text-xs font-bold text-rose-700 bg-rose-100 px-3 py-1.5 rounded-full border border-rose-200 shadow-inner"; addLog("Falha no Proxy", "err"); }
+            const bar = document.getElementById('serverBar'); bar.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Proxy...'; bar.className = "flex items-center gap-2 text-xs font-bold text-amber-700 bg-amber-100 px-3 py-1.5 rounded-full border border-amber-200 shadow-inner transition-colors";
+            try { const r = await fetch(`${API_BASE}/`); if(r.ok) { serverOnline = true; bar.innerHTML = '<i class="fas fa-shield-check"></i> API Online'; bar.className = "flex items-center gap-2 text-xs font-bold text-emerald-700 bg-emerald-100 px-3 py-1.5 rounded-full border border-emerald-200 shadow-inner transition-colors"; addLog("Proxy conectado.", "ok"); } else throw new Error("Err"); } 
+            catch(e) { serverOnline = false; bar.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Backend Offline'; bar.className = "flex items-center gap-2 text-xs font-bold text-rose-700 bg-rose-100 px-3 py-1.5 rounded-full border border-rose-200 shadow-inner transition-colors"; addLog("Proxy Inacessível", "err"); }
         }
-        function renderLogE(filtro) {
-            const c = document.getElementById('log-container'); if(!c) return;
-            c.innerHTML = actLog.filter(l => filtro === 'all' || l.type === filtro).map(l => `<div class="border-b border-slate-800 pb-1"><span class="text-slate-600">[${l.ts.split(' ')[1]}]</span> <span class="${l.type==='err'?'text-rose-400':(l.type==='ok'?'text-emerald-400':'text-slate-300')}">${l.msg}</span></div>`).join('');
-        }
-        function saveLogs() { localStorage.setItem('sostrass_logs', JSON.stringify(actLog)); }
 
-        // Inicialização
+        // Init
         window.onload = () => {
             document.getElementById('cfgApiBase').value = API_BASE; document.getElementById('cfgModel').value = modeloIA;
             document.getElementById('cg-imp').value = globalCosts.imposto; document.getElementById('cg-cartao').value = globalCosts.cartao; document.getElementById('cg-emb').value = globalCosts.embalagem; document.getElementById('cg-frete').value = globalCosts.frete; document.getElementById('cg-ganho').value = globalCosts.ganho;
-            renderCatalogo(); testarServidor(); simularPreco(document.getElementById('sim-custo').value); navTo('catalogo');
+            testarServidor(); simularPreco(document.getElementById('sim-custo').value); navTo('catalogo');
         };
     </script>
 </body>
 </html>
-
-
-
-
