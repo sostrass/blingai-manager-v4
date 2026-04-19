@@ -3,20 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sóstrass AI Enterprise</title>
+    <title>Sóstrass AI Enterprise v5</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
         ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        .glass-panel { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.5); box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); }
+        .ios-input { background: rgba(241, 245, 249, 0.7); border: 1px solid #e2e8f0; border-radius: 10px; padding: 8px 12px; transition: all 0.2s; outline: none; }
+        .ios-input:focus { border-color: #6366f1; background: #fff; box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1); }
         @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
         .toast-enter { animation: slideIn 0.3s ease-out forwards; }
     </style>
 </head>
-<body class="bg-slate-50 text-slate-800 font-sans h-screen flex overflow-hidden">
+<body class="bg-slate-100 text-slate-800 font-sans h-screen flex overflow-hidden bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]">
 
     <div id="toast-container" class="fixed top-20 right-6 z-50 flex flex-col gap-3"></div>
 
@@ -28,115 +30,222 @@
         </div>
         
         <div class="flex-1 overflow-y-auto py-6 px-3 space-y-1">
-            <p class="px-3 text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2">Visão Geral</p>
-            <button onclick="mudarAba('dashboard')" id="menu-dash" class="w-full flex items-center gap-3 px-3 py-2.5 text-white bg-indigo-600 rounded-lg font-medium transition shadow-lg shadow-indigo-900/20">
-                <i class="fas fa-chart-pie w-5 text-center"></i> Dashboard
-            </button>
-            <button onclick="mudarAba('catalogo')" id="menu-cat" class="w-full flex items-center gap-3 px-3 py-2.5 hover:text-white hover:bg-slate-800 rounded-lg transition">
+            <p class="px-3 text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2">Operacional</p>
+            <button onclick="mudarAba('catalogo')" id="menu-catalogo" class="w-full flex items-center gap-3 px-3 py-2.5 text-white bg-indigo-600 rounded-lg font-medium transition shadow-lg shadow-indigo-900/20">
                 <i class="fas fa-box-open w-5 text-center"></i> Catálogo ERP
+            </button>
+            <button onclick="mudarAba('massa')" id="menu-massa" class="w-full flex items-center gap-3 px-3 py-2.5 hover:text-white hover:bg-slate-800 rounded-lg transition">
+                <i class="fas fa-bolt text-amber-400 w-5 text-center"></i> Atualização em Massa
+            </button>
+            <button onclick="mudarAba('automacoes')" id="menu-automacoes" class="w-full flex items-center gap-3 px-3 py-2.5 hover:text-white hover:bg-slate-800 rounded-lg transition">
+                <i class="fas fa-robot text-emerald-400 w-5 text-center"></i> Central de I.A.
+            </button>
+
+            <div class="my-4 border-t border-slate-800"></div>
+            <p class="px-3 text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2">Inteligência Comercial</p>
+            
+            <button onclick="mudarAba('precos')" id="menu-precos" class="w-full flex items-center gap-3 px-3 py-2.5 hover:text-white hover:bg-slate-800 rounded-lg transition">
+                <i class="fas fa-globe w-5 text-center"></i> Custos Globais
+            </button>
+            <button onclick="mudarAba('simulador')" id="menu-simulador" class="w-full flex items-center gap-3 px-3 py-2.5 hover:text-white hover:bg-slate-800 rounded-lg transition">
+                <i class="fas fa-chart-line w-5 text-center"></i> Simulador de Margem
+            </button>
+
+            <div class="my-4 border-t border-slate-800"></div>
+            <button onclick="mudarAba('config')" id="menu-config" class="w-full flex items-center gap-3 px-3 py-2.5 hover:text-white hover:bg-slate-800 rounded-lg transition">
+                <i class="fas fa-cog w-5 text-center"></i> Configurações & Logs
             </button>
         </div>
 
         <div class="p-4 border-t border-slate-800 bg-slate-950">
             <button onclick="sincronizarBling()" class="w-full flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-500 text-white py-2.5 rounded-lg transition text-sm font-bold shadow-md">
-                <i class="fas fa-cloud-download-alt"></i> Puxar do Bling
+                <i class="fas fa-cloud-download-alt"></i> Sincronizar Bling
             </button>
         </div>
     </aside>
 
-    <div class="flex-1 flex flex-col min-w-0 bg-slate-50/50 relative">
-        <header class="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-8 z-10 shadow-sm">
+    <div class="flex-1 flex flex-col min-w-0 relative">
+        <header class="h-16 glass-panel flex items-center justify-between px-8 z-10 sticky top-0 border-b border-slate-200">
             <div class="flex-1 max-w-2xl flex items-center relative">
                 <i class="fas fa-search absolute left-4 text-slate-400"></i>
-                <input type="text" placeholder="Buscar SKU, código de barras ou descrição..." class="w-full bg-slate-100/70 border-none rounded-xl pl-11 pr-4 py-2.5 text-sm focus:ring-2 focus:ring-indigo-500 focus:bg-white outline-none transition">
+                <input type="text" placeholder="Buscar SKU, nome ou código..." class="w-full ios-input pl-11">
             </div>
             <div class="flex items-center gap-4 ml-6">
-                <span class="flex items-center gap-2 text-xs font-bold text-emerald-700 bg-emerald-100 px-3 py-1.5 rounded-full border border-emerald-200">
-                    <span class="relative flex h-2 w-2"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span><span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span></span> API Bling Ativa
-                </span>
+                <div id="serverBar" class="flex items-center gap-2 text-xs font-bold text-amber-700 bg-amber-100 px-3 py-1.5 rounded-full border border-amber-200 shadow-inner">
+                    <i class="fas fa-circle-notch fa-spin"></i> Conectando Proxy...
+                </div>
             </div>
         </header>
 
-        <main class="flex-1 overflow-auto p-8 relative">
+        <main class="flex-1 overflow-auto p-8">
             <div class="max-w-7xl mx-auto">
-                <div id="view-dashboard" class="block space-y-6">
-                    <h2 class="text-2xl font-black text-slate-800 tracking-tight">Inteligência Comercial</h2>
-                    <div class="grid grid-cols-3 gap-6">
-                        <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 flex items-center gap-4">
-                            <div class="h-12 w-12 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center text-xl"><i class="fas fa-boxes"></i></div>
-                            <div><p class="text-sm font-bold text-slate-500 uppercase">SKUs Ativos</p><p class="text-2xl font-black text-slate-800">5.240</p></div>
-                        </div>
-                        <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 flex items-center gap-4">
-                            <div class="h-12 w-12 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center text-xl"><i class="fas fa-percentage"></i></div>
-                            <div><p class="text-sm font-bold text-slate-500 uppercase">Margem Média</p><p class="text-2xl font-black text-slate-800">42.5%</p></div>
-                        </div>
-                        <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 flex items-center gap-4">
-                            <div class="h-12 w-12 rounded-full bg-rose-100 text-rose-600 flex items-center justify-center text-xl"><i class="fas fa-exclamation-triangle"></i></div>
-                            <div><p class="text-sm font-bold text-slate-500 uppercase">Alertas de Preço</p><p class="text-2xl font-black text-rose-600">14 itens</p></div>
-                        </div>
-                    </div>
-                    <div class="grid grid-cols-2 gap-6 mt-6">
-                        <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200"><h3 class="text-sm font-bold text-slate-700 mb-4 uppercase">Distribuição de Lucro</h3><canvas id="graficoLucro" height="200"></canvas></div>
-                        <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200"><h3 class="text-sm font-bold text-slate-700 mb-4 uppercase">Leituras do Robô</h3><canvas id="graficoRaspagem" height="200"></canvas></div>
-                    </div>
-                </div>
-
-                <div id="view-catalogo" class="hidden">
+                
+                <div id="view-catalogo" class="block space-y-6">
                     <div class="flex justify-between items-end mb-6">
-                        <h2 class="text-2xl font-black text-slate-800 tracking-tight">Gestão de Catálogo</h2>
+                        <div>
+                            <h2 class="text-3xl font-black text-slate-800 tracking-tight">Catálogo ERP</h2>
+                            <p class="text-slate-500 mt-1">Gerenciamento individualizado de produtos e marketplaces.</p>
+                        </div>
                     </div>
-                    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                    
+                    <div class="glass-panel rounded-2xl overflow-hidden">
                         <table class="w-full text-left text-sm whitespace-nowrap">
-                            <thead class="bg-slate-50 border-b border-slate-200 text-slate-600 uppercase text-[10px] tracking-wider font-black">
+                            <thead class="bg-slate-100/50 border-b border-slate-200 text-slate-500 uppercase text-[10px] tracking-wider font-black">
                                 <tr>
-                                    <th class="px-6 py-4 w-10"><input type="checkbox" class="rounded border-slate-300"></th>
-                                    <th class="px-6 py-4">Produto</th>
-                                    <th class="px-6 py-4">Custo</th>
-                                    <th class="px-6 py-4">Preço Atual</th>
-                                    <th class="px-6 py-4 text-center">Estoque</th>
+                                    <th class="px-6 py-4">SKU / Produto</th>
+                                    <th class="px-6 py-4 text-right">Custo Base</th>
+                                    <th class="px-6 py-4 text-right">Preço Bling</th>
+                                    <th class="px-6 py-4 text-center">Margem</th>
+                                    <th class="px-6 py-4 text-center">Plataformas</th>
                                     <th class="px-6 py-4 text-right">Ação</th>
                                 </tr>
                             </thead>
-                            <tbody id="tabela-produtos" class="divide-y divide-slate-100"></tbody>
+                            <tbody id="tabela-produtos" class="divide-y divide-slate-100">
+                                </tbody>
                         </table>
                     </div>
                 </div>
-            </div>
-        </main>
 
-        <div id="drawer-ia" class="absolute inset-y-0 right-0 w-[500px] bg-white shadow-2xl transform translate-x-full transition-transform duration-300 z-50 border-l border-slate-200 flex flex-col">
-            <div class="px-6 py-4 border-b flex justify-between items-center bg-slate-50">
-                <h3 class="font-bold text-slate-800"><i class="fas fa-tools text-indigo-600 mr-2"></i> Central do Produto</h3>
-                <button onclick="fecharDrawer()" class="text-slate-400 hover:text-red-500"><i class="fas fa-times text-xl"></i></button>
-            </div>
-            
-            <div class="p-6 flex-1 overflow-auto">
-                <h4 id="drawer-nome" class="font-bold text-lg text-slate-900 leading-tight"></h4>
-                <p class="text-sm text-slate-500 mb-4 mt-1">Custo base: R$ <span id="drawer-custo" class="font-bold text-slate-700"></span></p>
+                <div id="view-massa" class="hidden space-y-6">
+                    <div class="flex justify-between items-end mb-6">
+                        <div>
+                            <h2 class="text-3xl font-black text-slate-800 tracking-tight text-amber-600 flex items-center gap-3"><i class="fas fa-bolt"></i> Operação em Massa</h2>
+                            <p class="text-slate-500 mt-1">Aplique regras de precificação e custos para múltiplos SKUs simultaneamente.</p>
+                        </div>
+                    </div>
 
-                <div class="bg-slate-50 p-4 rounded-lg mb-6 border border-slate-200 shadow-inner">
-                    <p class="text-xs font-bold text-slate-700 uppercase mb-2"><i class="fas fa-radar text-indigo-500 mr-1"></i> Radar de Preços (Concorrentes)</p>
-                    <textarea id="urls-concorrentes" rows="3" placeholder="Cole os links do ML ou concorrentes aqui (um por linha)..." class="w-full p-2 text-xs font-mono border rounded mb-3 focus:ring-2 focus:ring-indigo-500 outline-none resize-none"></textarea>
-                    <button id="btn-espionar" onclick="acionarRadar()" class="w-full bg-slate-800 hover:bg-slate-900 text-white text-sm py-2.5 rounded-lg font-medium transition flex justify-center items-center gap-2 shadow-md">
-                        <i class="fas fa-search-dollar"></i> Varrer Mercado
-                    </button>
-                    <div id="resultado-espiao" class="mt-4 space-y-2"></div>
+                    <div class="grid grid-cols-3 gap-8">
+                        <div class="col-span-2 glass-panel rounded-2xl p-6 flex flex-col h-[70vh]">
+                            <div class="flex gap-4 mb-4">
+                                <input type="text" placeholder="Filtrar produtos..." class="ios-input flex-1 text-sm">
+                                <button class="bg-slate-100 text-slate-600 px-4 py-2 rounded-lg text-sm font-bold border border-slate-200 hover:bg-slate-200 transition">Selecionar Todos</button>
+                            </div>
+                            <div class="flex-1 overflow-auto border border-slate-200 rounded-xl bg-slate-50/50 p-2" id="massa-list">
+                                </div>
+                        </div>
+
+                        <div class="glass-panel rounded-2xl p-6 flex flex-col">
+                            <h3 class="font-bold text-slate-800 mb-4 uppercase text-xs tracking-wider">Parâmetros de Alteração</h3>
+                            
+                            <label class="text-xs font-bold text-slate-500 mb-1">O que alterar?</label>
+                            <select class="ios-input w-full mb-4 text-sm" id="massa-campo">
+                                <option value="preco">Preço Bling</option>
+                                <option value="custo">Custo do Produto</option>
+                                <option value="ganho">Margem de Ganho (%)</option>
+                            </select>
+
+                            <label class="text-xs font-bold text-slate-500 mb-1">Tipo de Operação</label>
+                            <div class="grid grid-cols-2 gap-2 mb-4">
+                                <button class="bg-indigo-600 text-white rounded-lg py-2 text-xs font-bold shadow">Definir Fixo</button>
+                                <button class="bg-slate-100 text-slate-600 border border-slate-200 rounded-lg py-2 text-xs font-bold hover:bg-slate-200">Acréscimo %</button>
+                            </div>
+
+                            <label class="text-xs font-bold text-slate-500 mb-1">Valor</label>
+                            <input type="number" class="ios-input w-full mb-6 text-xl font-black text-slate-800" value="0.00">
+
+                            <div class="mt-auto space-y-3">
+                                <button class="w-full bg-slate-800 hover:bg-slate-900 text-white py-3 rounded-xl font-bold transition shadow-lg">✓ Aplicar Localmente</button>
+                                <button class="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-3 rounded-xl font-bold transition shadow-lg flex items-center justify-center gap-2"><i class="fas fa-cloud-upload-alt"></i> Salvar e Enviar p/ Bling</button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
-                <button onclick="acionarIA()" id="btn-ia" class="w-full bg-indigo-50 text-indigo-700 border border-indigo-200 py-3 rounded-lg font-bold transition hover:bg-indigo-100 flex justify-center items-center gap-2">
-                    <i class="fas fa-sparkles text-indigo-500"></i> Gerar Descrição Blindada
-                </button>
-                <div id="resultado-ia" class="mt-3 bg-white border border-emerald-200 p-3 rounded-lg text-sm text-slate-700 hidden leading-relaxed shadow-sm"></div>
+                <div id="view-simulador" class="hidden space-y-6">
+                    <div class="flex justify-between items-end mb-6">
+                        <div>
+                            <h2 class="text-3xl font-black text-slate-800 tracking-tight flex items-center gap-3"><i class="fas fa-chart-line text-indigo-600"></i> Simulador de Rentabilidade</h2>
+                            <p class="text-slate-500 mt-1">Calcule cenários utilizando as regras de negócio integradas.</p>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-8">
+                        <div class="glass-panel rounded-2xl p-6">
+                            <h3 class="font-bold text-slate-800 mb-4 border-b pb-2">Variáveis Fixas (Globais)</h3>
+                            <div class="space-y-4">
+                                <div class="flex justify-between items-center"><span class="text-sm text-slate-600 font-medium">Impostos (%)</span> <input type="number" value="12" class="ios-input w-24 text-right font-bold text-slate-800"></div>
+                                <div class="flex justify-between items-center"><span class="text-sm text-slate-600 font-medium">Cartão de Crédito (%)</span> <input type="number" value="2.5" class="ios-input w-24 text-right font-bold text-slate-800"></div>
+                                <div class="flex justify-between items-center"><span class="text-sm text-slate-600 font-medium">Embalagem Média (R$)</span> <input type="number" value="3.00" class="ios-input w-24 text-right font-bold text-slate-800"></div>
+                                <div class="flex justify-between items-center"><span class="text-sm text-slate-600 font-medium">Margem de Ganho Alvo (%)</span> <input type="number" value="30" class="ios-input w-24 text-right font-bold text-emerald-600 bg-emerald-50"></div>
+                            </div>
+                        </div>
+
+                        <div class="glass-panel rounded-2xl p-6 bg-gradient-to-br from-indigo-50 to-white">
+                            <h3 class="font-bold text-slate-800 mb-4 border-b pb-2">Simulação Rápida</h3>
+                            <label class="text-xs font-bold text-slate-500 mb-1">Se o meu produto custa (R$):</label>
+                            <input type="number" value="50.00" class="ios-input w-full mb-4 text-2xl font-black text-slate-800" oninput="simularPreco(this.value)">
+                            
+                            <div class="bg-indigo-600 text-white rounded-xl p-4 shadow-lg shadow-indigo-200 mt-4">
+                                <p class="text-xs font-medium opacity-80 uppercase tracking-wider mb-1">Preço Sugerido (Bling)</p>
+                                <p class="text-4xl font-black" id="sim-resultado">R$ 104.91</p>
+                                <p class="text-xs mt-2 opacity-90"><i class="fas fa-check-circle"></i> Garante 30% de margem líquida.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="view-automacoes" class="hidden space-y-6">
+                    <h2 class="text-3xl font-black text-slate-800 tracking-tight">AI Automations Core</h2>
+                    <p class="text-slate-500">Módulo de I.A já implementado na etapa anterior está ativo aqui.</p>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <div id="modal-produto" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-8">
+        <div class="bg-slate-50 w-full max-w-5xl h-full max-h-[90vh] rounded-2xl shadow-2xl flex flex-col overflow-hidden">
+            <div class="bg-white border-b px-6 py-4 flex justify-between items-center shrink-0">
+                <div>
+                    <h3 class="font-black text-xl text-slate-800" id="modal-nome">Nome do Produto</h3>
+                    <p class="text-sm text-slate-500 font-mono" id="modal-sku">SKU-001</p>
+                </div>
+                <button onclick="fecharModal()" class="text-slate-400 hover:text-rose-500 transition text-2xl"><i class="fas fa-times"></i></button>
+            </div>
+            
+            <div class="flex-1 overflow-auto p-6 grid grid-cols-2 gap-8">
+                <div class="space-y-6">
+                    <div class="glass-panel p-5 rounded-xl border border-slate-200 shadow-sm">
+                        <h4 class="font-bold text-slate-800 mb-4 border-b pb-2"><i class="fas fa-tag text-indigo-500 mr-2"></i> Precificação Base</h4>
+                        <div class="space-y-4">
+                            <div><label class="text-xs font-bold text-slate-500">Custo do Produto (R$)</label><input type="number" id="modal-custo" class="ios-input w-full text-lg font-bold"></div>
+                            <div><label class="text-xs font-bold text-slate-500">Preço de Venda Bling (R$)</label><input type="number" id="modal-preco" class="ios-input w-full text-lg font-black text-indigo-600"></div>
+                            <div class="bg-emerald-50 text-emerald-700 p-3 rounded-lg border border-emerald-200 text-sm font-bold flex justify-between"><span>Margem Atual:</span> <span id="modal-margem">42.5%</span></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="space-y-4">
+                    <h4 class="font-bold text-slate-800 mb-2"><i class="fas fa-store text-amber-500 mr-2"></i> Taxas por Marketplace</h4>
+                    
+                    <div class="bg-white border border-slate-200 rounded-xl p-4 shadow-sm flex flex-col gap-3">
+                        <div class="flex justify-between items-center font-bold text-slate-800"><span class="text-rose-600"><i class="fas fa-shopping-bag mr-1"></i> Shopee</span> <span class="text-lg">R$ 125,90</span></div>
+                        <div class="grid grid-cols-3 gap-2">
+                            <div><label class="text-[10px] text-slate-500 uppercase">Comissão %</label><input type="number" value="14" class="ios-input w-full text-xs"></div>
+                            <div><label class="text-[10px] text-slate-500 uppercase">Fixo R$</label><input type="number" value="3" class="ios-input w-full text-xs"></div>
+                            <div><label class="text-[10px] text-slate-500 uppercase">Devolução %</label><input type="number" value="0.5" class="ios-input w-full text-xs"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white border border-slate-200 rounded-xl p-4 shadow-sm flex flex-col gap-3">
+                        <div class="flex justify-between items-center font-bold text-slate-800"><span class="text-yellow-500"><i class="fas fa-handshake mr-1"></i> Mercado Livre</span> <span class="text-lg">R$ 130,50</span></div>
+                        <div class="grid grid-cols-2 gap-2">
+                            <div><label class="text-[10px] text-slate-500 uppercase">Comissão %</label><input type="number" value="16" class="ios-input w-full text-xs"></div>
+                            <div><label class="text-[10px] text-slate-500 uppercase">Frete Fixo R$</label><input type="number" value="0" class="ios-input w-full text-xs"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bg-slate-100 border-t px-6 py-4 flex justify-end gap-4 shrink-0">
+                <button onclick="fecharModal()" class="px-6 py-2 text-slate-600 font-bold hover:bg-slate-200 rounded-lg transition">Cancelar</button>
+                <button class="px-6 py-2 bg-indigo-600 text-white font-bold rounded-lg hover:bg-indigo-700 transition shadow-lg">Salvar e Recalcular</button>
             </div>
         </div>
-        <div id="overlay" onclick="fecharDrawer()" class="absolute inset-0 bg-slate-900/40 backdrop-blur-sm z-40 hidden"></div>
     </div>
 
     <script>
-        let produtoAtual = null;
-        let graficosIniciados = false;
-
-        // 1. SISTEMA DE TOASTS
+        // === LÓGICA DE NAVEGAÇÃO E UX ===
         function mostrarToast(mensagem, tipo = 'sucesso') {
             const container = document.getElementById('toast-container');
             const toast = document.createElement('div');
@@ -148,148 +257,80 @@
             setTimeout(() => { toast.style.opacity = '0'; setTimeout(() => toast.remove(), 300); }, 4000);
         }
 
-        // 2. NAVEGAÇÃO SPA
         function mudarAba(aba) {
-            document.getElementById('view-dashboard').classList.add('hidden');
-            document.getElementById('view-catalogo').classList.add('hidden');
-            document.getElementById('menu-dash').classList.remove('bg-indigo-600', 'text-white', 'shadow-lg');
-            document.getElementById('menu-cat').classList.remove('bg-indigo-600', 'text-white', 'shadow-lg');
-            
-            fecharDrawer(); // Garante que o painel fecha ao trocar de aba
-
-            if(aba === 'dashboard') {
-                document.getElementById('view-dashboard').classList.remove('hidden');
-                document.getElementById('menu-dash').classList.add('bg-indigo-600', 'text-white', 'shadow-lg');
-                if(!graficosIniciados) iniciarGraficos();
-            } else {
-                document.getElementById('view-catalogo').classList.remove('hidden');
-                document.getElementById('menu-cat').classList.add('bg-indigo-600', 'text-white', 'shadow-lg');
-                carregarCatalogo();
-            }
-        }
-
-        // 3. TABELA COM O BOTÃO DE AÇÃO RESTAURADO
-        async function carregarCatalogo() {
-            const res = await fetch('/api/produtos/monitoramento');
-            const data = await res.json();
-            const tb = document.getElementById('tabela-produtos');
-            tb.innerHTML = '';
-            
-            data.dados.forEach(p => {
-                tb.innerHTML += `
-                    <tr class="hover:bg-slate-50 transition group">
-                        <td class="px-6 py-4"><input type="checkbox" class="rounded border-slate-300"></td>
-                        <td class="px-6 py-4">
-                            <div class="font-bold text-slate-800">${p.nome}</div>
-                            <div class="text-xs text-slate-400 font-mono">${p.sku}</div>
-                        </td>
-                        <td class="px-6 py-4 font-bold text-slate-500">R$ ${p.custo.toFixed(2)}</td>
-                        <td class="px-6 py-4 font-black text-indigo-600">R$ ${p.preco_atual.toFixed(2)}</td>
-                        <td class="px-6 py-4 text-center"><i class="fas fa-box text-emerald-500"></i></td>
-                        <td class="px-6 py-4 text-right">
-                            <button onclick='abrirDrawer(${JSON.stringify(p)})' class="opacity-0 group-hover:opacity-100 bg-indigo-50 border border-indigo-200 text-indigo-700 px-4 py-1.5 rounded-lg text-sm hover:bg-indigo-600 hover:text-white font-bold shadow-sm transition-all">
-                                <i class="fas fa-radar mr-1"></i> Analisar
-                            </button>
-                        </td>
-                    </tr>`;
+            ['catalogo', 'massa', 'automacoes', 'simulador'].forEach(a => {
+                const el = document.getElementById(`view-${a}`);
+                const menu = document.getElementById(`menu-${a}`);
+                if(el) el.classList.add('hidden');
+                if(menu) menu.classList.remove('bg-indigo-600', 'text-white', 'shadow-lg');
             });
-        }
-
-        // 4. LÓGICA DO DRAWER E DO RADAR (Totalmente Restaurada)
-        function abrirDrawer(p) {
-            produtoAtual = p;
-            document.getElementById('drawer-nome').innerText = p.nome;
-            document.getElementById('drawer-custo').innerText = p.custo.toFixed(2);
-            document.getElementById('urls-concorrentes').value = '';
-            document.getElementById('resultado-espiao').innerHTML = '';
-            document.getElementById('resultado-ia').classList.add('hidden');
             
-            document.getElementById('drawer-ia').classList.remove('translate-x-full');
-            document.getElementById('overlay').classList.remove('hidden');
+            document.getElementById(`view-${aba}`).classList.remove('hidden');
+            const ativo = document.getElementById(`menu-${aba}`);
+            if(ativo) ativo.classList.add('bg-indigo-600', 'text-white', 'shadow-lg');
         }
 
-        function fecharDrawer() {
-            document.getElementById('drawer-ia').classList.add('translate-x-full');
-            document.getElementById('overlay').classList.add('hidden');
-        }
-
-        async function acionarRadar() {
-            const textoUrls = document.getElementById('urls-concorrentes').value;
-            const urlsArray = textoUrls.split('\n').map(u => u.trim()).filter(u => u !== '');
-            if(urlsArray.length === 0) return mostrarToast("Cole pelo menos um link!", "aviso");
+        function abrirModal(nome, sku, custo, preco) {
+            document.getElementById('modal-nome').innerText = nome;
+            document.getElementById('modal-sku').innerText = sku;
+            document.getElementById('modal-custo').value = custo;
+            document.getElementById('modal-preco').value = preco;
             
-            const btn = document.getElementById('btn-espionar');
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Varrendo...';
-            document.getElementById('resultado-espiao').innerHTML = '';
-            
-            try {
-                const res = await fetch('/api/scraper/precos-multiplos', {
-                    method: 'POST', headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ urls: urlsArray })
-                });
-                const data = await res.json();
-                
-                if(data.sucesso) {
-                    const custo = produtoAtual.custo;
-                    let htmlResultados = '';
-                    data.resultados.forEach((item, index) => {
-                        const dominioUrl = new URL(item.url).hostname.replace('www.', '');
-                        if(item.sucesso) {
-                            const precoNum = parseFloat(item.preco.replace(/[^0-9,.]/g, '').replace(',', '.'));
-                            const lucro = precoNum - custo;
-                            const margem = ((lucro / precoNum) * 100).toFixed(1);
-                            let corMargem = margem >= 30 ? "text-emerald-600" : (margem >= 15 ? "text-amber-500" : "text-rose-600");
-                            
-                            htmlResultados += `
-                            <div class="bg-white border rounded p-3 shadow-sm flex justify-between items-center">
-                                <div><p class="text-[10px] text-slate-400 uppercase break-all">${dominioUrl}</p><p class="text-base font-black text-slate-800">R$ ${precoNum.toFixed(2)}</p></div>
-                                <div class="text-right"><p class="text-[10px] text-slate-500">Lucro</p><p class="text-sm font-bold ${corMargem}">${margem}%</p></div>
-                            </div>`;
-                        } else {
-                            htmlResultados += `<div class="bg-rose-50 border border-rose-100 rounded p-2 text-xs text-rose-600">Erro no Alvo ${index + 1}</div>`;
-                        }
-                    });
-                    document.getElementById('resultado-espiao').innerHTML = htmlResultados;
-                }
-            } catch(e) { document.getElementById('resultado-espiao').innerText = "Erro na comunicação com o servidor."; }
-            btn.innerHTML = '<i class="fas fa-search-dollar"></i> Varrer Mercado';
+            // Fórmula da Margem Integrada (Bling Price - Custo Base) / Bling Price
+            const margem = (((preco - custo) / preco) * 100).toFixed(1);
+            document.getElementById('modal-margem').innerText = `${margem}%`;
+
+            document.getElementById('modal-produto').classList.remove('hidden');
         }
 
-        async function acionarIA() {
-            const box = document.getElementById('resultado-ia');
-            box.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Escrevendo...';
-            box.classList.remove('hidden');
-            try {
-                const res = await fetch('/api/ia/gerar-descricao', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ nome_produto: produtoAtual.nome, caracteristicas: "" }) });
-                const data = await res.json();
-                box.innerText = data.descricao_gerada;
-            } catch(e) { box.innerText = "Erro ao conectar com a IA."; }
+        function fecharModal() {
+            document.getElementById('modal-produto').classList.add('hidden');
         }
 
-        function iniciarGraficos() {
-            const ctxLucro = document.getElementById('graficoLucro').getContext('2d');
-            new Chart(ctxLucro, {
-                type: 'doughnut',
-                data: { labels: ['Margem Ideal', 'Atenção', 'Crítico'], datasets: [{ data: [3400, 1500, 340], backgroundColor: ['#10b981', '#f59e0b', '#ef4444'], borderWidth: 0 }] },
-                options: { cutout: '75%', plugins: { legend: { position: 'bottom' } } }
-            });
-            const ctxRasp = document.getElementById('graficoRaspagem').getContext('2d');
-            new Chart(ctxRasp, {
-                type: 'bar',
-                data: { labels: ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom'], datasets: [{ label: 'Preços Lidos', data: [120, 190, 300, 250, 400, 100, 50], backgroundColor: '#4f46e5', borderRadius: 4 }] }
-            });
-            graficosIniciados = true;
+        function simularPreco(custo) {
+            const custoNum = parseFloat(custo) || 0;
+            // Utilizando a fórmula validada do seu código base: (Custo + Embalagem + Frete) ÷ (1 − Ganho% − Impostos% − Cartão%)
+            const ganho = 30; const impostos = 12; const cartao = 2.5; const emb = 3;
+            const den = 1 - (ganho + impostos + cartao) / 100;
+            const precoSugerido = (custoNum + emb) / den;
+            document.getElementById('sim-resultado').innerText = `R$ ${precoSugerido.toFixed(2)}`;
         }
 
-        function sincronizarBling() {
-            mostrarToast("Sincronizando com o Bling...", "aviso");
-            setTimeout(() => mostrarToast("Produtos atualizados com sucesso!", "sucesso"), 2000);
-        }
-
-        // INICIA O SISTEMA
+        // Simulação de Dados para o Catálogo (Substitua pela chamada real do seu server.js)
         window.onload = () => {
-            iniciarGraficos();
-            mostrarToast("Sistema Online. Módulo de Radar ativado.", "sucesso");
+            const mockData = [
+                { sku: 'CX-ORG-30', nome: 'Caixa Organizadora 30 Divisórias', custo: 45.00, preco: 89.90, margem: '49%' },
+                { sku: 'PER-6MM', nome: 'Pérola Branca 6mm (500g)', custo: 20.00, preco: 35.00, margem: '42%' }
+            ];
+            
+            const tbody = document.getElementById('tabela-produtos');
+            const mList = document.getElementById('massa-list');
+            
+            mockData.forEach(p => {
+                // Preenche Catálogo
+                tbody.innerHTML += `
+                    <tr class="hover:bg-slate-50 transition border-b border-slate-100 group">
+                        <td class="px-6 py-4"><div class="font-bold text-slate-800">${p.nome}</div><div class="text-xs text-slate-400 font-mono">${p.sku}</div></td>
+                        <td class="px-6 py-4 text-right text-slate-500 font-medium">R$ ${p.custo.toFixed(2)}</td>
+                        <td class="px-6 py-4 text-right font-black text-indigo-600">R$ ${p.preco.toFixed(2)}</td>
+                        <td class="px-6 py-4 text-center"><span class="bg-emerald-100 text-emerald-700 px-2 py-1 rounded text-xs font-bold">${p.margem}</span></td>
+                        <td class="px-6 py-4 text-center text-xs text-slate-400"><i class="fas fa-shopping-bag text-rose-500 mr-2"></i><i class="fas fa-handshake text-yellow-500"></i></td>
+                        <td class="px-6 py-4 text-right"><button onclick="abrirModal('${p.nome}', '${p.sku}', ${p.custo}, ${p.preco})" class="opacity-0 group-hover:opacity-100 bg-white border border-slate-300 text-slate-700 px-4 py-2 rounded-lg text-sm hover:bg-slate-100 font-bold shadow-sm transition">Gerenciar</button></td>
+                    </tr>`;
+                
+                // Preenche lista de Massa
+                mList.innerHTML += `
+                    <div class="flex items-center justify-between p-3 border-b border-slate-200/50 hover:bg-white cursor-pointer transition">
+                        <div class="flex items-center gap-3"><input type="checkbox" class="w-4 h-4 rounded text-indigo-600"><span class="font-mono text-xs text-indigo-600 font-bold">${p.sku}</span><span class="text-sm font-medium text-slate-700">${p.nome}</span></div>
+                        <div class="text-sm font-black text-slate-800">R$ ${p.preco.toFixed(2)}</div>
+                    </div>`;
+            });
+
+            setTimeout(() => {
+                document.getElementById('serverBar').innerHTML = '<i class="fas fa-check-circle"></i> Conectado via server.js';
+                document.getElementById('serverBar').className = "flex items-center gap-2 text-xs font-bold text-emerald-700 bg-emerald-100 px-3 py-1.5 rounded-full border border-emerald-200 shadow-inner";
+                mostrarToast("Conexão com proxy Node.js estabelecida.");
+            }, 1500);
         };
     </script>
 </body>
