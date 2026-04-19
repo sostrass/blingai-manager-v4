@@ -9,8 +9,16 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-        
         * { box-sizing: border-box; font-family: 'Inter', system-ui, sans-serif; }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        .glass-panel { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.6); box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); }
+        .ios-input { background: rgba(241, 245, 249, 0.7); border: 1px solid #e2e8f0; border-radius: 10px; padding: 8px 12px; transition: all 0.2s; outline: none; color: #1e293b; font-size: 13px; font-family: inherit; }
+        .ios-input:focus { border-color: #6366f1; background: #fff; box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15); }
+        @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        .toast-enter { animation: slideIn 0.3s ease-out forwards; }
         
         /* Custom Scrollbars */
         ::-webkit-scrollbar { width: 6px; height: 6px; }
@@ -27,17 +35,19 @@
         @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
         .toast-enter { animation: slideIn 0.3s ease-out forwards; }
         
-        /* Drag & Drop Panels (Modal) */
+        /* Drag & Drop */
+        .drag-zone { display: flex; flex-direction: column; gap: 8px; }
         .drag-panel { transition: border-color 0.15s, opacity 0.15s; }
         .drag-panel.dragging { opacity: 0.5; border: 2px dashed #6366f1; }
-        .dp-handle { cursor: grab; user-select: none; }
+        .drag-panel.drag-over { border-color: #22d3a5; background: rgba(34, 211, 165, 0.04); }
+        .dp-handle { cursor: grab; user-select: none; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #e2e8f0; padding: 10px 16px; background: rgba(248, 250, 252, 0.5); border-radius: 12px 12px 0 0; }
         .dp-handle:active { cursor: grabbing; }
 
-        /* Tooltips */
+       /* Tooltips */
         .tip { position: relative; display: inline-flex; }
-        .tip .tip-text { display: none; position: absolute; bottom: calc(100% + 5px); left: 50%; transform: translateX(-50%); background: #1e293b; border: 1px solid #334155; border-radius: 8px; padding: 8px 12px; font-size: 11px; color: #cbd5e1; z-index: 200; line-height: 1.5; min-width: 200px; white-space: normal; pointer-events: none; text-align: center; }
+        .tip .tip-text { display: none; position: absolute; bottom: calc(100% + 5px); left: 50%; transform: translateX(-50%); background: #1e293b; border: 1px solid #334155; border-radius: 8px; padding: 8px 12px; font-size: 11px; color: #cbd5e1; z-index: 200; line-height: 1.5; min-width: 220px; white-space: normal; pointer-events: none; text-align: center; }
         .tip:hover .tip-text { display: block; }
-        .tip-icon { width: 14px; height: 14px; border-radius: 50%; background: rgba(99,102,241,0.1); color: #6366f1; display: inline-flex; align-items: center; justify-content: center; font-size: 9px; font-weight: 700; cursor: help; margin-left: 4px; }
+        .tip-icon { width: 14px; height: 14px; border-radius: 50%; background: rgba(99,102,241,0.1); color: #6366f1; display: inline-flex; align-items: center; justify-content: center; font-size: 9px; font-weight: 700; cursor: help; margin-left: 4px; flex-shrink: 0; }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-800 font-sans h-screen flex overflow-hidden bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]">
@@ -127,208 +137,117 @@
                 </div>
             </div>
 
-            <div id="view-massa" class="hidden space-y-6">
+                <div id="view-massa" class="hidden space-y-6">
                 <div class="flex justify-between items-end mb-6">
                     <div>
-                        <h2 class="text-3xl font-black text-slate-800 tracking-tight text-amber-600 flex items-center gap-3"><i class="fas fa-bolt"></i> Operação em Massa</h2>
+                        <h2 class="text-3xl font-black text-slate-800 tracking-tight text-amber-600 flex items-center gap-3"><i class="fas fa-bolt"></i> Atualização em Massa</h2>
                         <p class="text-slate-500 mt-1">Aplique regras de precificação e custos para múltiplos SKUs simultaneamente.</p>
                     </div>
                 </div>
 
                 <div class="grid grid-cols-3 gap-8">
-                    <div class="col-span-2 glass-panel rounded-2xl p-6 flex flex-col h-[70vh]">
-                        <div class="flex gap-4 mb-4">
-                            <input type="text" id="massa-busca" placeholder="Filtrar produtos por SKU ou Nome..." class="ios-input flex-1 text-sm" oninput="renderMassaList()">
-                            <button onclick="selecionarTodosMassa()" class="bg-slate-100 text-slate-600 px-4 py-2 rounded-lg text-sm font-bold border border-slate-200 hover:bg-slate-200 transition">Sel. Todos</button>
-                            <button onclick="limparMassa()" class="bg-white text-slate-500 px-4 py-2 rounded-lg text-sm font-bold border border-slate-200 hover:bg-slate-50 transition">Limpar</button>
+                    <div class="col-span-2 flex flex-col h-[75vh]">
+                        <div class="glass-panel rounded-t-2xl p-4 flex gap-4 border-b-0">
+                            <input type="text" id="massa-busca" placeholder="🔍 Buscar SKU ou Nome..." class="ios-input flex-1 text-sm" oninput="renderMassaList()">
+                            <select id="massa-cat" class="ios-input text-sm" onchange="renderMassaList()">
+                                <option value="all">Todas Categorias</option>
+                            </select>
+                            <button onclick="massaSelAll()" class="bg-slate-100 text-slate-600 px-3 py-1.5 rounded-lg text-sm font-bold border border-slate-200 hover:bg-slate-200">Sel. Todos</button>
+                            <button onclick="massaSelNone()" class="bg-white text-slate-500 px-3 py-1.5 rounded-lg text-sm font-bold border border-slate-200 hover:bg-slate-50">Limpar</button>
                         </div>
-                        <div class="flex-1 overflow-auto border border-slate-200 rounded-xl bg-slate-50/50 p-2 space-y-1" id="massa-list">
-                            </div>
-                    </div>
-
-                    <div class="glass-panel rounded-2xl p-6 flex flex-col relative overflow-hidden">
-                        <div class="absolute top-0 left-0 w-full h-1 bg-amber-400"></div>
-                        <h3 class="font-bold text-slate-800 mb-4 uppercase text-xs tracking-wider">Parâmetros de Alteração</h3>
                         
-                        <label class="text-xs font-bold text-slate-500 mb-1">O que alterar?</label>
-                        <select class="ios-input w-full mb-4 text-sm" id="massa-campo">
-                            <option value="preco">Preço Bling Atual</option>
-                            <option value="custo">Custo do Produto</option>
-                        </select>
-
-                        <label class="text-xs font-bold text-slate-500 mb-1">Tipo de Operação</label>
-                        <div class="grid grid-cols-2 gap-2 mb-4">
-                            <button class="bg-indigo-600 text-white rounded-lg py-2 text-xs font-bold shadow" id="btn-op-fixo" onclick="setMassaOp('fixo')">Definir Fixo</button>
-                            <button class="bg-slate-100 text-slate-600 border border-slate-200 rounded-lg py-2 text-xs font-bold hover:bg-slate-200" id="btn-op-pct" onclick="setMassaOp('pct')">Acréscimo %</button>
+                        <div class="bg-slate-800 text-slate-300 text-[10px] uppercase tracking-wider font-bold p-3 grid grid-cols-[30px_80px_1fr_80px_80px_60px_100px] gap-2 items-center">
+                            <span></span><span>SKU</span><span>Produto</span><span class="text-right">Preço Bling</span><span class="text-right">Custo Base</span><span class="text-right">Margem</span><span>Plataformas</span>
                         </div>
-
-                        <label class="text-xs font-bold text-slate-500 mb-1">Valor</label>
-                        <input type="number" id="massa-valor" class="ios-input w-full mb-6 text-2xl font-black text-slate-800 text-right" value="0.00" step="0.01">
-
-                        <div class="mt-auto space-y-3">
-                            <button onclick="aplicarMassa(false)" class="w-full bg-slate-800 hover:bg-slate-900 text-white py-3 rounded-xl font-bold transition shadow-lg">✓ Aplicar Localmente</button>
-                            <button onclick="aplicarMassa(true)" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-3 rounded-xl font-bold transition shadow-lg flex items-center justify-center gap-2"><i class="fas fa-cloud-upload-alt"></i> Salvar e Enviar p/ Bling</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div id="view-simulador" class="hidden space-y-6">
-                <div class="flex justify-between items-end mb-6">
-                    <div>
-                        <h2 class="text-3xl font-black text-slate-800 tracking-tight flex items-center gap-3"><i class="fas fa-globe text-indigo-600"></i> Precificação Global</h2>
-                        <p class="text-slate-500 mt-1">Defina os parâmetros base. O sistema usa estes valores para sugerir o Preço Bling ideal de cada produto.</p>
-                    </div>
-                    <button onclick="salvarCustosGlobais()" class="bg-indigo-600 text-white px-6 py-2.5 rounded-lg font-bold shadow-lg hover:bg-indigo-700 transition">Salvar Parâmetros</button>
-                </div>
-                
-                <div class="grid grid-cols-2 gap-8">
-                    <div class="glass-panel rounded-2xl p-6 relative overflow-hidden">
-                        <div class="absolute top-0 left-0 w-full h-1 bg-indigo-500"></div>
-                        <h3 class="font-bold text-slate-800 mb-4 border-b border-slate-200/50 pb-2">Variáveis Fixas do Negócio</h3>
-                        <div class="space-y-4 mt-4">
-                            <div class="flex justify-between items-center"><span class="text-sm text-slate-600 font-medium">Impostos (%)</span> <input type="number" id="cg-imp" step="0.5" class="ios-input w-24 text-right font-bold text-slate-800" oninput="simularPreco(document.getElementById('sim-custo').value)"></div>
-                            <div class="flex justify-between items-center"><span class="text-sm text-slate-600 font-medium">Taxa de Cartão Média (%)</span> <input type="number" id="cg-cartao" step="0.1" class="ios-input w-24 text-right font-bold text-slate-800" oninput="simularPreco(document.getElementById('sim-custo').value)"></div>
-                            <div class="flex justify-between items-center"><span class="text-sm text-slate-600 font-medium">Embalagem por Pedido (R$)</span> <input type="number" id="cg-emb" step="0.5" class="ios-input w-24 text-right font-bold text-slate-800" oninput="simularPreco(document.getElementById('sim-custo').value)"></div>
-                            <div class="flex justify-between items-center"><span class="text-sm text-slate-600 font-medium">Frete Fixo Próprio (R$)</span> <input type="number" id="cg-frete" step="0.5" class="ios-input w-24 text-right font-bold text-slate-800" oninput="simularPreco(document.getElementById('sim-custo').value)"></div>
-                            <div class="flex justify-between items-center pt-2"><span class="text-sm text-slate-800 font-black">Margem de Lucro Alvo (%)</span> <input type="number" id="cg-ganho" step="1" class="ios-input w-24 text-right font-black text-emerald-600 bg-emerald-50 border-emerald-200" oninput="simularPreco(document.getElementById('sim-custo').value)"></div>
-                        </div>
-                    </div>
-
-                    <div class="glass-panel rounded-2xl p-6 bg-gradient-to-br from-indigo-50/50 to-white relative overflow-hidden">
-                        <div class="absolute top-0 left-0 w-full h-1 bg-emerald-400"></div>
-                        <h3 class="font-bold text-slate-800 mb-4 border-b border-slate-200/50 pb-2">Simulador de Prova Real</h3>
-                        <label class="text-xs font-bold text-slate-500 mb-1">Se o meu produto custa (R$):</label>
-                        <input type="number" id="sim-custo" value="50.00" class="ios-input w-full mb-4 text-2xl font-black text-slate-800" oninput="simularPreco(this.value)">
                         
-                        <div class="bg-indigo-600 text-white rounded-xl p-5 shadow-lg shadow-indigo-200/50 mt-4 relative overflow-hidden">
-                            <i class="fas fa-calculator absolute -right-4 -bottom-4 text-6xl text-white opacity-10"></i>
-                            <p class="text-xs font-medium opacity-80 uppercase tracking-wider mb-1">Preço Sugerido (Bling)</p>
-                            <p class="text-4xl font-black tracking-tight" id="sim-resultado">R$ 0,00</p>
-                            <p class="text-xs mt-3 opacity-90 font-medium"><i class="fas fa-check-circle text-emerald-300 mr-1"></i> Cobre o custo, a embalagem, o frete, dilui os impostos e garante a margem alvo exata.</p>
+                        <div class="flex-1 overflow-y-auto bg-white border border-slate-200 border-t-0 rounded-b-2xl shadow-sm" id="massa-list">
+                            </div>
+                    </div>
+
+                    <div class="glass-panel rounded-2xl p-6 flex flex-col">
+                        <div class="text-[10px] text-slate-400 uppercase font-bold tracking-wider mb-4">✏️ O que editar?</div>
+                        
+                        <div class="flex flex-wrap gap-2 mb-4">
+                            <button class="px-3 py-1.5 rounded-lg text-xs font-bold border border-indigo-600 bg-indigo-600 text-white" id="btn-m-preco" onclick="setMassaMode('preco')">💰 Preço Bling</button>
+                            <button class="px-3 py-1.5 rounded-lg text-xs font-bold border border-slate-200 bg-slate-50 text-slate-600" id="btn-m-custo" onclick="setMassaMode('custo')">💸 Custo</button>
+                            <button class="px-3 py-1.5 rounded-lg text-xs font-bold border border-slate-200 bg-slate-50 text-slate-600" id="btn-m-ganho" onclick="setMassaMode('ganho')">📈 % Ganho</button>
+                        </div>
+
+                        <div class="text-[10px] text-slate-400 uppercase font-bold tracking-wider mb-2">Tipo de operação</div>
+                        <div class="flex bg-slate-100 rounded-lg border border-slate-200 overflow-hidden mb-4">
+                            <button class="flex-1 py-2 text-xs font-bold bg-indigo-600 text-white" id="btn-op-set" onclick="setMassaOp('set')">Definir</button>
+                            <button class="flex-1 py-2 text-xs font-bold text-slate-600 hover:bg-slate-200" id="btn-op-addpct" onclick="setMassaOp('addpct')">+ %</button>
+                            <button class="flex-1 py-2 text-xs font-bold text-slate-600 hover:bg-slate-200" id="btn-op-subpct" onclick="setMassaOp('subpct')">− %</button>
+                            <button class="flex-1 py-2 text-xs font-bold text-slate-600 hover:bg-slate-200" id="btn-op-addfix" onclick="setMassaOp('addfix')">+ R$</button>
+                        </div>
+
+                        <div class="flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-lg p-3 mb-6">
+                            <span class="text-slate-400 text-sm font-bold" id="mUnitPre">R$</span>
+                            <input type="number" id="massa-val" class="w-full bg-transparent outline-none text-right font-black text-2xl text-slate-800" value="0.00" oninput="renderMassaPreview()">
+                            <span class="text-slate-400 text-sm font-bold" id="mUnitPos"></span>
+                        </div>
+
+                        <div class="text-[10px] text-slate-400 uppercase font-bold tracking-wider mb-2">👁 Prévia (<span id="massa-count-prev">0</span> itens)</div>
+                        <div id="massa-preview" class="flex-1 overflow-y-auto text-xs text-slate-500 mb-4 bg-slate-50 p-2 rounded border border-slate-100">
+                            Selecione produtos para ver o impacto.
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-2 mt-auto">
+                            <button onclick="applyMassa(false)" class="bg-indigo-600 hover:bg-indigo-700 text-white py-2.5 rounded-lg font-bold text-xs transition shadow-md">✓ Aplicar Local</button>
+                            <button onclick="applyMassa(true)" class="bg-emerald-600 hover:bg-emerald-700 text-white py-2.5 rounded-lg font-bold text-xs transition shadow-md flex items-center justify-center gap-1"><i class="fas fa-cloud-upload-alt"></i> Salvar Bling</button>
                         </div>
                     </div>
                 </div>
-            </div>
-
-            <div id="view-automacoes" class="hidden space-y-6">
-                <div class="flex justify-between items-end mb-6">
-                    <div>
-                        <h2 class="text-3xl font-black text-slate-800 tracking-tight flex items-center gap-3">
-                            <i class="fas fa-microchip text-emerald-600"></i> AI Automations Core
-                        </h2>
-                        <p class="text-slate-500 mt-1">Gerenciamento de respostas a avaliações e blindagem de anúncios.</p>
-                    </div>
-                </div>
-
-                <div class="grid grid-cols-2 gap-8">
-                    <div class="glass-panel rounded-2xl shadow-lg border-t-4 border-t-amber-400 overflow-hidden flex flex-col">
-                        <div class="bg-white/50 px-6 py-4 border-b border-slate-200/50 flex justify-between items-center">
-                            <h3 class="font-black text-slate-800"><i class="fas fa-comments text-amber-500 mr-2"></i> Consultor Parceiro (SAC)</h3>
-                            <span class="bg-amber-100 text-amber-700 text-[10px] font-bold px-2 py-1 rounded-md uppercase tracking-wider">Modo Ateliê</span>
-                        </div>
-                        <div class="p-6 flex-1 space-y-4">
-                            <div>
-                                <label class="text-xs font-bold text-slate-500 uppercase">Nome do Cliente</label>
-                                <input type="text" id="sac-cliente" placeholder="Ex: Cláudia987" class="ios-input w-full mt-1">
-                            </div>
-                            <div>
-                                <label class="text-xs font-bold text-slate-500 uppercase">Produto Adquirido</label>
-                                <input type="text" id="sac-produto" placeholder="Ex: Kit Alicates Coloridos" class="ios-input w-full mt-1">
-                            </div>
-                            <div>
-                                <label class="text-xs font-bold text-slate-500 uppercase">Relato do Cliente (Avaliação)</label>
-                                <textarea id="sac-relato" rows="3" placeholder="Cole o que o cliente escreveu aqui..." class="ios-input w-full mt-1 resize-none"></textarea>
-                            </div>
-                            
-                            <button onclick="gerarRespostaSAC()" id="btn-sac" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-3 rounded-xl transition shadow-lg flex items-center justify-center gap-2">
-                                <i class="fas fa-magic text-amber-400"></i> Formular Resposta Humanizada
-                            </button>
-
-                            <div id="sac-resultado" class="hidden mt-4 bg-slate-800 p-4 rounded-xl relative group">
-                                <p class="text-xs font-mono text-amber-400 mb-2">// Retorno da I.A.</p>
-                                <p id="sac-texto" class="text-sm text-slate-200 leading-relaxed font-sans"></p>
-                                <button onclick="copiarTexto('sac-texto')" class="absolute top-4 right-4 text-slate-400 hover:text-white transition opacity-0 group-hover:opacity-100 bg-slate-700/50 p-2 rounded">
-                                    <i class="fas fa-copy"></i>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="glass-panel rounded-2xl shadow-lg border-t-4 border-t-indigo-500 overflow-hidden flex flex-col">
-                        <div class="bg-white/50 px-6 py-4 border-b border-slate-200/50 flex justify-between items-center">
-                            <h3 class="font-black text-slate-800"><i class="fas fa-shield-alt text-indigo-500 mr-2"></i> Descrições Blindadas</h3>
-                            <span class="bg-indigo-100 text-indigo-700 text-[10px] font-bold px-2 py-1 rounded-md uppercase tracking-wider">Anti-Plágio IP</span>
-                        </div>
-                        <div class="p-6 flex-1 space-y-4">
-                            <div>
-                                <label class="text-xs font-bold text-slate-500 uppercase">Nome / Ficha Técnica Curta</label>
-                                <textarea id="desc-produto" rows="2" placeholder="Ex: Caixa 30 Divisórias, 20x19cm..." class="ios-input w-full mt-1 resize-none"></textarea>
-                            </div>
-                            
-                            <div class="bg-indigo-50/50 border border-indigo-100 rounded-lg p-3 flex gap-3 items-start">
-                                <i class="fas fa-info-circle text-indigo-500 mt-0.5"></i>
-                                <p class="text-xs text-slate-600">A I.A. gerará uma descrição com foco em redução de devoluções (medidas exatas) e embutirá o código HTML jurídico de proteção da Sóstrass no final.</p>
-                            </div>
-
-                            <button onclick="gerarDescricaoSegura()" id="btn-desc" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-xl transition shadow-lg flex items-center justify-center gap-2">
-                                <i class="fas fa-cogs"></i> Gerar Ficha c/ HTML Jurídico
-                            </button>
-
-                            <div id="desc-resultado" class="hidden mt-4 bg-slate-900 border border-slate-700 p-4 rounded-xl relative group">
-                                <div class="flex justify-between items-center mb-2">
-                                    <p class="text-xs font-mono text-emerald-400">root@sostrass-ai:~# output gerado</p>
-                                    <button onclick="copiarTexto('desc-texto')" class="text-slate-400 hover:text-white transition opacity-0 group-hover:opacity-100 bg-slate-700/50 p-1.5 rounded">
-                                        <i class="fas fa-copy"></i>
-                                    </button>
-                                </div>
-                                <div id="desc-texto" class="text-xs text-slate-300 font-mono leading-relaxed h-40 overflow-y-auto whitespace-pre-wrap"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
 
             <div id="view-config" class="hidden space-y-6">
                 <div class="flex justify-between items-end mb-6">
                     <div>
-                        <h2 class="text-3xl font-black text-slate-800 tracking-tight"><i class="fas fa-cog text-slate-600 mr-2"></i> Configurações do Sistema</h2>
-                        <p class="text-slate-500 mt-1">Gestão da infraestrutura Backend Proxy e auditoria do sistema.</p>
+                        <h2 class="text-3xl font-black text-slate-800 tracking-tight"><i class="fas fa-cog text-slate-600 mr-2"></i> Configurações & Logs</h2>
+                        <p class="text-slate-500 mt-1">Gestão da infraestrutura Backend, I.A. e auditoria do sistema.</p>
                     </div>
                 </div>
                 
                 <div class="grid grid-cols-2 gap-8">
                     <div class="glass-panel rounded-2xl p-6 relative overflow-hidden">
                         <div class="absolute top-0 left-0 w-full h-1 bg-slate-800"></div>
-                        <h3 class="font-bold text-slate-800 mb-4 border-b border-slate-200/50 pb-2"><i class="fas fa-server mr-2"></i>Conexão Backend Proxy</h3>
-                        <div class="bg-emerald-50 border border-emerald-200 rounded-lg p-3 text-xs text-emerald-700 mb-4">
-                            <strong>Arquitetura Segura:</strong> As chaves API (Bling e Gemini) nunca ficam expostas no navegador. Este painel se comunica apenas com o seu servidor no Railway.
-                        </div>
-                        <label class="text-xs font-bold text-slate-500 mb-1">URL do Servidor Node.js</label>
-                        <input type="text" id="cfg-url" class="ios-input w-full mb-2 font-mono text-sm" placeholder="https://seu-app.up.railway.app">
+                        <h3 class="font-bold text-slate-800 mb-4 border-b border-slate-200/50 pb-2"><i class="fas fa-server mr-2"></i>Conexões</h3>
                         
-                        <label class="text-xs font-bold text-slate-500 mb-1 mt-4 block">Modelo de Inteligência Artificial</label>
-                        <select id="cfg-model" class="ios-input w-full mb-4 text-sm">
-                            <option value="gemini-1.5-pro">Gemini 1.5 Pro (Mais potente - Padrão)</option>
-                            <option value="gemini-2.5-flash">Gemini 2.5 Flash (Rápido)</option>
+                        <div class="bg-emerald-50 border border-emerald-200 rounded-lg p-3 text-xs text-emerald-700 mb-4">
+                            ✓ <strong>Arquitetura segura:</strong> Chaves API protegidas no servidor backend.
+                        </div>
+                        
+                        <label class="text-xs font-bold text-slate-500 mb-1">URL do Servidor Node.js</label>
+                        <input type="text" id="cfgApiBase" class="ios-input w-full mb-4 font-mono text-sm" placeholder="http://localhost:3000">
+                        
+                        <label class="text-xs font-bold text-slate-500 mb-1 block">Modelo Gemini <div class="tip"><span class="tip-icon">?</span><div class="tip-text">Modelos 'Flash' são mais rápidos e baratos. 'Pro' é melhor para descrições longas complexas.</div></div></label>
+                        <select id="cfgModel" class="ios-input w-full mb-4 text-sm">
+                            <option value="gemini-2.5-flash-preview-05-14">Gemini 2.5 Flash (Recomendado)</option>
+                            <option value="gemini-2.0-flash">Gemini 2.0 Flash (Rápido)</option>
+                            <option value="gemini-1.5-pro">Gemini 1.5 Pro (Potente)</option>
                         </select>
 
-                        <div class="flex gap-2 mt-4">
-                            <button onclick="salvarConfig()" class="flex-1 bg-slate-800 text-white py-2.5 rounded-lg font-bold hover:bg-slate-900 transition shadow">💾 Salvar Conexão</button>
-                            <button onclick="testarServidor()" class="bg-slate-200 text-slate-700 px-4 py-2.5 rounded-lg font-bold hover:bg-slate-300 transition" title="Testar Ping"><i class="fas fa-satellite-dish"></i></button>
+                        <div class="flex gap-2">
+                            <button onclick="saveCfg()" class="flex-1 bg-slate-800 text-white py-2.5 rounded-lg font-bold hover:bg-slate-900 transition shadow">💾 Salvar Config</button>
+                            <button onclick="testarServidor()" class="bg-slate-200 text-slate-700 px-4 py-2.5 rounded-lg font-bold hover:bg-slate-300 transition" title="Testar Servidor"><i class="fas fa-satellite-dish"></i></button>
                         </div>
                     </div>
 
                     <div class="glass-panel rounded-2xl p-6 relative overflow-hidden flex flex-col h-[60vh]">
-                        <div class="absolute top-0 left-0 w-full h-1 bg-rose-500"></div>
+                        <div class="absolute top-0 left-0 w-full h-1 bg-slate-400"></div>
                         <div class="flex justify-between items-center border-b border-slate-200/50 pb-2 mb-4 shrink-0">
-                            <h3 class="font-bold text-slate-800"><i class="fas fa-terminal mr-2"></i>Console / Auditoria</h3>
-                            <button onclick="limparLogs()" class="text-xs text-rose-500 hover:text-rose-700 font-bold"><i class="fas fa-trash-alt mr-1"></i>Limpar</button>
+                            <h3 class="font-bold text-slate-800"><i class="fas fa-clipboard-list mr-2"></i>Auditoria</h3>
+                            <button onclick="if(confirm('Limpar logs?')){actLog=[];saveLogs();renderLogE('all');}" class="text-xs text-rose-500 hover:text-rose-700 font-bold"><i class="fas fa-trash-alt mr-1"></i>Limpar</button>
                         </div>
                         
-                        <div id="log-container" class="flex-1 overflow-y-auto bg-slate-950 rounded-xl p-4 text-[11px] font-mono text-emerald-400 space-y-1.5 shadow-inner">
-                            <div class="text-slate-500">Aguardando inicialização do sistema...</div>
+                        <div class="flex gap-2 mb-3 shrink-0">
+                            <button onclick="renderLogE('all')" class="bg-slate-100 text-slate-600 px-3 py-1 rounded text-xs font-bold hover:bg-slate-200">Todos</button>
+                            <button onclick="renderLogE('ok')" class="bg-emerald-50 text-emerald-600 px-3 py-1 rounded text-xs font-bold border border-emerald-200">✓ OK</button>
+                            <button onclick="renderLogE('err')" class="bg-rose-50 text-rose-600 px-3 py-1 rounded text-xs font-bold border border-rose-200">✕ Erros</button>
+                            <button onclick="renderLogE('info')" class="bg-indigo-50 text-indigo-600 px-3 py-1 rounded text-xs font-bold border border-indigo-200">ℹ Info</button>
                         </div>
+                        
+                        <div id="log-container" class="flex-1 overflow-y-auto bg-slate-950 rounded-xl p-4 text-[11px] font-mono space-y-2 shadow-inner">
+                            </div>
                     </div>
                 </div>
             </div>
@@ -544,44 +463,51 @@
 
 <script>
         // ==========================================
-        // 1. ESTADO GLOBAL E BANCO DE DADOS LOCAL
+        // 1. ÍCONES NATIVOS (SVG) E ESTADOS GLOBAIS
         // ==========================================
+        const PSVG = {
+            shopee: `<svg viewBox="0 0 48 48"><rect width="48" height="48" rx="10" fill="#EE4D2D"/><path d="M24 8c-5.5 0-9.5 3.8-9.5 8.5 0 1.2.3 2.3.7 3.3H13c-1.7 0-3 1.4-3 3.1l1.5 14.5c.2 1.5 1.4 2.6 2.9 2.6h19.2c1.5 0 2.7-1.1 2.9-2.6L38 22.9c0-1.7-1.3-3.1-3-3.1h-2.2c.4-1 .7-2.1.7-3.3C33.5 11.8 29.5 8 24 8zm0 3c3.6 0 6.5 2.5 6.5 5.5 0 1.2-.4 2.3-1.1 3.3h-10.8c-.7-1-1.1-2.1-1.1-3.3C17.5 13.5 20.4 11 24 11zm-6 16a2 2 0 110 4 2 2 0 010-4zm12 0a2 2 0 110 4 2 2 0 010-4z" fill="#fff"/></svg>`,
+            mercadolivre: `<svg viewBox="0 0 48 48"><rect width="48" height="48" rx="10" fill="#FFE600"/><ellipse cx="24" cy="24" rx="13" ry="13" fill="#333"/><path d="M17 23c0-3.9 3.1-7 7-7s7 3.1 7 7" fill="none" stroke="#FFE600" stroke-width="2.5" stroke-linecap="round"/><rect x="21" y="22" width="6" height="7" rx="1.5" fill="#FFE600"/></svg>`,
+            tiktok: `<svg viewBox="0 0 48 48"><rect width="48" height="48" rx="10" fill="#010101"/><path d="M32 15c-1.5-1-2.6-2.7-2.8-4.5H25v17.8c0 2-1.6 3.7-3.7 3.7S17.6 30.3 17.6 28.3s1.6-3.7 3.7-3.7c.4 0 .7.1 1 .2V21c-.3-.1-.7-.1-1-.1-4.2 0-7.5 3.3-7.5 7.4s3.3 7.4 7.5 7.4 7.5-3.3 7.5-7.4V20c1.4.9 3 1.4 4.8 1.4v-3.8c-.9 0-1.8-.3-2.5-.7L32 15z" fill="#fff"/></svg>`,
+            shein: `<svg viewBox="0 0 48 48"><rect width="48" height="48" rx="10" fill="#222"/><text x="50%" y="56%" dominant-baseline="middle" text-anchor="middle" fill="white" font-size="11" font-family="Arial" font-weight="bold" letter-spacing="1">SHEIN</text></svg>`,
+            amazon: `<svg viewBox="0 0 48 48"><rect width="48" height="48" rx="10" fill="#232F3E"/><text x="50%" y="41%" dominant-baseline="middle" text-anchor="middle" fill="white" font-size="10" font-family="Arial" font-weight="bold">amazon</text><path d="M12 31c7 3.5 15 5 23 2" stroke="#FF9900" stroke-width="2.5" stroke-linecap="round"/><path d="M32 28l4 3-4 3" stroke="#FF9900" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+            nuvemshop: `<svg viewBox="0 0 48 48"><rect width="48" height="48" rx="10" fill="#1C1CFF"/><path d="M13 31a7 7 0 010-14c.5 0 1 .1 1.5.2A9 9 0 0133 25 5.5 5.5 0 0134 36H13z" fill="white"/></svg>`
+        };
+        const getSvg = (id, sz=20) => `<div style="width:${sz}px;height:${sz}px;flex-shrink:0;">${PSVG[id] || ''}</div>`;
+
         let API_BASE = localStorage.getItem('sostrass_apibase') || 'http://localhost:3000';
         let serverOnline = false;
-        let modeloIA = localStorage.getItem('sostrass_model') || 'gemini-1.5-pro';
+        let modeloIA = localStorage.getItem('sostrass_model') || 'gemini-2.5-flash-preview-05-14';
         let actLog = JSON.parse(localStorage.getItem('sostrass_logs')) || [];
         let produtoAtual = null;
         let massaSelecionados = new Set();
-        let massaOpType = 'fixo'; // 'fixo' ou 'pct'
+        let massaOpType = 'set';
+        let massaCampo = 'preco';
 
-        // Custos Globais (Matemática do Negócio)
         let globalCosts = JSON.parse(localStorage.getItem('sostrass_gc')) || { imposto: 12, embalagem: 3, cartao: 2.5, frete: 0, ganho: 30 };
-        
-        // Taxas Individuais por Produto/Marketplace
         let mpRates = JSON.parse(localStorage.getItem('sostrass_rates')) || {};
 
-        // Definição dos Marketplaces
         const PLATS = [
-            { id: 'shopee', name: 'Shopee', color: 'text-rose-500', icon: 'fa-shopping-bag', fees: [{ k: 'comissao', l: 'Comissão', u: '%', d: 14 }, { k: 'servico', l: 'Tx. Serviço', u: 'R$', d: 3 }, { k: 'devolucao', l: 'Tx. Dev', u: '%', d: 0.5 }] },
-            { id: 'mercadolivre', name: 'Mercado Livre', color: 'text-yellow-500', icon: 'fa-handshake', fees: [{ k: 'comissao', l: 'Comissão', u: '%', d: 16 }, { k: 'frete', l: 'Frete Fixo', u: 'R$', d: 0 }] },
-            { id: 'tiktok', name: 'TikTok', color: 'text-slate-800', icon: 'fa-tiktok', fees: [{ k: 'comissao', l: 'Comissão', u: '%', d: 5 }, { k: 'fixo', l: 'Fixo', u: 'R$', d: 0 }] },
-            { id: 'shein', name: 'Shein', color: 'text-pink-600', icon: 'fa-tshirt', fees: [{ k: 'comissao', l: 'Comissão', u: '%', d: 18 }] },
-            { id: 'amazon', name: 'Amazon', color: 'text-orange-500', icon: 'fa-amazon', fees: [{ k: 'comissao', l: 'Comissão', u: '%', d: 15 }] },
-            { id: 'nuvemshop', name: 'Nuvemshop', color: 'text-blue-600', icon: 'fa-cloud', fees: [{ k: 'gateway', l: 'Gateway', u: '%', d: 2 }, { k: 'fixo', l: 'Custo Fixo', u: 'R$', d: 0 }] }
+            { id: 'shopee', name: 'Shopee', tc: 'text-rose-500', fees: [{ k: 'comissao', l: 'Comissão', u: '%', d: 14 }, { k: 'servico', l: 'Tx. Serviço', u: 'R$', d: 3 }, { k: 'devolucao', l: 'Tx. Dev', u: '%', d: 0.5 }] },
+            { id: 'mercadolivre', name: 'Mercado Livre', tc: 'text-yellow-600', fees: [{ k: 'comissao', l: 'Comissão', u: '%', d: 16 }, { k: 'frete', l: 'Frete Fixo', u: 'R$', d: 0 }] },
+            { id: 'tiktok', name: 'TikTok Shop', tc: 'text-slate-800', fees: [{ k: 'comissao', l: 'Comissão', u: '%', d: 5 }, { k: 'fixo', l: 'Fixo', u: 'R$', d: 0 }] },
+            { id: 'shein', name: 'Shein', tc: 'text-slate-800', fees: [{ k: 'comissao', l: 'Comissão', u: '%', d: 18 }] },
+            { id: 'amazon', name: 'Amazon', tc: 'text-orange-500', fees: [{ k: 'comissao', l: 'Comissão', u: '%', d: 15 }] },
+            { id: 'nuvemshop', name: 'Nuvemshop', tc: 'text-blue-600', fees: [{ k: 'gateway', l: 'Gateway', u: '%', d: 2 }, { k: 'fixo', l: 'Fixo', u: 'R$', d: 0 }] }
         ];
 
-        // Simulando Banco de Dados do Bling (Substitua na integração real)
         let products = JSON.parse(localStorage.getItem('sostrass_prods')) || [
-            { id: 1, sku: 'CX-ORG-30', name: 'Kit 30 Caixas Organizadoras 20x19x1.8cm', price: 89.90, cost: 45.00, stock: 145, cat: 'Caixas', desc: '', descComp: '', log: {}, fisc: {} },
-            { id: 2, sku: 'PER-6MM-BR', name: 'Pérola Branca 6mm ABS (Pacote 500g)', price: 35.00, cost: 18.00, stock: 430, cat: 'Pedrarias', desc: '', descComp: '', log: {}, fisc: {} },
-            { id: 3, sku: 'AL-BICO-01', name: 'Kit 3 Mini Alicates Coloridos Artesanato', price: 42.50, cost: 16.00, stock: 12, cat: 'Ferramentas', desc: '', descComp: '', log: {}, fisc: {} }
+            { id: 1, sku: 'CX-ORG-30', name: 'Kit 30 Caixas Organizadoras 20x19x1.8cm', price: 89.90, cost: 45.00, stock: 145, cat: 'Caixas', platforms: ['shopee','mercadolivre'], desc: '', descComp: '', log: {}, fisc: {} },
+            { id: 2, sku: 'PER-6MM-BR', name: 'Pérola Branca 6mm ABS (Pacote 500g)', price: 35.00, cost: 18.00, stock: 430, cat: 'Pedrarias', platforms: ['shopee'], desc: '', descComp: '', log: {}, fisc: {} },
+            { id: 3, sku: 'AL-BICO-01', name: 'Kit 3 Mini Alicates Coloridos Artesanato', price: 42.50, cost: 16.00, stock: 12, cat: 'Ferramentas', platforms: ['mercadolivre','nuvemshop'], desc: '', descComp: '', log: {}, fisc: {} }
         ];
 
         // ==========================================
-        // 2. FÓRMULAS DE PRECIFICAÇÃO (CORE MATH)
+        // 2. FÓRMULAS DE PRECIFICAÇÃO (MATEMÁTICA PURA)
         // ==========================================
+        const f2 = n => parseFloat(n||0).toFixed(2);
+        
         function getBaseCost(prod) {
-            // Custo base considera se o produto tem embalagem/frete extra, senão usa o global
             const emb = parseFloat(prod.log?.embExtra) > 0 ? parseFloat(prod.log.embExtra) : parseFloat(globalCosts.embalagem);
             const fre = parseFloat(prod.log?.freteExtra) > 0 ? parseFloat(prod.log.freteExtra) : parseFloat(globalCosts.frete);
             return (parseFloat(prod.cost) || 0) + emb + fre;
@@ -590,21 +516,18 @@
         function calcBlingPrice(prod) {
             const base = getBaseCost(prod);
             const den = 1 - (parseFloat(globalCosts.ganho) + parseFloat(globalCosts.imposto) + parseFloat(globalCosts.cartao)) / 100;
-            return den > 0 ? base / den : base * 3; // Fallback de segurança
+            return den > 0 ? base / den : base * 3;
         }
 
         function calcMktPrice(blingPrice, platId, prodId) {
             const pl = PLATS.find(x => x.id === platId);
             if(!pl) return blingPrice;
             const rates = (mpRates[prodId] && mpRates[prodId][platId]) ? mpRates[prodId][platId] : {};
-            
             let pct = 0, fixed = 0;
             pl.fees.forEach(f => {
                 const v = parseFloat(rates[f.k] ?? f.d) || 0;
                 if (f.u === '%') pct += v; else fixed += v;
             });
-            
-            // Taxa fixa entra ANTES da divisão pela margem percentual (matemática correta de markup)
             let p = blingPrice + fixed;
             if (pct > 0 && pct < 100) p = p / (1 - pct / 100);
             return p;
@@ -615,10 +538,8 @@
         }
 
         // ==========================================
-        // 3. UTILITÁRIOS E NAVEGAÇÃO
+        // 3. UI UTILITIES E DRAG & DROP
         // ==========================================
-        const f2 = (num) => parseFloat(num).toFixed(2);
-        
         function mostrarToast(msg, tipo = 'sucesso') {
             const c = document.getElementById('toast-container');
             const t = document.createElement('div');
@@ -630,260 +551,244 @@
 
         function addLog(msg, type = 'info') {
             actLog.unshift({ ts: new Date().toLocaleString(), msg, type });
-            if(actLog.length > 100) actLog.pop(); // Limita a 100
+            if(actLog.length > 200) actLog.pop();
             localStorage.setItem('sostrass_logs', JSON.stringify(actLog));
-            renderLogs();
-            if(type === 'error') {
+            if(document.getElementById('view-config').classList.contains('hidden') === false) renderLogE('all');
+            if(type === 'err') {
                 const b = document.getElementById('logBadge');
                 b.innerText = '!'; b.classList.remove('hidden');
             }
         }
 
+        // DRAG & DROP LOGIC
+        function initDragAndDrop() {
+            const panels = document.querySelectorAll('.drag-panel');
+            let draggedItem = null;
+
+            panels.forEach(panel => {
+                const handle = panel.querySelector('.dp-handle');
+                if(handle) {
+                    handle.addEventListener('mousedown', () => panel.setAttribute('draggable', true));
+                    handle.addEventListener('mouseup', () => panel.setAttribute('draggable', false));
+                }
+
+                panel.addEventListener('dragstart', function(e) {
+                    draggedItem = this;
+                    setTimeout(() => this.classList.add('dragging'), 0);
+                });
+
+                panel.addEventListener('dragend', function() {
+                    this.classList.remove('dragging');
+                    this.setAttribute('draggable', false);
+                    draggedItem = null;
+                });
+
+                panel.addEventListener('dragover', function(e) {
+                    e.preventDefault();
+                    if (this !== draggedItem) this.classList.add('drag-over');
+                });
+
+                panel.addEventListener('dragleave', function() {
+                    this.classList.remove('drag-over');
+                });
+
+                panel.addEventListener('drop', function(e) {
+                    e.preventDefault();
+                    this.classList.remove('drag-over');
+                    if (this !== draggedItem && draggedItem) {
+                        const parent = this.parentNode;
+                        const allSiblings = [...parent.children];
+                        const draggedIndex = allSiblings.indexOf(draggedItem);
+                        const droppedIndex = allSiblings.indexOf(this);
+                        if (draggedIndex < droppedIndex) parent.insertBefore(draggedItem, this.nextSibling);
+                        else parent.insertBefore(draggedItem, this);
+                    }
+                });
+            });
+        }
+
+        // ==========================================
+        // 4. VIEWS PRINCIPAIS (Catálogo, Massa, Config)
+        // ==========================================
         function navTo(aba) {
             ['catalogo', 'massa', 'automacoes', 'simulador', 'config'].forEach(a => {
                 document.getElementById(`view-${a}`)?.classList.add('hidden');
                 document.getElementById(`nav-${a}`)?.classList.remove('bg-indigo-600', 'text-white', 'shadow-lg', 'active');
             });
             document.getElementById(`view-${aba}`)?.classList.remove('hidden');
-            document.getElementById(`nav-${aba}`)?.classList.add('bg-indigo-600', 'text-white', 'shadow-lg', 'active');
+            const navBtn = document.getElementById(`nav-${aba}`);
+            if(navBtn) navBtn.classList.add('bg-indigo-600', 'text-white', 'shadow-lg', 'active');
             
             if(aba === 'catalogo') renderCatalogo();
             if(aba === 'massa') renderMassaList();
-            if(aba === 'log') { document.getElementById('logBadge').classList.add('hidden'); mudarAba('config'); } // Log fica na tela de config
+            if(aba === 'config') renderLogE('all');
+            if(aba === 'log') { document.getElementById('logBadge').classList.add('hidden'); navTo('config'); }
         }
+        function mudarAba(aba) { navTo(aba); } // Fallback
 
-        function mudarAba(aba) { navTo(aba); } // Alias fallback
-
-        // ==========================================
-        // 4. VIEWS PRINCIPAIS
-        // ==========================================
-        
-        // --- CATÁLOGO ---
         function filtrarGeral(query) { renderCatalogo(query.toLowerCase()); }
 
         function renderCatalogo(filtro = '') {
             const tbody = document.getElementById('tabela-produtos');
+            if(!tbody) return;
             tbody.innerHTML = '';
-
+            
             products.filter(p => p.sku.toLowerCase().includes(filtro) || p.name.toLowerCase().includes(filtro)).forEach(p => {
                 const base = getBaseCost(p);
                 const sug = calcBlingPrice(p);
                 const margem = calcMargin(p.price, base);
-                const corMargem = margem >= 30 ? 'text-emerald-600 bg-emerald-50 border-emerald-200' : (margem >= 15 ? 'text-amber-600 bg-amber-50 border-amber-200' : 'text-rose-600 bg-rose-50 border-rose-200');
+                const cor = margem >= 30 ? 'text-emerald-600 bg-emerald-50 border-emerald-200' : (margem >= 15 ? 'text-amber-600 bg-amber-50 border-amber-200' : 'text-rose-600 bg-rose-50 border-rose-200');
 
                 tbody.innerHTML += `
-                    <tr class="hover:bg-indigo-50/50 transition border-b border-slate-100 group">
-                        <td class="px-6 py-4"><div class="font-bold text-slate-800">${p.name}</div><div class="text-xs text-slate-400 font-mono">${p.sku}</div></td>
+                    <tr class="hover:bg-indigo-50/40 transition border-b border-slate-100 group cursor-pointer" onclick="abrirModalProduto(${p.id})">
+                        <td class="px-6 py-4"><div class="font-bold text-slate-800 truncate w-64" title="${p.name}">${p.name}</div><div class="text-xs text-slate-400 font-mono">${p.sku}</div></td>
                         <td class="px-6 py-4 text-right text-slate-500 font-medium">R$ ${f2(p.cost)}</td>
                         <td class="px-6 py-4 text-right">
                             <div class="font-black text-indigo-600">R$ ${f2(p.price)}</div>
                             <div class="text-[10px] ${Math.abs(p.price - sug) < 0.5 ? 'text-emerald-500' : 'text-slate-400'}">Sug: R$ ${f2(sug)}</div>
                         </td>
-                        <td class="px-6 py-4 text-center"><span class="px-2 py-1 rounded-md text-xs font-black border ${corMargem}">${margem.toFixed(1)}%</span></td>
+                        <td class="px-6 py-4 text-center"><span class="px-2 py-1 rounded-md text-xs font-black border ${cor}">${margem.toFixed(1)}%</span></td>
                         <td class="px-6 py-4 text-right">
-                            <button onclick="abrirModalProduto(${p.id})" class="opacity-0 group-hover:opacity-100 bg-white border border-slate-300 text-slate-700 px-4 py-2 rounded-lg text-sm hover:bg-indigo-600 hover:text-white hover:border-indigo-600 font-bold shadow-sm transition-all"><i class="fas fa-sliders-h mr-1"></i> Configurar</button>
+                            <button class="opacity-0 group-hover:opacity-100 bg-white border border-slate-300 text-slate-700 px-3 py-1.5 rounded-lg text-sm hover:bg-indigo-600 hover:text-white font-bold shadow-sm transition-all"><i class="fas fa-sliders-h"></i> Configurar</button>
                         </td>
                     </tr>`;
             });
         }
 
-        // --- OPERAÇÃO EM MASSA ---
+        // --- ATUALIZAÇÃO EM MASSA ---
         function renderMassaList() {
             const list = document.getElementById('massa-list');
+            if(!list) return;
             const q = document.getElementById('massa-busca')?.value.toLowerCase() || '';
+            const catFil = document.getElementById('massa-cat')?.value || 'all';
             list.innerHTML = '';
             
-            products.filter(p => p.sku.toLowerCase().includes(q) || p.name.toLowerCase().includes(q)).forEach(p => {
+            // Popula categorias no select se estiver vazio
+            const catSel = document.getElementById('massa-cat');
+            if(catSel && catSel.options.length === 1) {
+                const cats = [...new Set(products.map(p => p.cat).filter(Boolean))];
+                cats.forEach(c => catSel.innerHTML += `<option value="${c}">${c}</option>`);
+            }
+
+            products.filter(p => {
+                const matchQ = p.sku.toLowerCase().includes(q) || p.name.toLowerCase().includes(q);
+                const matchCat = catFil === 'all' || p.cat === catFil;
+                return matchQ && matchCat;
+            }).forEach(p => {
                 const isSel = massaSelecionados.has(p.id);
+                const b = getBaseCost(p); const m = calcMargin(p.price, b);
+                const pIcons = (p.platforms||[]).map(id => getSvg(id, 14)).join('');
+
                 list.innerHTML += `
-                    <div onclick="toggleMassaItem(${p.id})" class="flex items-center justify-between p-3 border-b border-slate-200/50 cursor-pointer transition rounded-lg mb-1 ${isSel ? 'bg-indigo-50 border-indigo-200' : 'hover:bg-white bg-slate-50/30'}">
-                        <div class="flex items-center gap-3">
-                            <div class="w-5 h-5 rounded border ${isSel ? 'bg-indigo-600 border-indigo-600 text-white' : 'border-slate-300 bg-white'} flex items-center justify-center text-xs"><i class="fas fa-check ${isSel ? '' : 'hidden'}"></i></div>
-                            <div><span class="font-mono text-xs ${isSel ? 'text-indigo-600' : 'text-slate-500'} font-bold block">${p.sku}</span><span class="text-sm font-medium text-slate-700 truncate w-64 block">${p.name}</span></div>
-                        </div>
-                        <div class="text-right">
-                            <div class="text-sm font-black text-slate-800">R$ ${f2(p.price)}</div>
-                            <div class="text-[10px] text-slate-400">Custo: R$ ${f2(p.cost)}</div>
-                        </div>
+                    <div onclick="toggleMassaItem(${p.id})" class="grid grid-cols-[30px_80px_1fr_80px_80px_60px_100px] gap-2 items-center p-2.5 border-b border-slate-200/50 cursor-pointer transition rounded mb-1 ${isSel ? 'bg-indigo-50 border-indigo-200' : 'hover:bg-white'}">
+                        <div class="w-4 h-4 rounded border ${isSel ? 'bg-indigo-600 border-indigo-600 text-white' : 'border-slate-300 bg-white'} flex items-center justify-center text-[10px]"><i class="fas fa-check ${isSel ? '' : 'hidden'}"></i></div>
+                        <span class="font-mono text-xs ${isSel ? 'text-indigo-600' : 'text-slate-500'} font-bold">${p.sku}</span>
+                        <span class="text-xs font-medium text-slate-700 truncate">${p.name}</span>
+                        <span class="text-sm font-black text-indigo-600 text-right">R$ ${f2(p.price)}</span>
+                        <span class="text-xs text-slate-500 text-right">R$ ${f2(b)}</span>
+                        <span class="text-xs font-bold text-right ${m >= 30 ? 'text-emerald-500' : 'text-rose-500'}">${m.toFixed(1)}%</span>
+                        <div class="flex gap-1 justify-end">${pIcons}</div>
                     </div>`;
             });
+            renderMassaPreview();
         }
 
         function toggleMassaItem(id) { massaSelecionados.has(id) ? massaSelecionados.delete(id) : massaSelecionados.add(id); renderMassaList(); }
-        function selecionarTodosMassa() { products.forEach(p => massaSelecionados.add(p.id)); renderMassaList(); }
-        function limparMassa() { massaSelecionados.clear(); renderMassaList(); }
+        function massaSelAll() { products.forEach(p => massaSelecionados.add(p.id)); renderMassaList(); }
+        function massaSelNone() { massaSelecionados.clear(); renderMassaList(); }
         
-        function setMassaOp(tipo) {
-            massaOpType = tipo;
-            document.getElementById('btn-op-fixo').className = tipo === 'fixo' ? "bg-indigo-600 text-white rounded-lg py-2 text-xs font-bold shadow" : "bg-slate-100 text-slate-600 border border-slate-200 rounded-lg py-2 text-xs font-bold hover:bg-slate-200";
-            document.getElementById('btn-op-pct').className = tipo === 'pct' ? "bg-indigo-600 text-white rounded-lg py-2 text-xs font-bold shadow" : "bg-slate-100 text-slate-600 border border-slate-200 rounded-lg py-2 text-xs font-bold hover:bg-slate-200";
+        function setMassaMode(modo) {
+            massaCampo = modo;
+            ['preco','custo','ganho'].forEach(m => {
+                const btn = document.getElementById(`btn-m-${m}`);
+                if(btn) btn.className = m === modo ? "px-3 py-1.5 rounded-lg text-xs font-bold border border-indigo-600 bg-indigo-600 text-white" : "px-3 py-1.5 rounded-lg text-xs font-bold border border-slate-200 bg-slate-50 text-slate-600";
+            });
+            renderMassaPreview();
         }
 
-        function aplicarMassa(enviarBling) {
-            if(massaSelecionados.size === 0) return mostrarToast("Selecione ao menos 1 produto.", "aviso");
-            const campo = document.getElementById('massa-campo').value;
-            const valor = parseFloat(document.getElementById('massa-valor').value) || 0;
+        function setMassaOp(tipo) {
+            massaOpType = tipo;
+            ['set','addpct','subpct','addfix'].forEach(t => {
+                const btn = document.getElementById(`btn-op-${t}`);
+                if(btn) btn.className = t === tipo ? "flex-1 py-2 text-xs font-bold bg-indigo-600 text-white" : "flex-1 py-2 text-xs font-bold text-slate-600 hover:bg-slate-200";
+            });
             
-            let count = 0;
+            document.getElementById('mUnitPre').innerText = (tipo === 'set' || tipo === 'addfix') && massaCampo !== 'ganho' ? 'R$' : '';
+            document.getElementById('mUnitPos').innerText = (tipo === 'addpct' || tipo === 'subpct') || massaCampo === 'ganho' ? '%' : '';
+            renderMassaPreview();
+        }
+
+        function renderMassaPreview() {
+            const prev = document.getElementById('massa-preview');
+            const cnt = document.getElementById('massa-count-prev');
+            if(!prev || !cnt) return;
+            cnt.innerText = massaSelecionados.size;
+
+            if(massaSelecionados.size === 0) { prev.innerHTML = "Selecione produtos."; return; }
+            
+            const val = parseFloat(document.getElementById('massa-val').value) || 0;
+            let html = '';
+            
+            products.filter(p => massaSelecionados.has(p.id)).slice(0,10).forEach(p => {
+                let old = massaCampo === 'preco' ? p.price : (massaCampo === 'custo' ? p.cost : globalCosts.ganho);
+                let nv = old;
+                if(massaOpType === 'set') nv = val;
+                else if(massaOpType === 'addpct') nv = old + (old * (val/100));
+                else if(massaOpType === 'subpct') nv = old - (old * (val/100));
+                else if(massaOpType === 'addfix') nv = old + val;
+                
+                const up = nv > old;
+                html += `<div class="flex justify-between border-b border-slate-200/50 py-1"><span class="font-bold text-slate-700">${p.sku}</span> <span><span class="line-through opacity-50 mr-2">${f2(old)}</span> <span class="font-bold ${up?'text-emerald-600':'text-rose-600'}">${f2(nv)} ${up?'▲':'▼'}</span></span></div>`;
+            });
+            if(massaSelecionados.size > 10) html += `<div class="text-center mt-2 italic">E mais ${massaSelecionados.size - 10} itens...</div>`;
+            prev.innerHTML = html;
+        }
+
+        function applyMassa(enviarBling) {
+            if(massaSelecionados.size === 0) return mostrarToast("Selecione produtos.", "aviso");
+            const val = parseFloat(document.getElementById('massa-val').value) || 0;
+            
+            let c = 0;
             products.forEach(p => {
                 if(massaSelecionados.has(p.id)) {
-                    let targetVal = campo === 'preco' ? p.price : p.cost;
-                    if(massaOpType === 'fixo') targetVal = valor;
-                    else if(massaOpType === 'pct') targetVal = targetVal + (targetVal * (valor/100));
+                    let target = massaCampo === 'preco' ? p.price : p.cost;
+                    if(massaOpType === 'set') target = val;
+                    else if(massaOpType === 'addpct') target = target + (target * (val/100));
+                    else if(massaOpType === 'subpct') target = target - (target * (val/100));
+                    else if(massaOpType === 'addfix') target = target + val;
                     
-                    if(campo === 'preco') p.price = targetVal; else p.cost = targetVal;
-                    count++;
+                    if(massaCampo === 'preco') p.price = target; else p.cost = target;
+                    c++;
                 }
             });
             localStorage.setItem('sostrass_prods', JSON.stringify(products));
-            mostrarToast(`${count} produtos atualizados com sucesso!`);
-            addLog(`Atualização em massa (${campo}) aplicada a ${count} itens.`, 'ok');
+            mostrarToast(`${c} itens atualizados!`);
+            addLog(`Massa: ${massaCampo} via ${massaOpType} em ${c} itens.`, 'ok');
             renderMassaList();
-            if(enviarBling) {
-                mostrarToast("Enviando para o Bling em background...", "aviso");
-                addLog(`Enviando ${count} produtos para ERP...`, 'info');
-            }
-        }
-
-        // --- SIMULADOR & CUSTOS GLOBAIS ---
-        function simularPreco(custoVal) {
-            const c = parseFloat(custoVal) || 0;
-            const imp = parseFloat(document.getElementById('cg-imp').value) || 0;
-            const car = parseFloat(document.getElementById('cg-cartao').value) || 0;
-            const emb = parseFloat(document.getElementById('cg-emb').value) || 0;
-            const fre = parseFloat(document.getElementById('cg-frete').value) || 0;
-            const ganho = parseFloat(document.getElementById('cg-ganho').value) || 0;
-
-            const base = c + emb + fre;
-            const den = 1 - (ganho + imp + car) / 100;
-            const res = den > 0 ? base / den : 0;
-            document.getElementById('sim-resultado').innerText = `R$ ${f2(res)}`;
-        }
-
-        function salvarCustosGlobais() {
-            globalCosts = {
-                imposto: parseFloat(document.getElementById('cg-imp').value) || 0,
-                cartao: parseFloat(document.getElementById('cg-cartao').value) || 0,
-                embalagem: parseFloat(document.getElementById('cg-emb').value) || 0,
-                frete: parseFloat(document.getElementById('cg-frete').value) || 0,
-                ganho: parseFloat(document.getElementById('cg-ganho').value) || 0
-            };
-            localStorage.setItem('sostrass_gc', JSON.stringify(globalCosts));
-            mostrarToast("Custos globais salvos! Catálogo recalculado.");
-            addLog("Custos Globais (Impostos, Ganho) atualizados.");
-        }
-
-        // --- CENTRAL DE I.A. E CONFIGURAÇÕES ---
-        function salvarConfig() {
-            API_BASE = document.getElementById('cfg-url').value;
-            modeloIA = document.getElementById('cfg-model').value;
-            localStorage.setItem('sostrass_apibase', API_BASE);
-            localStorage.setItem('sostrass_model', modeloIA);
-            mostrarToast("Configurações Salvas.");
-            testarServidor();
-        }
-
-        async function testarServidor() {
-            const bar = document.getElementById('serverBar');
-            bar.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Proxy...';
-            bar.className = "flex items-center gap-2 text-xs font-bold text-amber-700 bg-amber-100 px-3 py-1.5 rounded-full border border-amber-200 shadow-inner";
-            try {
-                const r = await fetch(`${API_BASE}/`);
-                if(r.ok) {
-                    serverOnline = true;
-                    bar.innerHTML = '<i class="fas fa-shield-check"></i> API Online';
-                    bar.className = "flex items-center gap-2 text-xs font-bold text-emerald-700 bg-emerald-100 px-3 py-1.5 rounded-full border border-emerald-200 shadow-inner";
-                    addLog("Conexão com servidor proxy verificada com sucesso.", "ok");
-                } else throw new Error("Status erro");
-            } catch(e) {
-                serverOnline = false;
-                bar.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Backend Offline';
-                bar.className = "flex items-center gap-2 text-xs font-bold text-rose-700 bg-rose-100 px-3 py-1.5 rounded-full border border-rose-200 shadow-inner";
-                addLog("Falha ao conectar no servidor proxy. I.A e Varredura desativados.", "error");
-            }
-        }
-
-        function renderLogs() {
-            const c = document.getElementById('log-container');
-            if(!c) return;
-            c.innerHTML = actLog.map(l => {
-                const color = l.type === 'error' ? 'text-rose-400' : (l.type === 'ok' ? 'text-emerald-400' : 'text-slate-400');
-                return `<div><span class="text-slate-600">[${l.ts.split(' ')[1]}]</span> <span class="${color}">${l.msg}</span></div>`;
-            }).join('');
-        }
-        function limparLogs() { actLog = []; localStorage.removeItem('sostrass_logs'); renderLogs(); }
-
-        // MÉTODOS I.A. (SAC e Descrição Blindada via Backend)
-        async function gerarRespostaSAC() {
-            if(!serverOnline) return mostrarToast("Servidor Offline.", "aviso");
-            const btn = document.getElementById('btn-sac');
-            const resArea = document.getElementById('sac-texto');
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processando...';
-            try {
-                const res = await fetch(`${API_BASE}/api/ia/sac`, {
-                    method: 'POST', headers:{'Content-Type':'application/json'},
-                    body: JSON.stringify({
-                        cliente: document.getElementById('sac-cliente').value,
-                        produto: document.getElementById('sac-produto').value,
-                        relato: document.getElementById('sac-relato').value
-                    })
-                });
-                const data = await res.json();
-                resArea.innerText = data.resposta;
-                document.getElementById('sac-resultado').classList.remove('hidden');
-                addLog("I.A: Resposta de SAC gerada.");
-            } catch(e) { mostrarToast("Erro na I.A.", "error"); addLog("Erro I.A: "+e.message, "error"); }
-            btn.innerHTML = '<i class="fas fa-magic text-amber-400"></i> Formular Resposta Humanizada';
-        }
-
-        async function gerarDescricaoSegura() {
-            if(!serverOnline) return mostrarToast("Servidor Offline.", "aviso");
-            const btn = document.getElementById('btn-desc');
-            const resArea = document.getElementById('desc-texto');
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Criando Blindagem...';
-            try {
-                const res = await fetch(`${API_BASE}/api/ia/descricao-blindada`, {
-                    method: 'POST', headers:{'Content-Type':'application/json'},
-                    body: JSON.stringify({ produto: document.getElementById('desc-produto').value })
-                });
-                const data = await res.json();
-                resArea.innerText = data.descricao;
-                document.getElementById('desc-resultado').classList.remove('hidden');
-                addLog("I.A: Ficha técnica com IP Protection gerada.");
-            } catch(e) { mostrarToast("Erro na I.A.", "error"); }
-            btn.innerHTML = '<i class="fas fa-cogs"></i> Gerar Ficha c/ HTML Jurídico';
-        }
-
-        function copiarTexto(id) {
-            navigator.clipboard.writeText(document.getElementById(id).innerText);
-            mostrarToast("Texto copiado!");
         }
 
         // ==========================================
-        // 5. LÓGICA DO SUPER MODAL (PIM)
+        // 5. O SUPER MODAL DO PRODUTO (PIM)
         // ==========================================
         function abrirModalProduto(id) {
             produtoAtual = products.find(p => p.id === id);
             if(!produtoAtual) return;
 
-            // Header
             document.getElementById('m-nome').innerText = produtoAtual.name;
             document.getElementById('m-sku').innerText = produtoAtual.sku;
-            document.getElementById('m-cat-display').innerText = `Categoria: ${produtoAtual.cat}`;
+            document.getElementById('m-cat-display').innerText = `Cat: ${produtoAtual.cat}`;
             document.getElementById('m-estoque-display').innerText = produtoAtual.stock;
             
-            // Aba Geral
+            // Popula Abas
             document.getElementById('m-cat').value = produtoAtual.cat;
             document.getElementById('m-estoque').value = produtoAtual.stock;
             document.getElementById('m-custo').value = produtoAtual.cost;
             document.getElementById('m-preco').value = produtoAtual.price;
             
-            // Aba Descrição
             document.getElementById('m-desc-curta').value = produtoAtual.desc || '';
             document.getElementById('m-desc-comp').value = produtoAtual.descComp || '';
             document.getElementById('m-ia-output').innerText = 'Aguardando comando...';
 
-            // Aba Logística
             document.getElementById('m-altura').value = produtoAtual.log?.alt || '';
             document.getElementById('m-largura').value = produtoAtual.log?.lar || '';
             document.getElementById('m-prof').value = produtoAtual.log?.pro || '';
@@ -892,20 +797,11 @@
             document.getElementById('m-frete-extra').value = produtoAtual.log?.freteExtra || '';
             document.getElementById('m-prazo').value = produtoAtual.log?.prazo || '0';
 
-            // Aba Fiscal
-            document.getElementById('m-ncm').value = produtoAtual.fisc?.ncm || '';
-            document.getElementById('m-origem').value = produtoAtual.fisc?.origem || '0';
-            document.getElementById('m-cfop').value = produtoAtual.fisc?.cfop || '';
-            document.getElementById('m-cst').value = produtoAtual.fisc?.cst || '';
-            document.getElementById('m-icms').value = produtoAtual.fisc?.icms || '';
-            document.getElementById('m-pis').value = produtoAtual.fisc?.pis || '';
-            document.getElementById('m-cofins').value = produtoAtual.fisc?.cofins || '';
-
-            // Limpa Radar
-            document.getElementById('m-radar-resultados').innerHTML = '<div class="text-slate-500 text-sm flex flex-col items-center justify-center h-full"><i class="fas fa-radar text-4xl mb-3 opacity-20"></i>Aguardando alvos...</div>';
-
-            recalcularModalGeral();
+            // Inicia Modal com Marketplaces renderizados via InnerHTML *uma única vez*
+            renderMarketplacesBase(); 
+            recalcularModalGeral(); 
             switchModalTab('geral');
+            
             document.getElementById('modal-produto').classList.remove('hidden');
         }
 
@@ -918,15 +814,11 @@
             ['geral', 'desc', 'precos', 'log', 'fisc', 'radar'].forEach(t => {
                 document.getElementById(`m-view-${t}`).classList.add('hidden');
                 const b = document.getElementById(`mtab-${t}`);
-                if(t === 'geral') b.className = "px-4 py-2 rounded-lg bg-transparent text-slate-500 font-bold text-sm hover:bg-slate-100 transition whitespace-nowrap";
-                else if (t === 'radar') b.className = "px-4 py-2 rounded-lg bg-transparent text-slate-500 font-bold text-sm hover:bg-slate-100 transition whitespace-nowrap border border-slate-200";
-                else b.className = "px-4 py-2 rounded-lg bg-transparent text-slate-500 font-bold text-sm hover:bg-slate-100 transition whitespace-nowrap";
+                if(b) b.className = "px-4 py-2 rounded-lg bg-transparent text-slate-500 font-bold text-sm hover:bg-slate-100 transition whitespace-nowrap" + (t==='radar'?' border border-slate-200':'');
             });
-
             document.getElementById(`m-view-${tab}`).classList.remove('hidden');
             const ativo = document.getElementById(`mtab-${tab}`);
-            if(tab === 'radar') ativo.className = "px-4 py-2 rounded-lg bg-indigo-600 text-white font-bold text-sm shadow-md transition whitespace-nowrap border border-indigo-700";
-            else ativo.className = "px-4 py-2 rounded-lg bg-indigo-600 text-white font-bold text-sm shadow-md transition whitespace-nowrap";
+            if(ativo) ativo.className = "px-4 py-2 rounded-lg bg-indigo-600 text-white font-bold text-sm shadow-md transition whitespace-nowrap";
         }
 
         function recalcularModalGeral() {
@@ -934,7 +826,6 @@
             const c = parseFloat(document.getElementById('m-custo').value) || 0;
             const p = parseFloat(document.getElementById('m-preco').value) || 0;
             
-            // Simula um prod para o motor
             const mockProd = { cost: c, log: { embExtra: document.getElementById('m-emb-extra').value, freteExtra: document.getElementById('m-frete-extra').value } };
             const base = getBaseCost(mockProd);
             const sug = calcBlingPrice(mockProd);
@@ -945,194 +836,170 @@
             document.getElementById('m-sugerido-display').innerText = `R$ ${f2(sug)}`;
             document.getElementById('m-preco-ref').innerText = f2(p);
             
-            const margemEl = document.getElementById('m-margem-display');
-            margemEl.innerText = `${margem.toFixed(1)}%`;
-            margemEl.className = margem >= 30 ? 'text-2xl font-black text-emerald-600' : (margem >= 15 ? 'text-2xl font-black text-amber-600' : 'text-2xl font-black text-rose-600');
+            const mEl = document.getElementById('m-margem-display');
+            mEl.innerText = `${margem.toFixed(1)}%`;
+            mEl.className = margem >= 30 ? 'text-2xl font-black text-emerald-600' : 'text-2xl font-black text-rose-600';
 
-            renderMarketplacesModal(mockProd, p);
+            // Atualiza os valores matemáticos das plataformas sem recriar os inputs
+            atualizarValoresMarketplaces(mockProd, p);
         }
 
-        function renderMarketplacesModal(mockProd, currentPrice) {
+        // Renderiza as caixas de marketplace uma vez quando abre o modal
+        function renderMarketplacesBase() {
             const container = document.getElementById('m-container-marketplaces');
             container.innerHTML = '';
             if(!mpRates[produtoAtual.id]) mpRates[produtoAtual.id] = {};
 
             PLATS.forEach(pl => {
                 const rates = mpRates[produtoAtual.id][pl.id] || {};
-                const precoMkt = calcMktPrice(currentPrice, pl.id, produtoAtual.id);
-                const margemMkt = calcMargin(precoMkt, getBaseCost(mockProd));
-                const lucroReais = precoMkt - getBaseCost(mockProd);
-
                 let inputsHTML = '';
+                
                 pl.fees.forEach(f => {
                     const val = rates[f.k] ?? f.d;
+                    // Ao digitar, chama salvarTaxaMkt
                     inputsHTML += `<div><label class="text-[10px] font-bold text-slate-500 uppercase block mb-1">${f.l} (${f.u})</label>
                     <input type="number" step="0.1" value="${val}" class="ios-input w-full text-xs font-bold" oninput="salvarTaxaMkt(${produtoAtual.id}, '${pl.id}', '${f.k}', this.value)"></div>`;
                 });
 
                 container.innerHTML += `
-                    <div class="bg-white border border-slate-200 rounded-xl p-4 shadow-sm flex flex-col gap-3 transition hover:border-indigo-300">
-                        <div class="flex justify-between items-center font-bold text-slate-800 border-b pb-2">
-                            <span class="${pl.color}"><i class="fas ${pl.icon} mr-2"></i> ${pl.name}</span>
-                            <span class="text-xl font-black">R$ ${precoMkt.toFixed(2)}</span>
-                        </div>
-                        <div class="grid grid-cols-${pl.fees.length} gap-2">${inputsHTML}</div>
-                        <div class="bg-slate-50 rounded-lg p-3 flex justify-between items-center text-sm border border-slate-100 mt-1">
-                            <span class="text-slate-500 font-bold">Lucro Final:</span>
-                            <span class="font-black ${margemMkt >= 15 ? 'text-emerald-600' : 'text-rose-600'}">R$ ${lucroReais.toFixed(2)} (${margemMkt.toFixed(1)}%)</span>
+                    <div class="drag-panel bg-white border border-slate-200 rounded-xl shadow-sm flex flex-col transition hover:border-indigo-300">
+                        <div class="dp-handle"><span class="${pl.tc} flex items-center gap-2 font-bold">${getSvg(pl.id, 16)} ${pl.name}</span> <span class="text-xl font-black" id="p-mkt-${pl.id}">R$ 0.00</span></div>
+                        <div class="p-4 flex flex-col gap-3">
+                            <div class="grid grid-cols-${pl.fees.length} gap-2">${inputsHTML}</div>
+                            <div class="bg-slate-50 rounded-lg p-3 flex justify-between items-center text-sm border border-slate-100 mt-1">
+                                <span class="text-slate-500 font-bold">Lucro Final:</span>
+                                <span class="font-black" id="l-mkt-${pl.id}">R$ 0.00 (0%)</span>
+                            </div>
                         </div>
                     </div>`;
+            });
+            initDragAndDrop(); // Re-vincula os eventos de drag
+        }
+
+        // A MÁGICA: Atualiza apenas os textos, mantendo o cursor do usuário intacto nos inputs
+        function atualizarValoresMarketplaces(mockProd, currentPrice) {
+            PLATS.forEach(pl => {
+                const precoMkt = calcMktPrice(currentPrice, pl.id, produtoAtual.id);
+                const margemMkt = calcMargin(precoMkt, getBaseCost(mockProd));
+                const lucroReais = precoMkt - getBaseCost(mockProd);
+
+                const elPreco = document.getElementById(`p-mkt-${pl.id}`);
+                const elLucro = document.getElementById(`l-mkt-${pl.id}`);
+                
+                if(elPreco) elPreco.innerText = `R$ ${precoMkt.toFixed(2)}`;
+                if(elLucro) {
+                    elLucro.innerText = `R$ ${lucroReais.toFixed(2)} (${margemMkt.toFixed(1)}%)`;
+                    elLucro.className = margemMkt >= 15 ? 'font-black text-emerald-600' : 'font-black text-rose-600';
+                }
             });
         }
 
         function salvarTaxaMkt(prodId, platId, key, val) {
             if(!mpRates[prodId][platId]) mpRates[prodId][platId] = {};
             mpRates[prodId][platId][key] = parseFloat(val) || 0;
+            // Salva silenciosamente e apenas re-calcula os textos de resultado
             localStorage.setItem('sostrass_rates', JSON.stringify(mpRates));
-            recalcularModalGeral();
+            recalcularModalGeral(); 
         }
 
-        async function gerarIAPrompt(tipo) {
-            if(!serverOnline) return mostrarToast("Proxy Offline. Conecte no painel de Configs.", "aviso");
-            const box = document.getElementById('m-ia-output');
-            box.innerHTML = '<span class="text-amber-400"><i class="fas fa-spinner fa-spin"></i> Solicitando ao Gemini...</span>';
-            
-            const pName = document.getElementById('m-nome').innerText;
-            const inst = document.getElementById('m-ia-inst').value;
-            const ctx = document.getElementById('m-ia-ctx').value;
-            
-            let prompt = `Produto: ${pName}\n`;
-            if(inst) prompt += `Instrução: ${inst}\n`;
-            if(ctx) prompt += `Contexto: ${ctx}\n`;
-            
-            if(tipo === 'curta') prompt += `Crie um título altamente conversivo para marketplace focado em artesanato. Max 100 caracteres.`;
-            else prompt += `Crie uma descrição detalhada com bullet points focando em evitar devoluções por tamanho/especificação errada.`;
-
-            try {
-                const res = await fetch(`${API_BASE}/api/ia/gerar`, {
-                    method: 'POST', headers:{'Content-Type':'application/json'},
-                    body: JSON.stringify({ prompt: prompt, model: modeloIA })
-                });
-                const data = await res.json();
-                // Acessa o formato padrão de resposta do Gemini v1beta
-                let txt = data.candidates?.[0]?.content?.parts?.[0]?.text || data.descricao_gerada || "Sem resposta clara.";
-                box.innerText = txt.replace(/\*/g, ''); // Remove bold markdown para ficar plain text no input
-                addLog(`IA: Geração de ficha para ${produtoAtual.sku} concluída.`);
-            } catch(e) {
-                box.innerText = "Erro na requisição. Verifique o servidor.";
-                addLog("Erro IA: " + e.message, "error");
-            }
-        }
-
-        function aplicarIA(targetId) {
-            const txt = document.getElementById('m-ia-output').innerText;
-            if(txt && !txt.includes('Aguardando') && !txt.includes('Erro')) {
-                document.getElementById(targetId).value = txt;
-                mostrarToast("Conteúdo aplicado!");
-            }
-        }
-
-        // --- RADAR DO MODAL ---
-        async function acionarRadarModal() {
-            const txt = document.getElementById('m-radar-urls').value;
-            const urls = txt.split('\n').map(u => u.trim()).filter(u => u !== '');
-            if(urls.length === 0) return mostrarToast("Insira links.", 'aviso');
-            if(!serverOnline) return mostrarToast("Servidor Offline.", 'aviso');
-
-            const btn = document.getElementById('btn-radar-modal');
-            const resArea = document.getElementById('m-radar-resultados');
-            btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Hackeando JSON-LD...`;
-            resArea.innerHTML = '';
-
-            try {
-                const res = await fetch(`${API_BASE}/api/scraper/precos-multiplos`, {
-                    method: 'POST', headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ urls })
-                });
-                const data = await res.json();
-                
-                if(data.sucesso) {
-                    const c = parseFloat(document.getElementById('m-custo').value) || 0;
-                    const base = getBaseCost({cost: c, log: {}}); // Simplificado para simulação
-                    
-                    data.resultados.forEach((item, index) => {
-                        const dom = new URL(item.url).hostname.replace('www.', '');
-                        if(item.sucesso) {
-                            const pNum = parseFloat(item.preco.replace(/[^0-9,.]/g, '').replace(',', '.'));
-                            const mg = calcMargin(pNum, base);
-                            const cor = mg >= 30 ? 'text-emerald-500' : (mg >= 15 ? 'text-amber-500' : 'text-rose-500');
-                            
-                            resArea.innerHTML += `
-                                <div class="bg-slate-800 border border-slate-700 rounded-xl p-4 flex justify-between items-center shadow-inner">
-                                    <div><p class="text-[10px] text-slate-400 uppercase font-bold">Alvo ${index+1} <span class="text-indigo-400 ml-1">${dom}</span></p><p class="text-xl font-black text-white">R$ ${pNum.toFixed(2)}</p></div>
-                                    <div class="text-right"><p class="text-[10px] text-slate-500 uppercase">Sua Margem se igualar:</p><p class="text-lg font-black ${cor}">${mg.toFixed(1)}%</p></div>
-                                </div>`;
-                        } else {
-                            resArea.innerHTML += `<div class="bg-rose-900/30 border border-rose-800/50 rounded-xl p-3 text-xs text-rose-400"><i class="fas fa-shield-alt mr-1"></i> Alvo ${index+1}: Acesso bloqueado pelo firewall.</div>`;
-                        }
-                    });
-                }
-            } catch(e) { mostrarToast("Falha na varredura.", 'error'); }
-            btn.innerHTML = `<i class="fas fa-search-dollar"></i> Iniciar Varredura`;
-        }
-
-        // --- SALVAMENTO FINAL DO PRODUTO ---
         function salvarModalCompleto() {
             if(!produtoAtual) return;
-            
-            // Abas Principais
             produtoAtual.cat = document.getElementById('m-cat').value;
             produtoAtual.stock = parseInt(document.getElementById('m-estoque').value) || 0;
             produtoAtual.cost = parseFloat(document.getElementById('m-custo').value) || 0;
             produtoAtual.price = parseFloat(document.getElementById('m-preco').value) || 0;
-            
             produtoAtual.desc = document.getElementById('m-desc-curta').value;
             produtoAtual.descComp = document.getElementById('m-desc-comp').value;
 
-            // Logística
             produtoAtual.log = {
                 alt: document.getElementById('m-altura').value, lar: document.getElementById('m-largura').value,
                 pro: document.getElementById('m-prof').value, pes: document.getElementById('m-peso').value,
                 embExtra: document.getElementById('m-emb-extra').value, freteExtra: document.getElementById('m-frete-extra').value,
                 prazo: document.getElementById('m-prazo').value
             };
-
-            // Fiscal
-            produtoAtual.fisc = {
-                ncm: document.getElementById('m-ncm').value, origem: document.getElementById('m-origem').value,
-                cfop: document.getElementById('m-cfop').value, cst: document.getElementById('m-cst').value,
-                icms: document.getElementById('m-icms').value, pis: document.getElementById('m-pis').value, cofins: document.getElementById('m-cofins').value
-            };
-
             localStorage.setItem('sostrass_prods', JSON.stringify(products));
-            renderCatalogo();
-            fecharModal();
-            mostrarToast(`Produto ${produtoAtual.sku} atualizado com sucesso!`);
-            addLog(`PIM: Ficha completa do SKU ${produtoAtual.sku} salva localmente.`, 'ok');
-        }
-
-        function sincronizarBling() {
-            mostrarToast("Enviando requisição ao ERP...", "aviso");
-            addLog("Iniciando rotina de Sincronização Bling (Upload/Download)");
-            setTimeout(() => { mostrarToast("Sincronização concluída."); addLog("Sincronização Bling: 3 produtos importados com sucesso.", "ok"); }, 1500);
+            renderCatalogo(); fecharModal();
+            mostrarToast(`Produto salvo!`); addLog(`PIM: Ficha ${produtoAtual.sku} atualizada.`, 'ok');
         }
 
         // ==========================================
-        // 6. INICIALIZAÇÃO
+        // 6. I.A., RADAR E CONFIGURAÇÕES
         // ==========================================
-        window.onload = () => {
-            document.getElementById('cfg-url').value = API_BASE;
-            document.getElementById('cfg-model').value = modeloIA;
-            document.getElementById('cg-imp').value = globalCosts.imposto;
-            document.getElementById('cg-cartao').value = globalCosts.cartao;
-            document.getElementById('cg-emb').value = globalCosts.embalagem;
-            document.getElementById('cg-frete').value = globalCosts.frete;
-            document.getElementById('cg-ganho').value = globalCosts.ganho;
+        async function gerarIAPrompt(tipo) {
+            if(!serverOnline) return mostrarToast("Proxy Offline.", "aviso");
+            const box = document.getElementById('m-ia-output');
+            box.innerHTML = '<span class="text-amber-400"><i class="fas fa-spinner fa-spin"></i> Conectando ao Gemini...</span>';
             
-            renderLogs();
-            renderCatalogo();
-            verificarServidor();
-            simularPreco(document.getElementById('sim-custo').value);
+            const prompt = `Produto: ${document.getElementById('m-nome').innerText}. Instrução: ${document.getElementById('m-ia-inst').value}. Contexto: ${document.getElementById('m-ia-ctx').value}. 
+            ${tipo === 'curta' ? 'Crie um título conversivo.' : 'Crie uma descrição detalhada com bullet points focada em medidas precisas.'}`;
+
+            try {
+                const res = await fetch(`${API_BASE}/api/ia/gerar`, { method: 'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ prompt, model: modeloIA }) });
+                const data = await res.json();
+                box.innerText = (data.candidates?.[0]?.content?.parts?.[0]?.text || data.descricao_gerada || "Sem resposta").replace(/\*/g, '');
+                addLog(`IA gerou conteúdo para ${produtoAtual.sku}`, "ok");
+            } catch(e) { box.innerText = "Erro na requisição."; addLog("Erro IA: " + e.message, "err"); }
+        }
+
+        function aplicarIA(targetId) {
+            document.getElementById(targetId).value = document.getElementById('m-ia-output').innerText;
+            mostrarToast("Conteúdo aplicado!");
+        }
+
+        async function acionarRadarModal() {
+            const urls = document.getElementById('m-radar-urls').value.split('\n').map(u => u.trim()).filter(Boolean);
+            if(urls.length === 0) return mostrarToast("Insira links.", 'aviso');
+            if(!serverOnline) return mostrarToast("Servidor Offline.", 'aviso');
+
+            const btn = document.getElementById('btn-radar-modal'); const resArea = document.getElementById('m-radar-resultados');
+            btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Varrendo JSON-LD...`; resArea.innerHTML = '';
+
+            try {
+                const res = await fetch(`${API_BASE}/api/scraper/precos-multiplos`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ urls }) });
+                const data = await res.json();
+                if(data.sucesso) {
+                    const base = getBaseCost({cost: parseFloat(document.getElementById('m-custo').value) || 0, log: {}}); 
+                    data.resultados.forEach((item, i) => {
+                        if(item.sucesso) {
+                            const pNum = parseFloat(item.preco.replace(/[^0-9,.]/g, '').replace(',', '.'));
+                            const mg = calcMargin(pNum, base);
+                            resArea.innerHTML += `<div class="bg-slate-800 rounded-xl p-4 flex justify-between shadow-inner"><div><p class="text-[10px] text-slate-400 font-bold">Alvo ${i+1}</p><p class="text-xl font-black text-white">R$ ${pNum.toFixed(2)}</p></div><div class="text-right"><p class="text-[10px] text-slate-500 uppercase">Sua Margem:</p><p class="text-lg font-black ${mg >= 30 ? 'text-emerald-500' : 'text-rose-500'}">${mg.toFixed(1)}%</p></div></div>`;
+                        } else {
+                            resArea.innerHTML += `<div class="bg-rose-900/30 p-3 text-xs text-rose-400 rounded-xl">Alvo ${i+1}: Bloqueado pelo Datadome.</div>`;
+                        }
+                    });
+                }
+            } catch(e) { mostrarToast("Falha.", 'err'); }
+            btn.innerHTML = `<i class="fas fa-search-dollar"></i> Iniciar Varredura`;
+        }
+
+        // Configs e Logs
+        function simularPreco(c) {
+            const num = parseFloat(c)||0, imp=parseFloat(document.getElementById('cg-imp').value)||0, car=parseFloat(document.getElementById('cg-cartao').value)||0, emb=parseFloat(document.getElementById('cg-emb').value)||0, fre=parseFloat(document.getElementById('cg-frete').value)||0, ganho=parseFloat(document.getElementById('cg-ganho').value)||0;
+            const res = (1 - (ganho+imp+car)/100) > 0 ? (num+emb+fre) / (1 - (ganho+imp+car)/100) : 0;
+            document.getElementById('sim-resultado').innerText = `R$ ${f2(res)}`;
+        }
+        function salvarCustosGlobais() {
+            globalCosts = { imposto: parseFloat(document.getElementById('cg-imp').value)||0, cartao: parseFloat(document.getElementById('cg-cartao').value)||0, embalagem: parseFloat(document.getElementById('cg-emb').value)||0, frete: parseFloat(document.getElementById('cg-frete').value)||0, ganho: parseFloat(document.getElementById('cg-ganho').value)||0 };
+            localStorage.setItem('sostrass_gc', JSON.stringify(globalCosts)); mostrarToast("Globais salvos."); renderCatalogo();
+        }
+        function saveCfg() { API_BASE = document.getElementById('cfgApiBase').value; modeloIA = document.getElementById('cfgModel').value; localStorage.setItem('sostrass_apibase', API_BASE); localStorage.setItem('sostrass_model', modeloIA); mostrarToast("Conexão Salva."); testarServidor(); }
+        async function testarServidor() {
+            const bar = document.getElementById('serverBar'); bar.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Proxy...'; bar.className = "flex items-center gap-2 text-xs font-bold text-amber-700 bg-amber-100 px-3 py-1.5 rounded-full border border-amber-200 shadow-inner";
+            try { const r = await fetch(`${API_BASE}/`); if(r.ok) { serverOnline = true; bar.innerHTML = '<i class="fas fa-shield-check"></i> API Online'; bar.className = "flex items-center gap-2 text-xs font-bold text-emerald-700 bg-emerald-100 px-3 py-1.5 rounded-full border border-emerald-200 shadow-inner"; addLog("Proxy OK", "ok"); } else throw new Error("Err"); } 
+            catch(e) { serverOnline = false; bar.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Backend Offline'; bar.className = "flex items-center gap-2 text-xs font-bold text-rose-700 bg-rose-100 px-3 py-1.5 rounded-full border border-rose-200 shadow-inner"; addLog("Falha no Proxy", "err"); }
+        }
+        function renderLogE(filtro) {
+            const c = document.getElementById('log-container'); if(!c) return;
+            c.innerHTML = actLog.filter(l => filtro === 'all' || l.type === filtro).map(l => `<div class="border-b border-slate-800 pb-1"><span class="text-slate-600">[${l.ts.split(' ')[1]}]</span> <span class="${l.type==='err'?'text-rose-400':(l.type==='ok'?'text-emerald-400':'text-slate-300')}">${l.msg}</span></div>`).join('');
+        }
+        function saveLogs() { localStorage.setItem('sostrass_logs', JSON.stringify(actLog)); }
+
+        // Inicialização
+        window.onload = () => {
+            document.getElementById('cfgApiBase').value = API_BASE; document.getElementById('cfgModel').value = modeloIA;
+            document.getElementById('cg-imp').value = globalCosts.imposto; document.getElementById('cg-cartao').value = globalCosts.cartao; document.getElementById('cg-emb').value = globalCosts.embalagem; document.getElementById('cg-frete').value = globalCosts.frete; document.getElementById('cg-ganho').value = globalCosts.ganho;
+            renderCatalogo(); testarServidor(); simularPreco(document.getElementById('sim-custo').value); navTo('catalogo');
         };
     </script>
 </body>
