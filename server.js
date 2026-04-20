@@ -2,133 +2,131 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const axios = require('axios');
-const cheerio = require('cheerio');
-const { GoogleGenerativeAI } = require('@google/generative-ai');
+const cheerio = require('cheerio'); // Para o Scraper do Radar
 
 const app = express();
-app.use(cors());
+
+// Libera o acesso para o seu painel frontend
+app.use(cors({ origin: '*' }));
 app.use(express.json());
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+// Chaves de Segurança (Ficam escondidas no Railway)
+const BLING_TOKEN = process.env.BLING_TOKEN;
+const GEMINI_KEY = process.env.GEMINI_API_KEY;
 
+// ---------------------------------------------------------
+// 1. ROTA DE STATUS (Health Check)
+// ---------------------------------------------------------
 app.get('/', (req, res) => {
-    res.sendFile(__dirname + '/index.html');
+    res.status(200).json({ status: 'Proxy Online', version: '6.0' });
 });
 
-// 1. DATA GRID (A Bolsa de Valores)
-app.get('/api/produtos/monitoramento', async (req, res) => {
-    const catalogo = [
-        { sku: "CX-ORG-30", nome: "Kit 30 Caixas Organizadoras", custo: 45.00, preco_atual: 89.90, margem: "49%", status: "Lucro Ideal" },
-        { sku: "PER-6MM-BR", nome: "Pérola Branca 6mm (Pacote 500g)", custo: 20.00, preco_atual: 35.00, margem: "42%", status: "Alerta - Concorrente Baixou" }
-    ];
-    res.json({ sucesso: true, dados: catalogo });
+// ---------------------------------------------------------
+// 2. ROTAS DO GEMINI (Inteligência Artificial)
+// ---------------------------------------------------------
+
+// Rota genérica (Usada pela aba Descrição & I.A)
+app.post('/api/ia/gerar', async (req, res) => {
+    try {
+        const { prompt, model } = req.body;
+        const targetModel = model || 'gemini-2.5-flash-preview-05-14';
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/${targetModel}:generateContent?key=${GEMINI_KEY}`;
+        
+        const response = await axios.post(url, {
+            contents: [{ parts: [{ text: prompt }] }],
+            generationConfig: { temperature: 0.7, maxOutputTokens: 2000 }
+        });
+        res.json(response.data);
+    } catch (error) {
+        console.error("Erro Gemini:", error.message);
+        res.status(500).json({ erro: error.message });
+    }
 });
 
-// 2. RADAR MULTI-CONCORRENTES (Axios + Cheerio)
+// Rota de SAC (Modo Ateliê)
+app.post('/api/ia/sac', async (req, res) => {
+    try {
+        const { cliente, produto, relato } = req.body;
+        const prompt = `Atue como Consultor Parceiro da Sóstrass. Cliente: ${cliente}. Produto: ${produto}. Relato: "${relato}". 
+        Crie uma resposta humana, amigável (clima de ateliê), focando na qualidade do produto. Máximo 480 caracteres. Sem markdown (asteriscos).`;
+        
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent?key=${GEMINI_KEY}`;
+        const response = await axios.post(url, { contents: [{ parts: [{ text: prompt }] }] });
+        
+        const texto = response.data.candidates[0].content.parts[0].text.replace(/\*/g, '');
+        res.json({ sucesso: true, resposta: texto });
+    } catch (error) {
+        res.status(500).json({ erro: 'Erro ao processar SAC' });
+    }
+});
+
+// Rota de Descrição Blindada (Com HTML Jurídico)
+app.post('/api/ia/descricao-blindada', async (req, res) => {
+    try {
+        const { produto } = req.body;
+        const prompt = `Crie uma ficha técnica detalhada para o e-commerce vendendo: ${produto}. Foco extremo em medidas para zerar devoluções. Sem markdown.`;
+        
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent?key=${GEMINI_KEY}`;
+        const response = await axios.post(url, { contents: [{ parts: [{ text: prompt }] }] });
+        
+        const texto = response.data.candidates[0].content.parts[0].text.replace(/\*/g, '');
+        const htmlBlindagem = `\n\n<hr>\n<div style="background-color: #f8f9fa; border-left: 4px solid #dc3545; padding: 15px; margin-top: 20px;">\n    <h4 style="color: #333; margin-top: 0;">⚠️ AVISO LEGAL DE DIREITOS AUTORAIS</h4>\n    <p style="font-size: 13px; color: #555; line-height: 1.5;">\n        As imagens e o layout deste anúncio são de propriedade exclusiva da <strong>DAJP / Sóstrass Acessórios e Pedrarias</strong>. Temos registro de autoria e possuímos os arquivos RAW originais de estúdio.\n        <br><br>\n        <strong>É estritamente proibida</strong> a cópia ou reprodução. Infratores estão sujeitos à denúncia imediata na plataforma (BPP/PPPI).\n    </p>\n</div>`;
+        
+        res.json({ sucesso: true, descricao: texto + htmlBlindagem });
+    } catch (error) {
+        res.status(500).json({ erro: 'Erro ao gerar blindagem' });
+    }
+});
+
+// ---------------------------------------------------------
+// 3. ROTA DO RADAR ESPIÃO (Scraper)
+// ---------------------------------------------------------
 app.post('/api/scraper/precos-multiplos', async (req, res) => {
     const { urls } = req.body;
-    if (!urls || !Array.isArray(urls) || urls.length === 0) {
-        return res.status(400).json({ erro: "Nenhuma URL fornecida." });
-    }
+    if (!urls || !Array.isArray(urls)) return res.status(400).json({ erro: "URLs inválidas." });
 
-    const resultados = [];
-
-    // Roda um "Loop" para cada link que você colou
-    for (const url of urls) {
+    let resultados = [];
+    
+    for (const link of urls) {
         try {
-            const response = await axios.get(url, {
-                headers: {
-                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
-                    'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8'
-                },
-                timeout: 10000 
+            // Finge ser um navegador real para evitar bloqueio básico
+            const { data } = await axios.get(link, {
+                headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)' },
+                timeout: 5000
             });
-
-            const $ = cheerio.load(response.data);
-            let precoExtraido = null;
-
-            $('script[type="application/ld+json"]').each((i, el) => {
-                try {
-                    const jsonData = JSON.parse($(el).html());
-                    if (jsonData.offers && jsonData.offers.price) precoExtraido = jsonData.offers.price;
-                    else if (Array.isArray(jsonData)) {
-                        const produto = jsonData.find(item => item['@type'] === 'Product' || item.offers);
-                        if (produto && produto.offers && produto.offers.price) precoExtraido = produto.offers.price;
-                    }
-                } catch (e) {}
-            });
-
-            if (!precoExtraido) {
-                precoExtraido = $('meta[itemprop="price"]').attr('content') || 
-                                $('meta[property="product:price:amount"]').attr('content') ||
-                                $('.ui-pdp-price__second-line .andes-money-amount__fraction').first().text(); 
+            const $ = cheerio.load(data);
+            
+            // Busca o preço nas tags universais (Funciona para ML, Nuvemshop, Shopify)
+            let preco = $('meta[property="product:price:amount"]').attr('content') || 
+                        $('meta[property="og:price:amount"]').attr('content');
+            
+            if (!preco) {
+                // Tenta achar no JSON-LD (Script usado por grandes varejistas)
+                $('script[type="application/ld+json"]').each((i, el) => {
+                    try {
+                        const json = JSON.parse($(el).html());
+                        if (json.offers && json.offers.price) preco = json.offers.price;
+                        else if (Array.isArray(json) && json[0].offers) preco = json[0].offers.price;
+                    } catch(e) {}
+                });
             }
 
-            if (precoExtraido && precoExtraido.toString().trim() !== '') {
-                const precoLimpo = precoExtraido.toString().replace(/[^0-9.,]/g, '').trim();
-                resultados.push({ url, sucesso: true, preco: precoLimpo });
+            if (preco) {
+                resultados.push({ url: link, sucesso: true, preco: parseFloat(preco).toFixed(2) });
             } else {
-                resultados.push({ url, sucesso: false, erro: "Preço não encontrado." });
+                resultados.push({ url: link, sucesso: false, erro: "Preço oculto" });
             }
-
-        } catch (erro) {
-            resultados.push({ url, sucesso: false, erro: "Bloqueado ou fora do ar." });
+        } catch (error) {
+            resultados.push({ url: link, sucesso: false, erro: "Bloqueado pelo site" });
         }
-        
-        // Pausa de 1 segundo entre cada site para não ser bloqueado por "ataque"
-        await new Promise(resolve => setTimeout(resolve, 1000));
     }
-
     res.json({ sucesso: true, resultados });
 });
 
-// 3. MOTOR DE I.A.
-app.post('/api/ia/gerar-descricao', async (req, res) => {
-    const { nome_produto, caracteristicas } = req.body;
-    try {
-        const model = genAI.getGenerativeModel({ model: "gemini-1.5-pro" });
-        const prompt = `Crie uma descrição técnica para: ${nome_produto}. Foco em artesanato e medidas exatas.`;
-        const result = await model.generateContent(prompt);
-        res.json({ sucesso: true, descricao_gerada: result.response.text() });
-    } catch (erro) {
-        res.status(500).json({ erro: "Erro ao processar I.A." });
-    }
-});
-
-// A ROTA ROBUSTA DE SINCRONIZAÇÃO BLING
-app.post('/api/bling/sincronizar', async (req, res) => {
-    const BLING_API_KEY = process.env.BLING_API_KEY;
-    let pagina = 1;
-    let produtosBling = [];
-    let temMaisPaginas = true;
-
-    try {
-        // Loop inteligente: Puxa 100 produtos por vez para não explodir a memória
-        while(temMaisPaginas) {
-            const url = `https://www.bling.com.br/Api/v2/produtos/page=${pagina}/json/?apikey=${BLING_API_KEY}&estoque=S`;
-            
-            const response = await axios.get(url);
-            const dados = response.data.retorno;
-
-            if (dados.erros) {
-                // Acabaram as páginas
-                temMaisPaginas = false; 
-            } else {
-                produtosBling = produtosBling.concat(dados.produtos);
-                pagina++;
-                
-                // Trava de segurança para não ser bloqueado pelo Bling (Rate Limit)
-                await new Promise(resolve => setTimeout(resolve, 340)); // 3 requisições por segundo máximo
-            }
-        }
-
-        // Aqui o sistema salva no Banco de Dados interno e retorna o sucesso
-        res.json({ sucesso: true, total_importado: produtosBling.length, mensagem: "Sincronização Enterprise concluída." });
-
-    } catch (erro) {
-        res.status(500).json({ erro: "Falha de comunicação com o servidor da API." });
-    }
-});
-
+// ---------------------------------------------------------
+// INICIALIZAÇÃO DO SERVIDOR
+// ---------------------------------------------------------
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`🚀 BlingAI Manager online na porta ${PORT}`));
+app.listen(PORT, () => {
+    console.log(`Skynet Proxy rodando na porta ${PORT}`);
+});
