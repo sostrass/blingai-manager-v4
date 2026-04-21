@@ -1,502 +1,1101 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sóstrass PIM Enterprise v7.0</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-        * { box-sizing: border-box; font-family: 'Inter', sans-serif; }
-        ::-webkit-scrollbar { width: 6px; height: 6px; }
-        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
-        .glass-panel { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(16px); border: 1px solid rgba(226, 232, 240, 0.8); box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03); }
-        .ios-input { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 10px 14px; outline: none; transition: all 0.2s; font-size: 13px; width: 100%; color: #1e293b;}
-        .ios-input:focus { border-color: #6366f1; background: #fff; box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15); }
-        .skeleton { background: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; border-radius: 8px; }
-        @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
-        .timeline-item { position: relative; padding-left: 20px; padding-bottom: 12px; border-left: 2px solid #e2e8f0; }
-        .timeline-item::before { content: ''; position: absolute; left: -5px; top: 2px; width: 8px; height: 8px; border-radius: 50%; background: #6366f1; }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BlingAI Manager v4 - Enterprise</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#07070e;--s1:#0e0e1a;--s2:#14141f;--s3:#1a1a28;
+  --glass:rgba(255,255,255,0.04);--gb:rgba(255,255,255,0.07);
+  --accent:#6366f1;--ag:#22d3a5;--ar:#f87171;--aw:#fbbf24;
+  --t1:#eeeef5;--t2:#8888a8;--t3:#50506a;
+  --teal:#14b8a6;--blue:#3b82f6;--purple:#a78bfa;
+  --r:14px;--rs:9px;--rm:11px;
+}
+body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--t1);min-height:100vh;font-size:13px;-webkit-font-smoothing:antialiased;}
+.app{display:flex;flex-direction:column;height:100vh;overflow:hidden;}
+ 
+/* ── HEADER NAV ── */
+.header-nav{background:var(--s1);border-bottom:1px solid var(--gb);display:flex;align-items:center;padding:0 24px;height:58px;flex-shrink:0;gap:0;}
+.logo{display:flex;align-items:center;gap:9px;margin-right:32px;flex-shrink:0;}
+.logo-icon{width:28px;height:28px;border-radius:8px;background:linear-gradient(135deg,#6366f1,#14b8a6);display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;}
+.logo h1{font-size:14px;font-weight:700;letter-spacing:-.3px;white-space:nowrap;}
+.logo .ver{font-size:9px;color:var(--t3);}
+.nav-menu{display:flex;gap:4px;flex:1;}
+.nav-item{display:flex;align-items:center;gap:6px;padding:7px 13px;border-radius:9px;cursor:pointer;transition:all .12s;color:var(--t2);font-size:13px;font-weight:500;white-space:nowrap;}
+.nav-item:hover{background:var(--glass);color:var(--t1);}
+.nav-item.active{background:rgba(99,102,241,.15);color:var(--accent);border:1px solid rgba(99,102,241,.22);}
+.nav-badge{background:var(--accent);color:#fff;border-radius:20px;padding:1px 7px;font-size:10px;font-weight:700;margin-left:2px;}
+.nav-badge.red{background:var(--ar);}
+.nav-sep{width:1px;height:28px;background:var(--gb);margin:0 12px;}
+.nav-right{display:flex;align-items:center;gap:8px;margin-left:auto;}
+ 
+/* ── MAIN ── */
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+.page-header{padding:14px 24px;border-bottom:1px solid var(--gb);display:flex;align-items:center;justify-content:space-between;background:var(--s1);flex-shrink:0;gap:12px;}
+.ph-info h2{font-size:15px;font-weight:600;}
+.ph-info .sub{font-size:11px;color:var(--t3);margin-top:2px;}
+.ph-actions{display:flex;gap:8px;align-items:center;flex-shrink:0;}
+.content{flex:1;overflow-y:auto;padding:20px 24px;}
+ 
+/* ── CATALOG GRID ── */
+.cat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px;}
+.cat-card{background:var(--s2);border:1px solid var(--gb);border-radius:var(--r);padding:15px;cursor:pointer;transition:all .15s;display:flex;flex-direction:column;}
+.cat-card:hover{border-color:var(--accent);transform:translateY(-1px);box-shadow:0 4px 16px rgba(0,0,0,0.25);}
+.cat-card.selected{border-color:var(--accent);background:rgba(99,102,241,.08);}
+.cc-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:8px;gap:6px;}
+.cc-sku{font-size:10px;color:var(--accent);font-weight:700;text-transform:uppercase;letter-spacing:.5px;}
+.cc-cat{font-size:10px;color:var(--t3);padding:2px 7px;background:var(--s3);border-radius:20px;}
+.cc-name{font-size:13px;color:var(--t1);font-weight:500;line-height:1.4;margin-bottom:10px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;flex:1;}
+.cc-plats{display:flex;gap:3px;margin-bottom:10px;flex-wrap:wrap;}
+.cc-plat-dot{width:11px;height:11px;border-radius:2px;overflow:hidden;display:inline-flex;}
+.cc-footer{border-top:1px solid var(--gb);padding-top:10px;display:flex;align-items:center;justify-content:space-between;}
+.cc-price{font-size:15px;font-weight:700;color:var(--teal);}
+.cc-marg{font-size:12px;font-weight:600;}
+ 
+/* ── CARDS ── */
+.gc{background:var(--s2);border:1px solid var(--gb);border-radius:var(--r);padding:15px;margin-bottom:12px;}
+.gc-sm{padding:11px 13px;}
+.gc-title{font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.9px;font-weight:700;margin-bottom:10px;display:flex;align-items:center;gap:5px;}
+.gc-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;gap:8px;flex-wrap:wrap;}
+.stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px;}
+.stat-pill{background:var(--s3);border:1px solid var(--gb);border-radius:var(--rm);padding:12px 13px;}
+.sp-l{font-size:9px;color:var(--t3);text-transform:uppercase;letter-spacing:.6px;font-weight:600;margin-bottom:4px;}
+.sp-v{font-size:17px;font-weight:700;}
+ 
+/* ── FORMS iOS ── */
+.ios-group{background:var(--s1);border-radius:var(--r);overflow:hidden;border:1px solid var(--gb);margin-bottom:10px;}
+.ios-row{display:flex;align-items:center;padding:10px 12px;border-bottom:1px solid var(--gb);gap:8px;}
+.ios-row:last-child{border-bottom:none;}
+.ios-row .ir-label{font-size:12px;color:var(--t2);font-weight:500;flex-shrink:0;min-width:130px;}
+.ios-row .ir-label.w{min-width:170px;}
+.ios-row .ir-val{flex:1;display:flex;align-items:center;gap:5px;justify-content:flex-end;}
+.ios-row input,.ios-row select{background:transparent;border:none;outline:none;color:var(--t1);font-size:13px;font-family:inherit;text-align:right;width:100%;}
+.ios-row .unit{font-size:11px;color:var(--t3);flex-shrink:0;}
+.ios-sect{font-size:10px;color:var(--t3);padding:8px 12px 3px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;background:var(--bg);}
+.form-input{width:100%;background:var(--s1);border:1px solid var(--gb);border-radius:var(--rm);padding:12px;color:var(--t1);font-size:12px;outline:none;font-family:inherit;resize:vertical;transition:border-color 0.2s;}
+.form-input:focus{border-color:var(--accent);}
+ 
+/* ── BUTTONS ── */
+.btn{display:inline-flex;align-items:center;gap:5px;padding:7px 13px;border-radius:9px;font-size:12px;font-weight:600;cursor:pointer;border:none;transition:all .13s;white-space:nowrap;font-family:inherit;}
+.btn-accent{background:var(--accent);color:#fff;}.btn-accent:hover{background:#5254d0;}
+.btn-ghost{background:var(--glass);color:var(--t1);border:1px solid var(--gb);}.btn-ghost:hover{background:var(--s3);}
+.btn-green{background:rgba(34,211,165,.13);color:var(--ag);border:1px solid rgba(34,211,165,.2);}.btn-green:hover{background:rgba(34,211,165,.22);}
+.btn-red{background:rgba(248,113,113,.1);color:var(--ar);border:1px solid rgba(248,113,113,.18);}
+.btn-amber{background:rgba(251,191,36,.1);color:var(--aw);border:1px solid rgba(251,191,36,.18);}
+.btn-ai{background:linear-gradient(135deg,#6366f1,#14b8a6);color:#fff;}.btn-ai:hover{opacity:.88;}
+.btn-sm{padding:5px 10px;font-size:11px;border-radius:7px;}
+.btn-xs{padding:3px 7px;font-size:10px;border-radius:6px;}
+.btn:disabled{opacity:.35;cursor:not-allowed;}
+ 
+/* ── PLATFORM CHIPS ── */
+.plat-grid{display:flex;flex-wrap:wrap;gap:6px;}
+.plat-chip{display:inline-flex;align-items:center;gap:5px;padding:5px 10px;border-radius:9px;font-size:11px;font-weight:600;border:1.5px solid;cursor:pointer;transition:all .13s;}
+.plat-chip.on{opacity:1;}.plat-chip.off{opacity:.25;filter:grayscale(.8);}
+ 
+/* ── PRICING PANELS ── */
+.mp-panel{background:var(--s1);border:1px solid var(--gb);border-radius:var(--r);margin-bottom:7px;overflow:hidden;}
+.mp-head{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;cursor:pointer;transition:background .12s;}
+.mp-head:hover{background:rgba(255,255,255,.02);}
+.mp-head-l,.mp-head-r{display:flex;align-items:center;gap:9px;}
+.fee-row{display:grid;grid-template-columns:repeat(auto-fill,minmax(148px,1fr));gap:7px;margin-bottom:10px;}
+.fee-box{background:var(--s3);border-radius:var(--rm);padding:9px 11px;}
+.fee-lbl{font-size:10px;color:var(--t3);font-weight:700;text-transform:uppercase;letter-spacing:.4px;margin-bottom:5px;}
+.fee-inp-row{display:flex;align-items:center;gap:4px;}
+.fee-inp-row input{background:var(--s2);border:1px solid var(--gb);border-radius:7px;padding:5px 8px;color:var(--t1);font-size:13px;font-weight:600;outline:none;text-align:right;width:100%;font-family:inherit;transition:border-color .12s;}
+.fee-inp-row input:focus{border-color:var(--accent);}
+.fee-inp-row .fu{font-size:11px;color:var(--t3);flex-shrink:0;}
+.result-strip{background:rgba(0,0,0,.25);border-radius:var(--rm);padding:11px 13px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:9px;border:1px solid var(--gb);}
+.rs-price{font-size:20px;font-weight:700;}
+.rs-stats{display:flex;gap:12px;flex-wrap:wrap;}
+.rss .rl{font-size:10px;color:var(--t3);margin-bottom:1px;}
+.rss .rv{font-weight:700;font-size:12px;}
+ 
+/* ── AI PANEL ── */
+.ai-box{background:rgba(99,102,241,.06);border:1px solid rgba(99,102,241,.18);border-radius:var(--r);padding:13px;position:relative;overflow:hidden;}
+.ai-box::before{content:'';position:absolute;top:0;left:0;right:0;height:1.5px;background:linear-gradient(90deg,#6366f1,#14b8a6,#6366f1);background-size:200%;animation:ab 3s linear infinite;}
+@keyframes ab{0%{background-position:0%}100%{background-position:200%}}
+.ai-out{background:rgba(0,0,0,.3);border:1px solid var(--gb);border-radius:var(--rm);padding:11px;font-size:12px;line-height:1.65;min-height:60px;color:var(--t1);white-space:pre-wrap;max-height:220px;overflow-y:auto;}
+ 
+/* ── BADGES ── */
+.badge{display:inline-flex;align-items:center;gap:3px;padding:2px 7px;border-radius:20px;font-size:10px;font-weight:600;}
+.bg-green{background:rgba(34,211,165,.12);color:var(--ag);}
+.bg-red{background:rgba(248,113,113,.12);color:var(--ar);}
+.bg-amber{background:rgba(251,191,36,.12);color:var(--aw);}
+.bg-blue{background:rgba(59,130,246,.12);color:var(--blue);}
+.bg-gray{background:var(--s3);color:var(--t3);}
+ 
+/* ── TOOLTIP ── */
+.tip{position:relative;display:inline-flex;}
+.tip .tip-text{display:none;position:absolute;bottom:calc(100% + 5px);left:50%;transform:translateX(-50%);background:#1a1a2e;border:1px solid var(--gb);border-radius:8px;padding:7px 10px;font-size:11px;color:var(--t2);z-index:200;line-height:1.5;max-width:220px;white-space:normal;pointer-events:none;}
+.tip:hover .tip-text{display:block;}
+.tip-icon{width:15px;height:15px;border-radius:50%;background:rgba(99,102,241,.2);color:var(--accent);display:inline-flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;cursor:help;flex-shrink:0;}
+ 
+/* ── DRAG PANELS ── */
+.drag-zone{display:flex;flex-direction:column;gap:8px;}
+.drag-panel{background:var(--glass);border:1px solid var(--gb);border-radius:var(--r);overflow:hidden;transition:border-color .15s,opacity .15s;}
+.drag-panel.dragging{opacity:.5;border:2px dashed var(--accent);}
+.drag-panel.drag-over{border-color:var(--ag);background:rgba(34,211,165,.04);}
+.dp-handle{display:flex;align-items:center;justify-content:space-between;padding:10px 13px;border-bottom:1px solid var(--gb);user-select:none;transition:background .12s;}
+.dp-handle.unlocked{cursor:grab;}.dp-handle.unlocked:active{cursor:grabbing;}
+.dp-handle-l{display:flex;align-items:center;gap:7px;}
+.dp-dots{display:flex;flex-direction:column;gap:2px;opacity:.35;}
+.dp-dots span{display:block;width:12px;height:1.5px;background:var(--t2);border-radius:2px;}
+.dp-body{padding:13px;}
+.dp-body.col{display:none;}
+.dp-arr{font-size:10px;color:var(--t3);cursor:pointer;transition:transform .18s;display:inline-block;}
+.dp-arr.open{transform:rotate(180deg);}
+ 
+/* ── LOCK BTN ── */
+.lock-btn{display:flex;align-items:center;gap:5px;padding:5px 10px;border-radius:8px;font-size:11px;font-weight:600;cursor:pointer;border:1px solid var(--gb);background:var(--glass);color:var(--t2);transition:all .12s;white-space:nowrap;}
+.lock-btn.open{border-color:rgba(251,191,36,.3);color:var(--aw);background:rgba(251,191,36,.08);}
+ 
+/* ── PRODUCT TABS ── */
+.ptabs{display:flex;gap:2px;background:var(--s2);border-radius:10px;padding:2px;flex-shrink:0;}
+.ptab{padding:5px 11px;border-radius:8px;font-size:11px;cursor:pointer;color:var(--t2);transition:all .12s;font-weight:500;white-space:nowrap;}
+.ptab:hover{color:var(--t1);}
+.ptab.on{color:var(--t1);background:var(--s3);}
+ 
+/* ── MASSA ── */
+.massa-list{display:flex;flex-direction:column;}
+.ml-header,.ml-item{display:grid;grid-template-columns:20px 72px 1fr 80px 78px 58px 90px;align-items:center;gap:8px;padding:8px 12px;}
+.ml-header{background:var(--s3);font-size:10px;color:var(--t3);font-weight:700;text-transform:uppercase;letter-spacing:.4px;border-radius:var(--rm) var(--rm) 0 0;}
+.ml-item{border-bottom:1px solid rgba(255,255,255,.04);cursor:pointer;transition:background .1s;}
+.ml-item:hover{background:rgba(255,255,255,.02);}
+.ml-item:last-child{border-bottom:none;}
+.ml-item.sel{background:rgba(99,102,241,.1);}
+.ml-check{width:15px;height:15px;border-radius:4px;border:1.5px solid var(--t3);display:flex;align-items:center;justify-content:center;font-size:9px;transition:all .12s;flex-shrink:0;}
+.ml-item.sel .ml-check{background:var(--accent);border-color:var(--accent);color:#fff;}
+.me-panel{background:var(--s2);border:1px solid var(--gb);border-radius:var(--r);padding:14px;}
+.me-mode-row{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:12px;}
+.me-mode-btn{padding:6px 10px;border-radius:7px;font-size:11px;font-weight:600;cursor:pointer;border:1px solid var(--gb);background:transparent;color:var(--t2);transition:all .12s;font-family:inherit;}
+.me-mode-btn.on{background:var(--accent);border-color:var(--accent);color:#fff;}
+.me-op-row{display:flex;background:var(--s3);border-radius:var(--rm);overflow:hidden;border:1px solid var(--gb);margin-bottom:10px;}
+.me-op-btn{flex:1;padding:7px 4px;font-size:11px;border:none;background:transparent;color:var(--t2);cursor:pointer;font-family:inherit;font-weight:600;transition:all .12s;}
+.me-op-btn.on{background:var(--accent);color:#fff;}
+.me-val-row{display:flex;align-items:center;gap:6px;background:var(--s3);border:1px solid var(--gb);border-radius:var(--rm);padding:8px 12px;margin-bottom:10px;}
+.me-val-row input{background:none;border:none;outline:none;color:var(--t1);font-size:22px;font-weight:700;width:100%;text-align:right;font-family:inherit;}
+ 
+/* ── FORMULA BOX ── */
+.fbox{background:rgba(99,102,241,.05);border:1px solid rgba(99,102,241,.15);border-radius:var(--rs);padding:10px 12px;font-size:11px;color:var(--t2);line-height:1.6;}
+.fbox strong{color:var(--t1);}
+.f-step{display:flex;align-items:flex-start;gap:7px;margin-top:5px;}
+.f-num{width:17px;height:17px;border-radius:50%;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;flex-shrink:0;margin-top:1px;}
+ 
+/* ── DIM BOX ── */
+.dim-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;}
+.dim-box{background:var(--s2);border:1px solid var(--gb);border-radius:var(--rm);padding:9px;text-align:center;}
+.dim-box label{display:block;font-size:9px;color:var(--t3);font-weight:700;text-transform:uppercase;letter-spacing:.4px;margin-bottom:3px;}
+.dim-box input{width:100%;background:transparent;border:none;outline:none;color:var(--t1);font-size:15px;font-weight:700;font-family:inherit;text-align:center;}
+.dim-unit{font-size:9px;color:var(--t3);margin-top:2px;}
+ 
+/* ── LOG ── */
+.log-entry{display:flex;align-items:flex-start;gap:9px;padding:8px 12px;border-bottom:1px solid rgba(255,255,255,.04);font-size:11px;}
+.log-entry:last-child{border-bottom:none;}
+.log-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;margin-top:3px;}
+.log-ok .log-dot{background:var(--ag);}.log-err .log-dot{background:var(--ar);}.log-warn .log-dot{background:var(--aw);}.log-info .log-dot{background:var(--blue);}
+ 
+/* ── SPINNER ── */
+.spin{width:12px;height:12px;border:1.5px solid rgba(255,255,255,.18);border-top-color:#fff;border-radius:50%;animation:sp .6s linear infinite;display:inline-block;}
+@keyframes sp{to{transform:rotate(360deg)}}
+ 
+/* ── TOAST ── */
+.toast{position:fixed;bottom:15px;right:15px;background:var(--s3);border:1px solid var(--gb);border-radius:12px;padding:9px 14px;font-size:12px;display:none;align-items:center;gap:7px;z-index:9999;backdrop-filter:blur(20px);box-shadow:0 8px 32px rgba(0,0,0,.5);}
+@keyframes tu{from{transform:translateY(8px);opacity:0}to{transform:translateY(0);opacity:1}}
+ 
+/* ── EMPTY ── */
+.empty{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;color:var(--t3);text-align:center;padding:40px;}
+.empty h3{font-size:14px;color:var(--t1);margin:10px 0 5px;}
+ 
+/* ── SERVER STATUS BAR ── */
+.server-bar{display:flex;align-items:center;gap:8px;padding:4px 12px;background:rgba(34,211,165,.08);border:1px solid rgba(34,211,165,.2);border-radius:8px;font-size:11px;color:var(--ag);}
+.server-bar.offline{background:rgba(248,113,113,.08);border-color:rgba(248,113,113,.2);color:var(--ar);}
+.server-bar.checking{background:rgba(251,191,36,.08);border-color:rgba(251,191,36,.2);color:var(--aw);}
+ 
+::-webkit-scrollbar{width:4px;height:4px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:var(--gb);border-radius:4px;}
+</style>
 </head>
-<body class="bg-slate-50 text-slate-800 h-screen flex overflow-hidden bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]">
-
-    <div id="toast-container" class="fixed top-20 right-6 z-50 flex flex-col gap-3"></div>
-
-    <aside class="w-64 bg-slate-900 text-slate-400 flex flex-col shadow-xl z-20 shrink-0">
-        <div class="h-16 flex items-center px-6 border-b border-slate-800 bg-slate-950">
-            <h1 class="text-lg font-bold text-white flex items-center gap-2"><i class="fas fa-gem text-indigo-500"></i> Sóstrass<span class="text-[10px] bg-indigo-500/20 text-indigo-400 px-1.5 rounded">PRO</span></h1>
-        </div>
-        <div class="flex-1 py-6 px-3 space-y-1 overflow-y-auto">
-            <p class="px-3 text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2">Operacional</p>
-            <button onclick="navTo('catalogo')" id="nav-catalogo" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-lg font-medium transition active bg-indigo-600 text-white shadow-lg"><i class="fas fa-chart-line w-5 text-center"></i> Monitoramento</button>
-            <button onclick="navTo('massa')" id="nav-massa" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 hover:text-white hover:bg-slate-800 rounded-lg transition"><i class="fas fa-bolt w-5 text-amber-400 text-center"></i> Op. em Massa</button>
-            <button onclick="navTo('automacoes')" id="nav-automacoes" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 hover:text-white hover:bg-slate-800 rounded-lg transition"><i class="fas fa-robot w-5 text-emerald-400 text-center"></i> Central I.A.</button>
-            <div class="my-4 border-t border-slate-800"></div>
-            <p class="px-3 text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2">Sistema</p>
-            <button onclick="navTo('simulador')" id="nav-simulador" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 hover:text-white hover:bg-slate-800 rounded-lg transition"><i class="fas fa-globe w-5 text-center"></i> Custos Globais</button>
-            <button onclick="navTo('config')" id="nav-config" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 hover:text-white hover:bg-slate-800 rounded-lg transition"><i class="fas fa-cog w-5 text-center"></i> Configurações</button>
-        </div>
-        <div class="p-4 border-t border-slate-800 bg-slate-950 text-center">
-            <button onclick="sincronizarBling()" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white py-2.5 rounded-lg text-sm font-bold transition shadow-lg"><i class="fas fa-sync-alt mr-2"></i> Puxar do Bling</button>
-        </div>
-    </aside>
-
-    <div class="flex-1 flex flex-col min-w-0 relative">
-        <header class="h-16 glass-panel flex items-center justify-between px-8 z-10 sticky top-0 border-b border-slate-200">
-            <div class="flex-1 max-w-2xl relative">
-                <i class="fas fa-search absolute left-4 top-3.5 text-slate-400"></i>
-                <input type="text" id="buscaGeral" placeholder="Buscar SKU ou Produto..." class="w-full ios-input pl-10 py-2.5" oninput="renderCatalogo(this.value)">
-            </div>
-            <div class="flex items-center gap-3 ml-6">
-                <div id="serverBar" class="px-4 py-1.5 bg-slate-100 rounded-full text-[10px] font-black border border-slate-200 text-slate-500"><i class="fas fa-circle-notch fa-spin mr-1"></i> PROXY...</div>
-            </div>
-        </header>
-
-        <main class="flex-1 overflow-auto p-8" id="view-container">
-            <div id="view-catalogo" class="space-y-6">
-                <div class="flex justify-between items-end mb-6">
-                    <div><h2 class="text-3xl font-black tracking-tight text-slate-800">Monitoramento Financeiro</h2><p class="text-slate-500 mt-1">Visão global de margens e histórico de preços.</p></div>
-                </div>
-                <div class="glass-panel rounded-2xl overflow-hidden shadow-sm">
-                    <table class="w-full text-left text-sm whitespace-nowrap">
-                        <thead class="bg-slate-50 border-b border-slate-200 text-slate-500 uppercase text-[10px] font-black">
-                            <tr>
-                                <th class="px-6 py-4">SKU / Produto</th>
-                                <th class="px-6 py-4 text-right">Custo Base</th>
-                                <th class="px-6 py-4 text-right">Preço Venda</th>
-                                <th class="px-6 py-4 text-center">Margem</th>
-                                <th class="px-6 py-4 w-32 text-center">Gráfico (7d)</th>
-                                <th class="px-6 py-4 text-right">Ação</th>
-                            </tr>
-                        </thead>
-                        <tbody id="tabela-produtos" class="divide-y divide-slate-100 bg-white"></tbody>
-                    </table>
-                </div>
-            </div>
-
-            <div id="view-massa" class="hidden space-y-6">
-                <h2 class="text-3xl font-black text-amber-600 tracking-tight"><i class="fas fa-bolt mr-2"></i>Ações em Lote</h2>
-                <div class="grid grid-cols-3 gap-6">
-                    <div class="col-span-2 glass-panel p-4 rounded-2xl flex flex-col h-[70vh]">
-                        <div class="flex gap-4 mb-4">
-                            <input type="text" id="massa-busca" placeholder="Filtrar SKU..." class="ios-input flex-1" oninput="renderMassa()">
-                            <button onclick="massaSelAll()" class="bg-slate-100 text-slate-600 px-4 py-2 rounded-lg text-sm font-bold border">Sel. Todos</button>
-                        </div>
-                        <div id="massa-list" class="flex-1 overflow-y-auto space-y-1 pr-2 bg-white border border-slate-100 rounded-xl p-2"></div>
-                    </div>
-                    <div class="glass-panel p-6 rounded-2xl flex flex-col">
-                        <label class="text-xs font-bold text-slate-500 uppercase mb-2">Campo a Editar</label>
-                        <select id="massa-campo" class="ios-input mb-4"><option value="preco">Preço de Venda</option><option value="custo">Custo do Produto</option></select>
-                        <label class="text-xs font-bold text-slate-500 uppercase mb-2">Valor Fixo (R$)</label>
-                        <input type="number" id="massa-val" class="ios-input text-2xl font-black mb-6" value="0.00">
-                        <button onclick="aplicarMassa()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-3 rounded-xl font-bold shadow-lg mt-auto transition"><i class="fas fa-check mr-2"></i> Aplicar Alterações</button>
-                    </div>
-                </div>
-            </div>
-
-            <div id="view-automacoes" class="hidden space-y-6">
-                <h2 class="text-3xl font-black text-emerald-600 tracking-tight">AI Core Services</h2>
-                <div class="grid grid-cols-2 gap-8">
-                    <div class="glass-panel p-6 rounded-2xl border-t-4 border-amber-400">
-                        <h3 class="font-bold mb-4 text-slate-800"><i class="fas fa-comments text-amber-500 mr-2"></i> SAC Ateliê</h3>
-                        <textarea id="ia-sac-input" rows="4" class="ios-input mb-4 resize-none" placeholder="Cole a dúvida ou relato do cliente aqui..."></textarea>
-                        <button onclick="gerarSAC()" class="w-full bg-slate-900 hover:bg-slate-800 text-white py-3 rounded-xl font-bold transition"><i class="fas fa-magic text-amber-400 mr-2"></i> Formular Resposta Humana</button>
-                        <div id="ia-sac-res" class="mt-4 bg-slate-800 text-slate-200 p-4 rounded-xl text-sm hidden"></div>
-                    </div>
-                    <div class="glass-panel p-6 rounded-2xl border-t-4 border-indigo-400">
-                        <h3 class="font-bold mb-4 text-slate-800"><i class="fas fa-shield-alt text-indigo-500 mr-2"></i> Blindagem Jurídica</h3>
-                        <input type="text" id="ia-blind-input" class="ios-input mb-4" placeholder="Nome do Produto para Ficha Técnica...">
-                        <button onclick="gerarBlindagem()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-3 rounded-xl font-bold transition"><i class="fas fa-cogs mr-2"></i> Gerar Descrição c/ Proteção IP</button>
-                        <div id="ia-blind-res" class="mt-4 bg-slate-900 text-slate-300 font-mono p-4 rounded-xl text-xs h-40 overflow-auto hidden whitespace-pre-wrap"></div>
-                    </div>
-                </div>
-            </div>
-
-            <div id="view-simulador" class="hidden space-y-6">
-                <div class="flex justify-between items-end mb-6">
-                    <div><h2 class="text-3xl font-black text-indigo-600 tracking-tight"><i class="fas fa-globe mr-2"></i> Precificação Global</h2><p class="text-slate-500">Parâmetros base do negócio para cálculo do Preço Bling.</p></div>
-                    <button onclick="salvarCustosGlobais()" class="bg-indigo-600 text-white px-6 py-2.5 rounded-lg font-bold shadow-lg hover:bg-indigo-700 transition">Salvar Parâmetros</button>
-                </div>
-                <div class="grid grid-cols-2 gap-8">
-                    <div class="glass-panel rounded-2xl p-6 border-t-4 border-indigo-500">
-                        <h3 class="font-bold text-slate-800 mb-4 border-b border-slate-200/50 pb-2">Variáveis Fixas</h3>
-                        <div class="space-y-4">
-                            <div class="flex justify-between items-center"><span class="text-sm font-medium text-slate-600">Impostos (%)</span><input type="number" id="cg-imp" step="0.5" class="ios-input w-24 text-right font-bold" oninput="simularPrecoBase()"></div>
-                            <div class="flex justify-between items-center"><span class="text-sm font-medium text-slate-600">Cartão de Crédito (%)</span><input type="number" id="cg-cartao" step="0.1" class="ios-input w-24 text-right font-bold" oninput="simularPrecoBase()"></div>
-                            <div class="flex justify-between items-center"><span class="text-sm font-medium text-slate-600">Embalagem Média (R$)</span><input type="number" id="cg-emb" step="0.5" class="ios-input w-24 text-right font-bold" oninput="simularPrecoBase()"></div>
-                            <div class="flex justify-between items-center"><span class="text-sm font-medium text-slate-600">Frete Fixo Próprio (R$)</span><input type="number" id="cg-frete" step="0.5" class="ios-input w-24 text-right font-bold" oninput="simularPrecoBase()"></div>
-                            <div class="flex justify-between items-center pt-2"><span class="text-sm font-black text-slate-800">Margem Alvo (%)</span><input type="number" id="cg-ganho" step="1" class="ios-input w-24 text-right font-black text-emerald-600 bg-emerald-50 border-emerald-200" oninput="simularPrecoBase()"></div>
-                        </div>
-                    </div>
-                    <div class="glass-panel rounded-2xl p-6 bg-gradient-to-br from-indigo-50/50 to-white">
-                        <h3 class="font-bold text-slate-800 mb-4 border-b border-slate-200/50 pb-2">Simulador Rápido</h3>
-                        <label class="text-xs font-bold text-slate-500 mb-1">Se o produto custa (R$):</label>
-                        <input type="number" id="sim-custo" value="50.00" class="ios-input w-full mb-4 text-2xl font-black" oninput="simularPrecoBase()">
-                        <div class="bg-indigo-600 text-white rounded-xl p-5 shadow-lg mt-4">
-                            <p class="text-xs font-medium opacity-80 uppercase mb-1">Preço Sugerido (Bling)</p>
-                            <p class="text-4xl font-black" id="sim-resultado">R$ 0,00</p>
-                            <p class="text-xs mt-3 opacity-90"><i class="fas fa-check-circle text-emerald-300 mr-1"></i> Garante a margem alvo exata com os custos acima.</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div id="view-config" class="hidden space-y-6">
-                <h2 class="text-3xl font-black text-slate-800 tracking-tight">Infraestrutura & Logs</h2>
-                <div class="grid grid-cols-2 gap-8">
-                    <div class="glass-panel p-6 rounded-2xl border-l-4 border-emerald-500">
-                        <h3 class="font-bold text-slate-800 mb-4 border-b pb-2">Conexão Segura</h3>
-                        <div class="bg-emerald-50 p-3 rounded-lg text-xs text-emerald-700 mb-4"><strong>Segurança Ativa:</strong> Chaves de API protegidas no servidor Node.js (Railway).</div>
-                        <label class="text-xs font-bold text-slate-500 mb-1">URL do Servidor Proxy</label>
-                        <input type="text" id="cfg-proxy" class="ios-input mb-4 font-mono text-sm" placeholder="https://seu-app.up.railway.app">
-                        <label class="text-xs font-bold text-slate-500 mb-1">Modelo de Inteligência Artificial</label>
-                        <select id="cfg-model" class="ios-input mb-6"><option value="gemini-2.5-flash">Gemini 2.5 Flash</option><option value="gemini-1.5-pro">Gemini 1.5 Pro</option></select>
-                        <button onclick="salvarConfig()" class="w-full bg-slate-800 hover:bg-slate-900 text-white py-3 rounded-xl font-bold shadow-md transition">Salvar Conexão e Testar</button>
-                    </div>
-                    <div class="glass-panel p-6 rounded-2xl flex flex-col h-[50vh]">
-                        <h3 class="font-bold text-slate-800 mb-4 border-b pb-2"><i class="fas fa-history mr-2"></i>Activity Feed</h3>
-                        <div id="activity-logs" class="flex-1 overflow-y-auto text-[11px] font-mono space-y-1 pr-2"></div>
-                    </div>
-                </div>
-            </div>
-        </main>
+<body>
+<div class="app">
+ 
+<div class="header-nav">
+  <div class="logo">
+    <div class="logo-icon">⬡</div>
+    <div><h1>BlingAI Manager</h1><span class="ver">v4 · Gestão inteligente</span></div>
+  </div>
+  <div class="nav-menu">
+    <div class="nav-item active" onclick="navTo('catalogo')" id="nav-catalogo">📦 Catálogo <span class="nav-badge" id="prodCount">0</span></div>
+    <div class="nav-item" onclick="navTo('massa')" id="nav-massa">⚡ Em Massa</div>
+    <div class="nav-item" onclick="navTo('precos')" id="nav-precos">🌐 Precificação</div>
+    <div class="nav-item" onclick="navTo('simulador')" id="nav-simulador">📊 Simulador</div>
+    <div class="nav-item" onclick="navTo('ia')" id="nav-ia">🤖 Central I.A.</div>
+    <div class="nav-item" onclick="navTo('log')" id="nav-log">📋 Logs <span id="logBadge" class="nav-badge red" style="display:none;"></span></div>
+    <div class="nav-item" onclick="navTo('config')" id="nav-config">⚙️ Config</div>
+  </div>
+  <div class="nav-right">
+    <div id="serverBar" class="server-bar checking">⟳ Verificando servidor...</div>
+    <div class="lock-btn" id="lockBtn" onclick="toggleLock()">🔒 Fixo</div>
+  </div>
+</div>
+ 
+<div class="main">
+  <div class="page-header" id="pageHeader">
+    <div class="ph-info">
+      <h2 id="tbTitle">Catálogo de Produtos</h2>
+      <div class="sub" id="tbSub">Todos os produtos sincronizados</div>
     </div>
+    <div class="ph-actions" id="phActions"></div>
+  </div>
+  <div class="content" id="mainArea">
+    <div class="empty"><div style="font-size:36px">📦</div><h3>Carregando...</h3></div>
+  </div>
+</div>
+</div>
+<div class="toast" id="toast"><span id="tIcon">✓</span><span id="tMsg"></span></div>
+ 
+<script>
+// ═══════════════════════════════════════════════════════
+// 🔒 CONFIGURAÇÃO DO SERVIDOR BACKEND
+// Cole aqui a URL gerada após o deploy no Railway.
+// ═══════════════════════════════════════════════════════
+const API_BASE = localStorage.getItem('bmp4_apibase') || 'http://localhost:3000';
+ 
+// ══ INLINE SVG ICONS ══
+const PSVG={
+  shopee:`<svg viewBox="0 0 48 48"><rect width="48" height="48" rx="10" fill="#EE4D2D"/><path d="M24 8c-5.5 0-9.5 3.8-9.5 8.5 0 1.2.3 2.3.7 3.3H13c-1.7 0-3 1.4-3 3.1l1.5 14.5c.2 1.5 1.4 2.6 2.9 2.6h19.2c1.5 0 2.7-1.1 2.9-2.6L38 22.9c0-1.7-1.3-3.1-3-3.1h-2.2c.4-1 .7-2.1.7-3.3C33.5 11.8 29.5 8 24 8zm0 3c3.6 0 6.5 2.5 6.5 5.5 0 1.2-.4 2.3-1.1 3.3h-10.8c-.7-1-1.1-2.1-1.1-3.3C17.5 13.5 20.4 11 24 11zm-6 16a2 2 0 110 4 2 2 0 010-4zm12 0a2 2 0 110 4 2 2 0 010-4z" fill="#fff"/></svg>`,
+  mercadolivre:`<svg viewBox="0 0 48 48"><rect width="48" height="48" rx="10" fill="#FFE600"/><ellipse cx="24" cy="24" rx="13" ry="13" fill="#333"/><path d="M17 23c0-3.9 3.1-7 7-7s7 3.1 7 7" fill="none" stroke="#FFE600" stroke-width="2.5" stroke-linecap="round"/><rect x="21" y="22" width="6" height="7" rx="1.5" fill="#FFE600"/></svg>`,
+  tiktokshop:`<svg viewBox="0 0 48 48"><rect width="48" height="48" rx="10" fill="#010101"/><path d="M32 15c-1.5-1-2.6-2.7-2.8-4.5H25v17.8c0 2-1.6 3.7-3.7 3.7S17.6 30.3 17.6 28.3s1.6-3.7 3.7-3.7c.4 0 .7.1 1 .2V21c-.3-.1-.7-.1-1-.1-4.2 0-7.5 3.3-7.5 7.4s3.3 7.4 7.5 7.4 7.5-3.3 7.5-7.4V20c1.4.9 3 1.4 4.8 1.4v-3.8c-.9 0-1.8-.3-2.5-.7L32 15z" fill="url(#tg)"/><defs><linearGradient id="tg" x1="10" y1="10" x2="38" y2="38"><stop stop-color="#69C9D0"/><stop offset="1" stop-color="#EE1D52"/></linearGradient></defs></svg>`,
+  shein:`<svg viewBox="0 0 48 48"><rect width="48" height="48" rx="10" fill="#B5297D"/><text x="50%" y="56%" dominant-baseline="middle" text-anchor="middle" fill="white" font-size="13" font-family="Arial" font-weight="bold">SHEIN</text></svg>`,
+  amazon:`<svg viewBox="0 0 48 48"><rect width="48" height="48" rx="10" fill="#232F3E"/><text x="50%" y="41%" dominant-baseline="middle" text-anchor="middle" fill="white" font-size="10" font-family="Arial" font-weight="bold">amazon</text><path d="M12 31c7 3.5 15 5 23 2" stroke="#FF9900" stroke-width="2.5" stroke-linecap="round"/><path d="M32 28l4 3-4 3" stroke="#FF9900" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+  magalu:`<svg viewBox="0 0 48 48"><rect width="48" height="48" rx="10" fill="#0086FF"/><text x="50%" y="56%" dominant-baseline="middle" text-anchor="middle" fill="white" font-size="8.5" font-family="Arial" font-weight="bold">MAGALU</text></svg>`,
+  americanas:`<svg viewBox="0 0 48 48"><rect width="48" height="48" rx="10" fill="#E30613"/><text x="50%" y="56%" dominant-baseline="middle" text-anchor="middle" fill="white" font-size="7" font-family="Arial" font-weight="bold">AMERICANAS</text></svg>`,
+  nuvemshop:`<svg viewBox="0 0 48 48"><rect width="48" height="48" rx="10" fill="#1C1CFF"/><path d="M13 31a7 7 0 010-14c.5 0 1 .1 1.5.2A9 9 0 0133 25 5.5 5.5 0 0134 36H13z" fill="white"/></svg>`,
+};
+function psvg(id,sz=16){const s=PSVG[id]||`<svg viewBox="0 0 48 48"><rect width="48" height="48" rx="10" fill="#333"/></svg>`;return `<span style="display:inline-flex;width:${sz}px;height:${sz}px;border-radius:3px;overflow:hidden;flex-shrink:0;">${s}</span>`;}
+ 
+// ══ PLATFORMS ══
+const PLATS=[
+  {id:'shopee',name:'Shopee',color:'#EE4D2D',tc:'#EE4D2D',fees:[{k:'comissao',l:'Comissão',u:'%',d:14},{k:'servico',l:'Tx. Serviço',u:'R$',d:2},{k:'devolucao',l:'Tx. Devolução',u:'%',d:0.5}]},
+  {id:'mercadolivre',name:'Mercado Livre',color:'#FFE600',tc:'#C8A800',fees:[{k:'comissao_low',l:'Comissão até R$79',u:'%',d:12},{k:'comissao_high',l:'Comissão +R$79',u:'%',d:16},{k:'frete',l:'Frete incluso',u:'R$',d:0}]},
+  {id:'tiktokshop',name:'TikTok Shop',color:'#69C9D0',tc:'#3DBAC2',fees:[{k:'comissao',l:'Comissão',u:'%',d:5},{k:'fixo',l:'Taxa fixa',u:'R$',d:0}]},
+  {id:'shein',name:'Shein',color:'#B5297D',tc:'#B5297D',fees:[{k:'comissao',l:'Comissão',u:'%',d:18},{k:'logistica',l:'Logística',u:'R$',d:0}]},
+  {id:'amazon',name:'Amazon',color:'#FF9900',tc:'#E68800',fees:[{k:'comissao',l:'Comissão',u:'%',d:15},{k:'fba',l:'Taxa FBA',u:'R$',d:0}]},
+  {id:'magalu',name:'Magalu',color:'#0086FF',tc:'#0070DD',fees:[{k:'comissao',l:'Comissão',u:'%',d:16},{k:'fixo',l:'Taxa fixa',u:'R$',d:0}]},
+  {id:'americanas',name:'Americanas',color:'#E30613',tc:'#E30613',fees:[{k:'comissao',l:'Comissão',u:'%',d:16},{k:'fixo',l:'Taxa fixa',u:'R$',d:0}]},
+  {id:'nuvemshop',name:'Nuvemshop',color:'#1C1CFF',tc:'#4040FF',fees:[{k:'gateway',l:'Gateway',u:'%',d:2},{k:'fixo',l:'Custo fixo',u:'R$',d:0}]},
+];
+const CATS=['Pedrarias','Caixas','Acessórios','Outros'];
+const GEMINI_MODELS=[
+  {id:'gemini-2.5-flash-preview-05-14',label:'Gemini 2.5 Flash (recomendado)'},
+  {id:'gemini-1.5-pro',label:'Gemini 1.5 Pro (mais capaz)'},
+];
+const DEF_GLOBAL={imposto:12,embalagem:3,cartao:2.5,ganho:30,frete:0,minPrice:0,maxPrice:0};
+const SAMPLE=[
+  {id:1,sku:'CX-ORG-30',name:'Kit 30 Caixas Organizadoras 20x19cm',price:89.90,cost:45.00,stock:145,cat:'Caixas',platforms:['shopee','mercadolivre','magalu'],updated:'2026-04-10',description:'Caixa com 30 divisórias.',descComp:'',aiInst:'',aiCtx:'',dims:{altura:8.5,largura:7,profundidade:12,peso:0.42},fiscal:{ncm:'85258090',origem:'3',cst:'070',cfop:'6108',icms:12,ipi:0,pis:1.65,cofins:7.6},img:'',embalagemExtra:0,freteExtra:0},
+  {id:2,sku:'PER-6MM-BR',name:'Pérola Branca 6mm ABS (500g)',price:35.00,cost:18.00,stock:430,cat:'Pedrarias',platforms:['shopee','mercadolivre','shein'],updated:'2026-04-08',description:'Pérolas ABS importadas.',descComp:'',aiInst:'',aiCtx:'',dims:{altura:3,largura:5,profundidade:15,peso:0.65},fiscal:{ncm:'94054090',origem:'3',cst:'070',cfop:'6108',icms:12,ipi:0,pis:1.65,cofins:7.6},img:'',embalagemExtra:0,freteExtra:0},
+];
+ 
+// ══ STATE ══
+let products=JSON.parse(localStorage.getItem('bmp4_prods')||'null')||JSON.parse(JSON.stringify(SAMPLE));
+let sel=null;
+let pTab='overview';
+let curNav='catalogo';
+let mpRates=JSON.parse(localStorage.getItem('bmp4_rates')||'{}');
+let globalCosts=JSON.parse(localStorage.getItem('bmp4_global')||JSON.stringify(DEF_GLOBAL));
+let globalPlatRates=JSON.parse(localStorage.getItem('bmp4_gplat')||'{}');
+let actLog=JSON.parse(localStorage.getItem('bmp4_log')||'[]');
+let geminiModel=localStorage.getItem('bmp4_model')||'gemini-2.5-flash-preview-05-14';
+let dragLocked=true;
+let colPanels={};
+let massaSel=new Set();
+let massaOp='set';
+let massaMode='preco';
+let massaQ='';
+let massaCat='all';
+let massaPlat='all';
+let serverOnline=false;
+ 
+function save(){
+  localStorage.setItem('bmp4_prods',JSON.stringify(products));
+  localStorage.setItem('bmp4_rates',JSON.stringify(mpRates));
+  localStorage.setItem('bmp4_global',JSON.stringify(globalCosts));
+  localStorage.setItem('bmp4_gplat',JSON.stringify(globalPlatRates));
+  localStorage.setItem('bmp4_log',JSON.stringify(actLog.slice(-300)));
+  localStorage.setItem('bmp4_model',geminiModel);
+}
+ 
+// ══ LOG / TOAST ══
+let toastT;
+function toast(msg,ok=true){
+  clearTimeout(toastT);
+  const el=document.getElementById('toast');
+  document.getElementById('tMsg').textContent=msg;
+  document.getElementById('tIcon').textContent=ok?'✓':'✕';
+  el.style.cssText=`display:flex;background:${ok?'var(--s3)':'rgba(248,113,113,.15)'};border-color:${ok?'var(--gb)':'rgba(248,113,113,.3)'};animation:tu .22s ease;`;
+  toastT=setTimeout(()=>el.style.display='none',3200);
+}
+function addLog(msg,type='info',detail=''){
+  actLog.unshift({ts:new Date().toISOString(),msg,type,detail});
+  const b=document.getElementById('logBadge');
+  const errs=actLog.filter(l=>l.type==='err').length;
+  if(b){b.style.display=errs?'inline':'none';b.textContent=errs||'';}
+  save();
+}
+ 
+// ══ FORMAT ══
+const f2=n=>Number(n||0).toFixed(2).replace('.',',');
+const f1=n=>Number(n||0).toFixed(1).replace('.',',');
+const f3=n=>Number(n||0).toFixed(3).replace('.',',');
+ 
+function getBaseCost(prod){
+  const gc=globalCosts;
+  const emb=(prod.embalagemExtra>0)?parseFloat(prod.embalagemExtra):(parseFloat(gc.embalagem)||0);
+  const frete=(prod.freteExtra>0)?parseFloat(prod.freteExtra):(parseFloat(gc.frete)||0);
+  return (prod.cost||0)+emb+frete;
+}
+function calcBlingPrice(prod){
+  const base=getBaseCost(prod);
+  const gc=globalCosts;
+  const den=1-(parseFloat(gc.ganho)||0+parseFloat(gc.imposto)||0+parseFloat(gc.cartao)||0)/100;
+  if(den<=0) return base*3;
+  let p=base/den;
+  return p;
+}
+function calcMktPrice(blingPrice,platId,rates){
+  const pl=PLATS.find(x=>x.id===platId);if(!pl) return blingPrice;
+  const r=rates||{};
+  let pct=0,fixed=0;
+  pl.fees.forEach(f=>{const v=parseFloat(r[f.k]??f.d)||0;if(f.u==='%')pct+=v;else fixed+=v;});
+  let p=blingPrice+fixed;
+  if(pct>0&&pct<100) p=p/(1-pct/100);
+  return p;
+}
+function calcMargin(price,baseCost){return price>0?((price-baseCost)/price)*100:0;}
+ 
+// ══ SERVER CHECK ══
+async function checkServer(){
+  const bar=document.getElementById('serverBar');
+  try{
+    const r=await fetch(`${API_BASE}/`,{signal:AbortSignal.timeout(4000)});
+    serverOnline=r.ok;
+    if(bar){bar.className='server-bar';bar.textContent='✓ Servidor online';}
+    addLog('Servidor backend online','ok');
+  }catch(e){
+    serverOnline=false;
+    if(bar){bar.className='server-bar offline';bar.textContent='✕ Servidor offline — modo local';}
+  }
+}
+ 
+// ══ API CALLS (via backend proxy) ══
+async function apiGet(path){
+  const r=await fetch(`${API_BASE}${path}`);
+  if(!r.ok) throw new Error(`HTTP ${r.status}`);
+  return r.json();
+}
+async function apiPut(path,body){
+  const r=await fetch(`${API_BASE}${path}`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+  if(!r.ok) throw new Error(`HTTP ${r.status}`);
+  return r.json();
+}
+async function apiPost(path,body){
+  const r=await fetch(`${API_BASE}${path}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+  if(!r.ok) throw new Error(`HTTP ${r.status}`);
+  return r.json();
+}
+ 
+// ══ DRAG ══
+let dragSrc=null;
+function toggleLock(){
+  dragLocked=!dragLocked;
+  const btn=document.getElementById('lockBtn');
+  if(btn){btn.textContent=dragLocked?'🔒 Fixo':'🔓 Arrastável';btn.className='lock-btn'+(dragLocked?'':' open');}
+  document.querySelectorAll('.dp-handle').forEach(h=>{h.draggable=!dragLocked;h.className='dp-handle'+(dragLocked?'':' unlocked');});
+  toast(dragLocked?'Painéis fixos':'Arraste os painéis para reorganizar!');
+}
+function initDrag(zone){
+  if(!zone) return;
+  zone.querySelectorAll('.drag-panel').forEach(panel=>{
+    const h=panel.querySelector('.dp-handle');if(!h) return;
+    h.draggable=!dragLocked;h.className='dp-handle'+(dragLocked?'':' unlocked');
+    h.addEventListener('dragstart',e=>{if(dragLocked){e.preventDefault();return;}dragSrc=panel;panel.classList.add('dragging');e.dataTransfer.effectAllowed='move';e.dataTransfer.setData('text','');});
+    panel.addEventListener('dragover',e=>{e.preventDefault();if(panel!==dragSrc)panel.classList.add('drag-over');});
+    panel.addEventListener('dragleave',()=>panel.classList.remove('drag-over'));
+    panel.addEventListener('drop',e=>{e.preventDefault();panel.classList.remove('drag-over');if(dragSrc&&dragSrc!==panel){const all=[...zone.children];const si=all.indexOf(dragSrc),ti=all.indexOf(panel);if(si<ti)zone.insertBefore(dragSrc,panel.nextSibling);else zone.insertBefore(dragSrc,panel);}});
+    panel.addEventListener('dragend',()=>{panel.classList.remove('dragging');dragSrc=null;});
+  });
+}
+function dp(id,title,icon,content,tip=''){
+  const col=colPanels[id];
+  const tipHtml=tip?`<div class="tip"><span class="tip-icon">?</span><div class="tip-text">${tip}</div></div>`:'';
+  return `<div class="drag-panel" id="dpp-${id}">
+    <div class="dp-handle${dragLocked?'':' unlocked'}">
+      <div class="dp-handle-l"><div class="dp-dots"><span></span><span></span><span></span></div><span style="font-size:14px;">${icon}</span><span style="font-size:12px;font-weight:600;color:var(--t1);">${title}</span>${tipHtml}</div>
+      <span class="dp-arr${col?'':' open'}" id="dpa-${id}" onclick="colT('${id}')">▾</span>
+    </div>
+    <div class="dp-body${col?' col':''}" id="dpb-${id}">${content}</div>
+  </div>`;
+}
+function colT(id){colPanels[id]=!colPanels[id];const b=document.getElementById('dpb-'+id);const a=document.getElementById('dpa-'+id);if(b)b.className='dp-body'+(colPanels[id]?' col':'');if(a)a.className='dp-arr'+(colPanels[id]?'':' open');}
+function setupZone(z){if(z)setTimeout(()=>initDrag(z),30);}
+ 
+// ══ NAV ══
+function navTo(v){
+  curNav=v;sel=null;
+  document.querySelectorAll('.nav-item').forEach(el=>el.classList.remove('active'));
+  const ni=document.getElementById('nav-'+v);if(ni)ni.classList.add('active');
+  document.getElementById('phActions').innerHTML='';
+  if(v==='catalogo') renderCatalogo();
+  else if(v==='massa') renderMassa();
+  else if(v==='precos') renderPrecos();
+  else if(v==='simulador') renderSim();
+  else if(v==='ia') renderIA();
+  else if(v==='log') renderLog();
+  else if(v==='config') renderConfig();
+}
+ 
+// ══ CATALOGO ══
+function renderCatalogo(){
+  document.getElementById('tbTitle').textContent='Catálogo de Produtos';
+  document.getElementById('tbSub').textContent=`${products.length} produtos · clique para editar`;
+  document.getElementById('prodCount').textContent=products.length;
+  document.getElementById('phActions').innerHTML=`
+    <button class="btn btn-ghost btn-sm" onclick="sincronizarBling()">↓ Sincronizar Bling</button>
+    <input type="text" id="catSearch" placeholder="Buscar SKU ou nome..." oninput="filtrarCatalogo(this.value)"
+      style="background:var(--s2);border:1px solid var(--gb);border-radius:var(--rs);padding:6px 10px;color:var(--t1);font-size:12px;outline:none;font-family:inherit;width:200px;">
+    <select id="catCatSel" onchange="filtrarCatalogo(document.getElementById('catSearch').value)"
+      style="background:var(--s2);border:1px solid var(--gb);border-radius:var(--rs);padding:6px 9px;color:var(--t1);font-size:11px;outline:none;font-family:inherit;">
+      <option value="all">Todas categorias</option>${CATS.map(c=>`<option value="${c}">${c}</option>`).join('')}
+    </select>`;
+  renderCatGrid(products);
+}
+ 
+function filtrarCatalogo(q){
+  const cat=document.getElementById('catCatSel')?.value||'all';
+  const ql=q.toLowerCase();
+  const filtered=products.filter(p=>(cat==='all'||p.cat===cat)&&(!ql||p.name.toLowerCase().includes(ql)||p.sku.toLowerCase().includes(ql)));
+  renderCatGrid(filtered);
+}
+ 
+function renderCatGrid(items){
+  const area=document.getElementById('mainArea');
+  if(!items.length){area.innerHTML='<div class="empty"><h3>Nenhum produto</h3><p>Ajuste os filtros ou sincronize com o Bling.</p></div>';return;}
+  const byCat={};
+  items.forEach(p=>{const c=p.cat||'Outros';if(!byCat[c])byCat[c]=[];byCat[c].push(p);});
+  let html='';
+  Object.entries(byCat).forEach(([cat,prods])=>{
+    html+=`<div style="margin-bottom:20px;">
+      <div style="font-size:11px;color:var(--t3);font-weight:700;text-transform:uppercase;letter-spacing:.7px;margin-bottom:10px;padding:0 2px;">${cat} <span style="color:var(--t3);font-weight:400;">(${prods.length})</span></div>
+      <div class="cat-grid">`;
+    prods.forEach(p=>{
+      const base=getBaseCost(p);
+      const marg=calcMargin(p.price,base);
+      const ok=marg>15;
+      const icons=p.platforms.slice(0,5).map(id=>`<span class="cc-plat-dot">${PSVG[id]||''}</span>`).join('');
+      html+=`<div class="cat-card ${sel?.id===p.id?'selected':''}" onclick="abrirProduto(${p.id})">
+        <div class="cc-top">
+          <div class="cc-sku">${p.sku}</div>
+          <div class="cc-cat">${p.cat?.split(' ')[0]||'—'}</div>
+        </div>
+        <div class="cc-name" title="${p.name}">${p.name}</div>
+        <div class="cc-plats">${icons}</div>
+        <div class="cc-footer">
+          <div><div style="font-size:9px;color:var(--t3);margin-bottom:2px;">Preço Bling</div><div class="cc-price">R$ ${f2(p.price)}</div></div>
+          <div style="text-align:right;">
+            <div style="font-size:9px;color:var(--t3);margin-bottom:2px;">Margem</div>
+            <div class="cc-marg" style="color:${ok?'var(--ag)':'var(--aw)'}">${f1(marg)}%</div>
+          </div>
+        </div>
+      </div>`;
+    });
+    html+=`</div></div>`;
+  });
+  area.innerHTML=html;
+}
+ 
+function abrirProduto(id){
+  sel=products.find(p=>p.id===id);
+  if(!sel) return;
+  pTab='overview';
+  document.getElementById('tbTitle').textContent=sel.name;
+  document.getElementById('tbSub').textContent=`SKU: ${sel.sku} · Cat: ${sel.cat||'—'} · ${sel.stock} un · Atualizado: ${sel.updated||'—'}`;
+  document.getElementById('phActions').innerHTML=`
+    <div class="ptabs">
+      <div class="ptab on" onclick="switchPTab('overview')">📊 Visão Geral</div>
+      <div class="ptab" onclick="switchPTab('descricao')">📝 Descrição</div>
+      <div class="ptab" onclick="switchPTab('precos_prod')">💰 Preços</div>
+      <div class="ptab" onclick="switchPTab('logistica')">📦 Logística</div>
+      <div class="ptab" onclick="switchPTab('fiscal')">🧾 Fiscal</div>
+      <div class="ptab" onclick="switchPTab('radar')">📡 Radar Espião</div>
+    </div>
+    <button class="btn btn-ghost btn-sm" onclick="renderCatalogo()">← Catálogo</button>
+    <button class="btn btn-green btn-sm" onclick="salvarBling()">▲ Salvar Bling</button>`;
+  renderProdTab();
+}
+ 
+function switchPTab(tab){
+  pTab=tab;
+  document.querySelectorAll('.ptab').forEach((t,i)=>t.classList.toggle('on',['overview','descricao','precos_prod','logistica','fiscal','radar'][i]===tab));
+  renderProdTab();
+}
+function renderProdTab(){
+  if(!sel) return;
+  if(pTab==='overview') renderOverview();
+  else if(pTab==='descricao') renderDescricao();
+  else if(pTab==='precos_prod') renderPrecosProd();
+  else if(pTab==='logistica') renderLogistica();
+  else if(pTab==='fiscal') renderFiscal();
+  else if(pTab==='radar') renderRadar();
+}
+ 
+// ══ OVERVIEW ══
+function renderOverview(){
+  const p=sel;
+  const base=getBaseCost(p);
+  const marg=calcMargin(p.price,base);
+  const sugBling=calcBlingPrice(p);
+  const gc=globalCosts;
+  const chips=PLATS.map(pl=>{const on=p.platforms.includes(pl.id);return`<div class="plat-chip ${on?'on':'off'}" style="border-color:${pl.color};color:${pl.tc}" onclick="togglePlat(${p.id},'${pl.id}')">${psvg(pl.id,13)} ${pl.name}</div>`;}).join('');
+  const platPrices=p.platforms.map(id=>{const pl=PLATS.find(x=>x.id===id);if(!pl)return'';const fp=calcMktPrice(p.price,id,mpRates[p.id]?.[id]||{});const mg=calcMargin(fp,base);return`<div style="display:flex;align-items:center;gap:8px;padding:7px 10px;background:var(--s1);border-radius:var(--rs);border:1px solid var(--gb);">${psvg(id,14)}<span style="color:${pl.tc};font-size:11px;font-weight:600;">${pl.name}</span><span style="margin-left:auto;font-size:13px;font-weight:700;color:${mg>15?'var(--ag)':'var(--ar)'};">R$ ${f2(fp)}</span><span style="font-size:10px;color:${mg>15?'var(--ag)':'var(--ar)'};">${f1(mg)}%</span></div>`;}).join('');
+ 
+  const area=document.getElementById('mainArea');
+  area.innerHTML=`
+  <div class="drag-zone" id="zone-ov">
+    ${dp('ov-ind','Indicadores','📊',`
+      <div class="stat-grid" style="margin-bottom:0;">
+        <div class="stat-pill"><div class="sp-l">Preço Bling</div><div class="sp-v" style="color:var(--teal)">R$ ${f2(p.price)}</div></div>
+        <div class="stat-pill"><div class="sp-l">Custo total</div><div class="sp-v" style="color:var(--ar)">R$ ${f2(base)}</div></div>
+        <div class="stat-pill"><div class="sp-l">Margem bruta</div><div class="sp-v" style="color:${marg>15?'var(--ag)':'var(--aw)'}">${f1(marg)}%</div></div>
+        <div class="stat-pill"><div class="sp-l">Estoque</div><div class="sp-v">${p.stock} un</div></div>
+      </div>
+    `)}
+    ${dp('ov-plats','Plataformas vinculadas','🔗',`
+      <div style="font-size:11px;color:var(--t3);margin-bottom:8px;">Clique para ativar/desativar.</div>
+      <div class="plat-grid" style="margin-bottom:10px;">${chips}</div>
+      <div style="display:flex;flex-direction:column;gap:4px;">${platPrices||'<div style="color:var(--t3);font-size:11px;">Nenhuma plataforma vinculada</div>'}</div>
+    `)}
+    ${dp('ov-edit','Edição rápida','✏️',`
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+        <div>
+          <div class="ios-group">
+            <div class="ios-row"><span class="ir-label">Categoria</span><div class="ir-val"><select id="ovCat">${CATS.map(c=>`<option value="${c}" ${p.cat===c?'selected':''}>${c}</option>`).join('')}</select></div></div>
+            <div class="ios-row"><span class="ir-label">Preço Bling (R$)</span><div class="ir-val"><span class="unit">R$</span><input id="ovPrice" type="number" value="${p.price}" step="0.01" min="0"></div></div>
+            <div class="ios-row"><span class="ir-label">Custo (R$)</span><div class="ir-val"><span class="unit">R$</span><input id="ovCost" type="number" value="${p.cost}" step="0.01" min="0"></div></div>
+            <div class="ios-row"><span class="ir-label">Estoque</span><div class="ir-val"><input id="ovStock" type="number" value="${p.stock}" step="1" min="0"><span class="unit">un</span></div></div>
+          </div>
+          <button class="btn btn-green btn-sm" onclick="saveBase()">▲ Salvar</button>
+        </div>
+        <div>
+          <div style="font-size:11px;color:var(--t3);margin-bottom:6px;">Preço Bling sugerido pelos custos globais:</div>
+          <div style="font-size:22px;font-weight:700;color:var(--teal);margin-bottom:4px;">R$ ${f2(sugBling)}</div>
+        </div>
+      </div>
+    `)}
+  </div>
+  <div style="padding-bottom:14px;"></div>`;
+  setupZone(area.querySelector('.drag-zone'));
+}
+ 
+// ══ DESCRICAO ══
+function renderDescricao(){
+  const p=sel;
+  const area=document.getElementById('mainArea');
+  area.innerHTML=`
+  <div class="drag-zone" id="zone-desc">
+    ${dp('desc-titulo','Título / Descrição Curta','📝',`
+      <div style="font-size:11px;color:var(--t3);margin-bottom:7px;">Título exibido no marketplace.</div>
+      <textarea id="dDesc" rows="3" class="form-input">${p.description||''}</textarea>
+    `)}
+    ${dp('desc-ai','✦ Gemini AI — Gerador de Descrição','🤖',`
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;">
+        <button class="btn btn-ai btn-sm" onclick="genAI('comp')"><span id="spComp"></span>✦ Gerar Ficha Completa</button>
+      </div>
+      <div class="ai-out" id="aoComp" style="min-height:60px;">Clique em "Gerar Ficha Completa"...</div>
+      <div style="margin-top:7px;"><button class="btn btn-ghost btn-xs" onclick="applyAI('comp')">← Aplicar ao campo abaixo</button></div>
+    `)}
+    ${dp('desc-comp','Descrição Complementar / Detalhada','📋',`
+      <textarea id="dComp" rows="10" class="form-input" style="font-family:monospace;">${p.descComp||''}</textarea>
+    `)}
+  </div>
+  <div style="padding-bottom:14px;"></div>`;
+  setupZone(area.querySelector('.drag-zone'));
+}
+ 
+// ══ PRECOS POR PRODUTO ══
+function renderPrecosProd(){
+  const p=sel;
+  if(!mpRates[p.id]) mpRates[p.id]={};
+  PLATS.forEach(pl=>{if(!mpRates[p.id][pl.id]){mpRates[p.id][pl.id]={};pl.fees.forEach(f=>mpRates[p.id][pl.id][f.k]=f.d);}});
+  const base=getBaseCost(p);
+  const margBase=calcMargin(p.price,base);
+ 
+  const panels=PLATS.map(pl=>{
+    const r=mpRates[p.id][pl.id]||{};
+    const active=p.platforms.includes(pl.id);
+    const fp=calcMktPrice(p.price,pl.id,r);
+    const mg=calcMargin(fp,base);
+    const ok=mg>15;
+    const isCol=colPanels[`pr${p.id}_${pl.id}`];
+    const feeInputs=pl.fees.map(f=>{
+      const v=parseFloat(r[f.k]??f.d)||0;
+      return`<div class="fee-box"><div class="fee-lbl">${f.l}</div><div class="fee-inp-row">${f.u==='R$'?'<span class="fu">R$</span>':''}<input type="number" value="${v}" min="0" step="${f.u==='%'?'0.1':'0.01'}" oninput="updateFee(${p.id},'${pl.id}','${f.k}',this.value)">${f.u==='%'?'<span class="fu">%</span>':''}</div></div>`;
+    }).join('');
+    return`<div class="mp-panel" style="${!active?'opacity:.5':''}">
+      <div class="mp-head" onclick="colT2('pr${p.id}_${pl.id}','mppb-${pl.id}','mpar-${pl.id}')">
+        <div class="mp-head-l">${psvg(pl.id,20)}<span style="font-size:12px;font-weight:600;color:${pl.tc}">${pl.name}</span></div>
+        <div class="mp-head-r"><span style="font-size:17px;font-weight:700;color:${ok?'var(--teal)':'var(--ar)'}" id="hfp-${pl.id}">R$ ${f2(fp)}</span><span id="mpar-${pl.id}" style="color:var(--t3);font-size:10px;display:inline-block;transform:${isCol?'rotate(-90deg)':''};">▾</span></div>
+      </div>
+      <div id="mppb-${pl.id}" style="padding:0 13px 12px;display:${isCol?'none':''};">
+        <div class="fee-row">${feeInputs}</div>
+        <div class="result-strip">
+          <div><div style="font-size:9px;color:var(--t3);text-transform:uppercase;font-weight:700;margin-bottom:2px;">Preço sugerido marketplace</div><div class="rs-price" style="color:${ok?'var(--teal)':'var(--ar)'}" id="rfp-${pl.id}">R$ ${f2(fp)}</div></div>
+          <div class="rs-stats">
+            <div class="rss"><div class="rl">Margem</div><div class="rv" style="color:${ok?'var(--ag)':'var(--ar)'}" id="rmg-${pl.id}">${ok?'+':''}${f1(mg)}%</div></div>
+            <div class="rss"><div class="rl">Lucro bruto</div><div class="rv" style="color:${(fp-base)>0?'var(--ag)':'var(--ar)'}" id="rlucro-${pl.id}">R$ ${f2(fp-base)}</div></div>
+          </div>
+          <button class="btn btn-green btn-sm" onclick="saveMP('${pl.id}')">▲ Salvar</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+ 
+  document.getElementById('mainArea').innerHTML=`
+  <div class="stat-grid">
+    <div class="stat-pill"><div class="sp-l">Preço Bling atual</div><div class="sp-v" style="color:var(--teal)">R$ ${f2(p.price)}</div></div>
+    <div class="stat-pill"><div class="sp-l">Custo total</div><div class="sp-v" style="color:var(--ar)">R$ ${f2(base)}</div></div>
+    <div class="stat-pill"><div class="sp-l">Margem bruta</div><div class="sp-v" style="color:${margBase>15?'var(--ag)':'var(--aw)'}">${f1(margBase)}%</div></div>
+  </div>
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;"><div style="font-size:10px;color:var(--t3);font-weight:700;text-transform:uppercase;letter-spacing:.5px;">Preços por Marketplace</div></div>
+  ${panels}<div style="padding-bottom:18px;"></div>`;
+}
+ 
+// ══ LOGISTICA ══
+function renderLogistica(){
+  const p=sel;const d=p.dims||{};
+  const area=document.getElementById('mainArea');
+  area.innerHTML=`
+  <div class="drag-zone" id="zone-log">
+    ${dp('log-dims','Dimensões do Produto','📐',`
+      <div class="dim-grid">
+        <div class="dim-box"><label>Altura</label><input id="dAltura" type="number" value="${d.altura||''}" step="0.1" placeholder="0"><div class="dim-unit">cm</div></div>
+        <div class="dim-box"><label>Largura</label><input id="dLargura" type="number" value="${d.largura||''}" step="0.1" placeholder="0"><div class="dim-unit">cm</div></div>
+        <div class="dim-box"><label>Profundidade</label><input id="dProf" type="number" value="${d.profundidade||''}" step="0.1" placeholder="0"><div class="dim-unit">cm</div></div>
+        <div class="dim-box"><label>Peso Bruto</label><input id="dPeso" type="number" value="${d.peso||''}" step="0.001" placeholder="0"><div class="dim-unit">kg</div></div>
+      </div>
+      <div style="margin-top:9px;"><button class="btn btn-green btn-sm" onclick="saveDims()">▲ Salvar dimensões</button></div>
+    `)}
+  </div>`;
+  setupZone(area.querySelector('.drag-zone'));
+}
+ 
+// ══ FISCAL ══
+function renderFiscal(){
+  const p=sel;const fi=p.fiscal||{ncm:'',origem:'3',cst:'070',cfop:'6108',icms:0,ipi:0,pis:0,cofins:0};
+  const area=document.getElementById('mainArea');
+  area.innerHTML=`
+  <div class="drag-zone" id="zone-fisc">
+    ${dp('fisc-dados','Dados Tributários','🧾',`
+      <div style="font-size:11px;color:var(--aw);margin-bottom:9px;">Empresa Optante pelo Simples Nacional (Não gera crédito de ICMS).</div>
+      <div class="ios-group">
+        <div class="ios-row"><span class="ir-label">NCM</span><div class="ir-val"><input id="fNcm" type="text" value="${fi.ncm||''}" placeholder="00000000" maxlength="10"></div></div>
+        <div class="ios-row"><span class="ir-label">Origem</span><div class="ir-val"><select id="fOrigem"><option value="0" ${fi.origem==='0'?'selected':''}>0 – Nacional</option><option value="1" ${fi.origem==='1'?'selected':''}>1 – Estrangeira importada</option><option value="3" ${fi.origem==='3'?'selected':''}>3 – Nacional c/ importado</option></select></div></div>
+        <div class="ios-row"><span class="ir-label">CST/CSOSN</span><div class="ir-val"><input id="fCst" type="text" value="${fi.cst||''}" placeholder="070"></div></div>
+        <div class="ios-row"><span class="ir-label">CFOP</span><div class="ir-val"><input id="fCfop" type="text" value="${fi.cfop||''}" placeholder="6108"></div></div>
+      </div>
+      <button class="btn btn-green btn-sm" onclick="saveFiscal()">▲ Salvar</button>
+    `)}
+  </div>`;
+  setupZone(area.querySelector('.drag-zone'));
+}
 
-    <div id="modal-pim" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-6 transition-opacity">
-        <div class="bg-slate-50 w-full max-w-6xl h-full max-h-[92vh] rounded-3xl shadow-2xl flex flex-col overflow-hidden transform transition-transform">
-            
-            <div class="px-8 py-5 border-b border-slate-200 flex justify-between items-center bg-white shrink-0">
-                <div class="flex items-center gap-4">
-                    <div class="w-12 h-12 rounded-xl bg-indigo-50 border border-indigo-100 flex items-center justify-center text-indigo-500 text-xl"><i class="fas fa-box-open"></i></div>
-                    <div><h3 class="font-black text-2xl text-slate-800 leading-tight" id="m-nome">Produto</h3><p class="text-xs font-mono font-bold text-indigo-500 mt-1" id="m-sku">SKU</p></div>
-                </div>
-                <div class="flex gap-2">
-                    <button onclick="mTab('geral')" id="btn-m-geral" class="px-4 py-2 rounded-lg text-xs font-bold bg-indigo-600 text-white shadow-md transition">Visão Geral</button>
-                    <button onclick="mTab('desc')" id="btn-m-desc" class="px-4 py-2 rounded-lg text-xs font-bold bg-slate-100 text-slate-500 hover:bg-slate-200 transition">Descrição & I.A.</button>
-                    <button onclick="mTab('mkt')" id="btn-m-mkt" class="px-4 py-2 rounded-lg text-xs font-bold bg-slate-100 text-slate-500 hover:bg-slate-200 transition">Marketplaces</button>
-                    <button onclick="mTab('fisc')" id="btn-m-fisc" class="px-4 py-2 rounded-lg text-xs font-bold bg-slate-100 text-slate-500 hover:bg-slate-200 transition">Fiscal / Logística</button>
-                    <button onclick="mTab('radar')" id="btn-m-radar" class="px-4 py-2 rounded-lg text-xs font-bold bg-slate-100 text-slate-500 hover:bg-slate-200 transition border border-slate-200"><i class="fas fa-radar text-indigo-500 mr-1"></i> Radar</button>
-                    <button onclick="fecharModal()" class="ml-4 text-slate-400 hover:text-rose-500 text-xl w-10 h-10 rounded-full hover:bg-rose-50 transition"><i class="fas fa-times"></i></button>
-                </div>
-            </div>
+// ══ RADAR ESPIÃO ══
+function renderRadar(){
+  const area=document.getElementById('mainArea');
+  area.innerHTML=`
+    <div class="gc" style="display:flex; flex-direction:column; height: calc(100vh - 200px);">
+        <div class="gc-hdr"><div class="gc-title">📡 Radar Espião de Concorrentes</div></div>
+        <div style="font-size:11px;color:var(--t3);margin-bottom:10px;">Cole os links dos concorrentes abaixo (um por linha). O sistema consegue processar mais de 50 links simultaneamente utilizando o motor proxy.</div>
+        <textarea id="radarUrls" rows="6" class="form-input" style="font-family:monospace; margin-bottom:12px;" placeholder="https://produto.mercadolivre.com.br/...\nhttps://shopee.com.br/..."></textarea>
+        <button class="btn btn-accent btn-sm" style="align-self:flex-start;" onclick="executarRadarPim()"><span id="radarSpin"></span> 🔍 Iniciar Varredura Múltipla</button>
+        <div id="radarResults" style="margin-top:15px; flex:1; overflow-y:auto; display:flex; flex-direction:column; gap:8px;"></div>
+    </div>
+  `;
+}
 
-            <div class="flex-1 overflow-y-auto p-8 bg-slate-50/50">
-                
-                <div id="m-view-geral" class="space-y-6">
-                    <div class="grid grid-cols-4 gap-4">
-                        <div class="glass-panel p-4 rounded-2xl"><p class="text-[10px] font-bold text-slate-400 uppercase mb-1">Custo Total (Base)</p><p class="text-xl font-black text-rose-500" id="m-res-custo">R$ 0,00</p></div>
-                        <div class="glass-panel p-4 rounded-2xl"><p class="text-[10px] font-bold text-slate-400 uppercase mb-1">Preço Bling Atual</p><p class="text-xl font-black text-indigo-600" id="m-res-preco">R$ 0,00</p></div>
-                        <div class="glass-panel p-4 rounded-2xl border-indigo-200 bg-indigo-50/20"><p class="text-[10px] font-bold text-indigo-600 uppercase mb-1">Margem Real (Atual)</p><p class="text-xl font-black text-indigo-600" id="m-res-margem">0%</p></div>
-                        <div class="glass-panel p-4 rounded-2xl border-emerald-200 bg-emerald-50/20"><p class="text-[10px] font-bold text-emerald-600 uppercase mb-1">Sugestão da Fórmula</p><p class="text-xl font-black text-emerald-600" id="m-res-sug">R$ 0,00</p></div>
-                    </div>
-                    <div class="glass-panel p-6 rounded-2xl">
-                        <h4 class="font-bold text-xs uppercase text-slate-500 mb-4 border-b pb-2">Edição de Valores</h4>
-                        <div class="grid grid-cols-4 gap-6">
-                            <div><label class="text-[10px] font-bold text-slate-500 uppercase">Categoria</label><input type="text" id="m-inp-cat" class="ios-input mt-1"></div>
-                            <div><label class="text-[10px] font-bold text-slate-500 uppercase">Estoque</label><input type="number" id="m-inp-stock" class="ios-input mt-1 font-bold"></div>
-                            <div><label class="text-[10px] font-bold text-slate-500 uppercase">Custo Fornecedor (R$)</label><input type="number" id="m-inp-cost" class="ios-input mt-1 font-bold text-rose-600" oninput="recalcPim()"></div>
-                            <div><label class="text-[10px] font-bold text-slate-500 uppercase">Preço Venda (R$)</label><input type="number" id="m-inp-price" class="ios-input mt-1 font-black text-indigo-600" oninput="recalcPim()"></div>
-                        </div>
-                    </div>
-                </div>
+async function executarRadarPim(){
+  if(!serverOnline) return toast('Conecte ao backend nas Configurações', false);
+  const urls = document.getElementById('radarUrls').value.split('\n').filter(u=>u.trim());
+  if(!urls.length) return toast('Insira ao menos um link', false);
+  const resDiv = document.getElementById('radarResults');
+  resDiv.innerHTML = '<div style="color:var(--t3); font-size:12px; display:flex; align-items:center; gap:8px;"><div class="spin"></div> Raspando links no servidor...</div>';
+  try {
+    const data = await apiPost('/api/scraper/precos-multiplos', {urls});
+    resDiv.innerHTML = data.resultados.map(i => {
+      if(i.sucesso) return `<div style="background:var(--s2); padding:10px 14px; border-radius:8px; display:flex; justify-content:space-between; align-items:center; border:1px solid var(--gb);"><span style="color:var(--t2); font-size:11px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:65%;" title="${i.url}">${i.url}</span><span style="color:var(--ag); font-weight:bold; font-size:14px;">R$ ${i.preco}</span></div>`;
+      return `<div style="background:rgba(248,113,113,.1); padding:10px 14px; border-radius:8px; display:flex; justify-content:space-between; align-items:center; border:1px solid rgba(248,113,113,.2);"><span style="color:var(--t2); font-size:11px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:65%;" title="${i.url}">${i.url}</span><span style="color:var(--ar); font-weight:bold; font-size:12px;">Falha: ${i.erro||'Oculto'}</span></div>`;
+    }).join('');
+  } catch(e) {
+    resDiv.innerHTML = `<div style="color:var(--ar); font-size:12px;">❌ Erro ao conectar com Scraper: ${e.message}</div>`;
+  }
+}
 
-                <div id="m-view-desc" class="hidden space-y-6">
-                    <div class="grid grid-cols-2 gap-6">
-                        <div class="space-y-6">
-                            <div class="glass-panel p-5 rounded-2xl">
-                                <label class="text-[10px] font-bold text-slate-500 uppercase block mb-2"><i class="fas fa-heading mr-1 text-slate-400"></i> Título / Descrição Curta</label>
-                                <textarea id="m-inp-desc" rows="2" class="ios-input w-full resize-none font-medium text-slate-700"></textarea>
-                            </div>
-                            <div class="glass-panel p-5 rounded-2xl">
-                                <label class="text-[10px] font-bold text-slate-500 uppercase block mb-2"><i class="fas fa-align-left mr-1 text-slate-400"></i> Descrição Completa</label>
-                                <textarea id="m-inp-descComp" rows="10" class="ios-input w-full resize-none text-xs font-mono leading-relaxed text-slate-600"></textarea>
-                            </div>
-                        </div>
-                        <div class="glass-panel p-6 rounded-2xl border-indigo-200 bg-indigo-50/30 flex flex-col">
-                            <h4 class="font-bold text-indigo-800 mb-4"><i class="fas fa-sparkles text-amber-500 mr-2"></i> AI Estúdio</h4>
-                            <label class="text-[10px] font-bold text-slate-500 uppercase mb-1">Instrução de Contexto</label>
-                            <textarea id="m-ia-context" rows="3" class="ios-input text-xs mb-4 resize-none" placeholder="Ex: Destacar que é à prova d'água, ideal para mecânicos..."></textarea>
-                            <div class="flex gap-2 mb-4">
-                                <button onclick="gerarIAPim('curta')" class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 rounded-lg text-xs shadow transition">Gerar Título</button>
-                                <button onclick="gerarIAPim('comp')" class="flex-1 bg-slate-800 hover:bg-slate-900 text-white font-bold py-2 rounded-lg text-xs shadow transition">Gerar Completa</button>
-                            </div>
-                            <div class="bg-slate-900 rounded-xl p-4 flex-1 flex flex-col relative group shadow-inner">
-                                <div id="ia-pim-skeleton" class="hidden space-y-2 mt-2"><div class="skeleton h-3 w-full"></div><div class="skeleton h-3 w-5/6"></div></div>
-                                <div id="m-ia-out" class="text-xs text-slate-300 font-mono flex-1 overflow-y-auto whitespace-pre-wrap">Aguardando comando...</div>
-                                <div class="mt-3 pt-3 border-t border-slate-700 flex gap-2">
-                                    <button onclick="applyPimIA('m-inp-desc')" class="text-[10px] font-bold text-indigo-400 hover:text-indigo-300">← Aplicar Título</button>
-                                    <button onclick="applyPimIA('m-inp-descComp')" class="text-[10px] font-bold text-indigo-400 hover:text-indigo-300 ml-auto">← Aplicar Completa</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div id="m-view-mkt" class="hidden grid grid-cols-2 lg:grid-cols-3 gap-4">
-                    </div>
-
-                <div id="m-view-fisc" class="hidden grid grid-cols-2 gap-8">
-                    <div class="glass-panel p-6 rounded-2xl">
-                        <h4 class="font-bold text-xs uppercase text-slate-500 mb-4 border-b pb-2"><i class="fas fa-box mr-2"></i>Logística</h4>
-                        <div class="grid grid-cols-2 gap-4 mb-4">
-                            <div><label class="text-[10px] font-bold text-slate-500 uppercase">Peso (kg)</label><input type="number" id="m-log-peso" class="ios-input mt-1"></div>
-                            <div><label class="text-[10px] font-bold text-slate-500 uppercase">Altura (cm)</label><input type="number" id="m-log-alt" class="ios-input mt-1"></div>
-                            <div><label class="text-[10px] font-bold text-slate-500 uppercase">Largura (cm)</label><input type="number" id="m-log-lar" class="ios-input mt-1"></div>
-                            <div><label class="text-[10px] font-bold text-slate-500 uppercase">Profundidade (cm)</label><input type="number" id="m-log-pro" class="ios-input mt-1"></div>
-                        </div>
-                        <h4 class="font-bold text-[10px] uppercase text-amber-600 mb-2 mt-4">Custos Logísticos Específicos</h4>
-                        <div class="grid grid-cols-2 gap-4">
-                            <div><label class="text-[10px] font-bold text-slate-500 uppercase">Emb. Extra (R$)</label><input type="number" id="m-log-embex" class="ios-input mt-1" oninput="recalcPim()"></div>
-                            <div><label class="text-[10px] font-bold text-slate-500 uppercase">Frete Extra (R$)</label><input type="number" id="m-log-freex" class="ios-input mt-1" oninput="recalcPim()"></div>
-                        </div>
-                    </div>
-                    <div class="glass-panel p-6 rounded-2xl">
-                        <h4 class="font-bold text-xs uppercase text-slate-500 mb-4 border-b pb-2"><i class="fas fa-file-invoice-dollar mr-2"></i>Fiscal (Bling)</h4>
-                        <div class="space-y-4">
-                            <div><label class="text-[10px] font-bold text-slate-500 uppercase">NCM</label><input type="text" id="m-fisc-ncm" class="ios-input mt-1 font-mono"></div>
-                            <div><label class="text-[10px] font-bold text-slate-500 uppercase">Origem</label><select id="m-fisc-origem" class="ios-input mt-1"><option value="0">0 - Nacional</option><option value="1">1 - Estrangeira Importada</option></select></div>
-                            <div class="grid grid-cols-2 gap-4">
-                                <div><label class="text-[10px] font-bold text-slate-500 uppercase">CFOP</label><input type="text" id="m-fisc-cfop" class="ios-input mt-1"></div>
-                                <div><label class="text-[10px] font-bold text-slate-500 uppercase">ICMS (%)</label><input type="number" id="m-fisc-icms" class="ios-input mt-1"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div id="m-view-radar" class="hidden h-full">
-                    <div class="grid grid-cols-3 gap-6 h-[55vh]">
-                        <div class="glass-panel p-6 rounded-2xl flex flex-col h-full">
-                            <h4 class="font-bold text-slate-800 mb-2"><i class="fas fa-satellite-dish text-indigo-600 mr-2"></i> Scraper Concorrência</h4>
-                            <p class="text-xs text-slate-500 mb-4">Insira links. O servidor raspa o JSON-LD ignorando bloqueios CORS.</p>
-                            <textarea id="m-radar-url" class="ios-input w-full flex-1 font-mono text-xs whitespace-pre resize-none mb-4" placeholder="Cole links aqui..."></textarea>
-                            <button onclick="executarRadarPim()" class="w-full bg-slate-800 hover:bg-slate-900 text-white font-bold py-3 rounded-xl shadow-lg transition flex items-center justify-center gap-2"><i class="fas fa-search-dollar"></i> Varrer Preços</button>
-                        </div>
-                        <div class="col-span-2 glass-panel p-6 rounded-2xl bg-slate-900 flex flex-col h-full">
-                            <h4 class="font-bold text-white mb-4 border-b border-slate-700 pb-2">Resultados</h4>
-                            <div id="m-radar-res" class="flex-1 overflow-y-auto space-y-3 pr-2">
-                                <div class="text-slate-500 text-sm flex flex-col items-center justify-center h-full"><i class="fas fa-radar text-4xl mb-3 opacity-20"></i>Aguardando alvos...</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-            </div>
-
-            <div class="bg-white border-t border-slate-200 px-8 py-5 flex justify-between items-center shrink-0">
-                <div class="text-xs text-slate-400 font-medium"><i class="fas fa-save text-emerald-500 mr-1"></i> Alterações salvam localmente para a próxima sincronização.</div>
-                <div class="flex gap-3">
-                    <button onclick="fecharModal()" class="px-6 py-2.5 text-slate-500 font-bold hover:bg-slate-100 rounded-xl transition">Cancelar</button>
-                    <button onclick="salvarProdutoPim()" class="px-8 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl shadow-lg transition"><i class="fas fa-check mr-2"></i> Salvar Ficha Completa</button>
-                </div>
-            </div>
+// ══ CENTRAL I.A. (NOVO) ══
+function renderIA(){
+  document.getElementById('tbTitle').textContent='Central I.A.';
+  document.getElementById('tbSub').textContent='Serviços cognitivos isolados (SAC e Copywriting)';
+  document.getElementById('phActions').innerHTML='';
+  document.getElementById('mainArea').innerHTML=`
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px;">
+        <div class="gc">
+            <div class="gc-title">💬 SAC Ateliê</div>
+            <div style="font-size:11px;color:var(--t3);margin-bottom:10px;">Gera respostas humanizadas, amigáveis, com foco em artesanato (miçangas, pérolas) e assinatura da Sóstrass.</div>
+            <textarea id="iaSacInput" rows="5" class="form-input" placeholder="Cole a dúvida ou avaliação do cliente aqui..."></textarea>
+            <button class="btn btn-ai btn-sm" style="margin-top:10px;" onclick="gerarSAC()">Formular Resposta</button>
+            <div class="ai-out" id="iaSacRes" style="margin-top:10px;display:none;"></div>
+        </div>
+        <div class="gc">
+            <div class="gc-title">🛡️ Blindagem Jurídica</div>
+            <div style="font-size:11px;color:var(--t3);margin-bottom:10px;">Gera uma descrição blindada contra cópias com o registro legal de propriedade intelectual da DAJP / Sóstrass.</div>
+            <input type="text" id="iaBlindInput" class="form-input" placeholder="Nome do SKU / Produto...">
+            <button class="btn btn-accent btn-sm" style="margin-top:10px;" onclick="gerarBlindagem()">Gerar Descrição c/ IP</button>
+            <div class="ai-out" id="iaBlindRes" style="margin-top:10px;display:none;"></div>
         </div>
     </div>
+  `;
+}
 
-    <script>
-        // --- 1. DADOS E SVGS DAS PLATAFORMAS (TODAS AS 8!) ---
-        const PSVG = {
-            shopee: `<svg viewBox="0 0 48 48"><rect width="48" height="48" rx="10" fill="#EE4D2D"/><path d="M24 8c-5.5 0-9.5 3.8-9.5 8.5 0 1.2.3 2.3.7 3.3H13c-1.7 0-3 1.4-3 3.1l1.5 14.5c.2 1.5 1.4 2.6 2.9 2.6h19.2c1.5 0 2.7-1.1 2.9-2.6L38 22.9c0-1.7-1.3-3.1-3-3.1h-2.2c.4-1 .7-2.1.7-3.3C33.5 11.8 29.5 8 24 8zm0 3c3.6 0 6.5 2.5 6.5 5.5 0 1.2-.4 2.3-1.1 3.3h-10.8c-.7-1-1.1-2.1-1.1-3.3C17.5 13.5 20.4 11 24 11zm-6 16a2 2 0 110 4 2 2 0 010-4zm12 0a2 2 0 110 4 2 2 0 010-4z" fill="#fff"/></svg>`,
-            mercadolivre: `<svg viewBox="0 0 48 48"><rect width="48" height="48" rx="10" fill="#FFE600"/><ellipse cx="24" cy="24" rx="13" ry="13" fill="#333"/><path d="M17 23c0-3.9 3.1-7 7-7s7 3.1 7 7" fill="none" stroke="#FFE600" stroke-width="2.5" stroke-linecap="round"/><rect x="21" y="22" width="6" height="7" rx="1.5" fill="#FFE600"/></svg>`,
-            tiktok: `<svg viewBox="0 0 48 48"><rect width="48" height="48" rx="10" fill="#010101"/><path d="M32 15c-1.5-1-2.6-2.7-2.8-4.5H25v17.8c0 2-1.6 3.7-3.7 3.7S17.6 30.3 17.6 28.3s1.6-3.7 3.7-3.7c.4 0 .7.1 1 .2V21c-.3-.1-.7-.1-1-.1-4.2 0-7.5 3.3-7.5 7.4s3.3 7.4 7.5 7.4 7.5-3.3 7.5-7.4V20c1.4.9 3 1.4 4.8 1.4v-3.8c-.9 0-1.8-.3-2.5-.7L32 15z" fill="#fff"/></svg>`,
-            shein: `<svg viewBox="0 0 48 48"><rect width="48" height="48" rx="10" fill="#222"/><text x="50%" y="56%" dominant-baseline="middle" text-anchor="middle" fill="white" font-size="11" font-family="Arial" font-weight="bold" letter-spacing="1">SHEIN</text></svg>`,
-            amazon: `<svg viewBox="0 0 48 48"><rect width="48" height="48" rx="10" fill="#232F3E"/><text x="50%" y="41%" dominant-baseline="middle" text-anchor="middle" fill="white" font-size="10" font-family="Arial" font-weight="bold">amazon</text><path d="M12 31c7 3.5 15 5 23 2" stroke="#FF9900" stroke-width="2.5" stroke-linecap="round"/><path d="M32 28l4 3-4 3" stroke="#FF9900" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
-            magalu: `<svg viewBox="0 0 48 48"><rect width="48" height="48" rx="10" fill="#0086FF"/><text x="50%" y="54%" dominant-baseline="middle" text-anchor="middle" fill="white" font-size="24" font-family="Arial" font-weight="bold">m</text></svg>`,
-            americanas: `<svg viewBox="0 0 48 48"><rect width="48" height="48" rx="10" fill="#E60014"/><path d="M16 28l8-14 8 14h-4l-4-7-4 7z" fill="white"/><rect x="12" y="30" width="24" height="4" fill="white"/></svg>`,
-            nuvemshop: `<svg viewBox="0 0 48 48"><rect width="48" height="48" rx="10" fill="#1C1CFF"/><path d="M13 31a7 7 0 010-14c.5 0 1 .1 1.5.2A9 9 0 0133 25 5.5 5.5 0 0134 36H13z" fill="white"/></svg>`
-        };
-        const getSvg = (id, sz=20) => `<div style="width:${sz}px;height:${sz}px;flex-shrink:0;">${PSVG[id] || ''}</div>`;
+async function gerarSAC(){
+  const p = document.getElementById('iaSacInput').value; if(!p) return toast('Insira o relato do cliente', false);
+  const out = document.getElementById('iaSacRes'); out.style.display='block'; out.innerHTML='<div class="spin"></div> Processando IA...';
+  
+  // O seu prompt secreto de SAC injetado no código
+  const prompt = `DIRETRIZ MESTRA: CONSULTOR PARCEIRO SÓSTRASS
+  1. EDUCAÇÃO E CUMPRIMENTO: Comece com cumprimento amigável (Olá, Oi). Valide o que o cliente disse.
+  2. AUTORIDADE TÉCNICA: Fale da utilidade prática do produto para artesanato (miçangas, pérolas).
+  3. LINGUAGEM NATURAL: Proibido usar asteriscos ou negritos. Sem palavras difíceis ou respostas robóticas.
+  4. FORMATO: Máximo 480 caracteres. Assinatura: Equipe Sóstrass Acessórios e Pedrarias.
+  Relato/Avaliação do cliente: "${p}"`;
+  
+  try{ 
+      const d = await apiPost('/api/ia/gerar', {prompt: prompt, model: geminiModel}); 
+      out.textContent = d.candidates?.[0]?.content?.parts?.[0]?.text?.replace(/\*/g,'') || 'Erro ao processar'; 
+  }catch(e){out.textContent='Erro de conexão: ' + e.message;}
+}
 
-        const PLATS = [
-            { id: 'shopee', name: 'Shopee', color: 'rose', fees: [{k:'com',l:'Comissão %',d:14},{k:'fix',l:'Taxa R$',d:3}] },
-            { id: 'mercadolivre', name: 'Mercado Livre', color: 'yellow', fees: [{k:'com',l:'Comissão %',d:16},{k:'fre',l:'Frete R$',d:0}] },
-            { id: 'tiktok', name: 'TikTok Shop', color: 'slate', fees: [{k:'com',l:'Comissão %',d:5},{k:'fix',l:'Fixo R$',d:0}] },
-            { id: 'shein', name: 'Shein', color: 'slate', fees: [{k:'com',l:'Comissão %',d:18}] },
-            { id: 'amazon', name: 'Amazon', color: 'orange', fees: [{k:'com',l:'Comissão %',d:15}] },
-            { id: 'magalu', name: 'Magalu', color: 'blue', fees: [{k:'com',l:'Comissão %',d:16}] },
-            { id: 'americanas', name: 'Americanas', color: 'rose', fees: [{k:'com',l:'Comissão %',d:16}] },
-            { id: 'nuvemshop', name: 'Nuvemshop', color: 'indigo', fees: [{k:'gate',l:'Gateway %',d:2},{k:'fix',l:'Fixo R$',d:0}] }
-        ];
+async function gerarBlindagem(){
+  const p = document.getElementById('iaBlindInput').value; if(!p) return toast('Insira o nome do produto', false);
+  const out = document.getElementById('iaBlindRes'); out.style.display='block'; out.innerHTML='<div class="spin"></div> Processando IA...';
+  
+  const prompt = `Crie uma ficha técnica detalhada para o e-commerce vendendo: ${p}. Foco extremo em medidas para zerar devoluções. Sem usar markdown ou asteriscos. No final, adicione este exato texto de blindagem: "AVISO LEGAL DE DIREITOS AUTORAIS: As imagens e o layout deste anúncio são de propriedade exclusiva da DAJP / Sóstrass Acessórios e Pedrarias. Temos registro de autoria e possuímos os arquivos originais. É estritamente proibida a cópia."`;
 
-        let API_BASE = localStorage.getItem('sostrass_apibase') || 'https://blingai-manager-v4.up.railway.app';
-        let MODELO_IA = localStorage.getItem('sostrass_model') || 'gemini-2.5-flash';
-        let serverOnline = false;
-        
-        let globalCosts = JSON.parse(localStorage.getItem('sostrass_gc')) || { imposto: 12, embalagem: 3, cartao: 2.5, frete: 0, ganho: 30 };
-        let products = JSON.parse(localStorage.getItem('sostrass_prods')) || [
-            { id: 1, sku: 'CX-ORG-30', name: 'Kit 30 Caixas Organizadoras 20x19cm', price: 89.90, cost: 45.00, stock: 145, cat: 'Caixas', hist:[80,85,89.9,89.9,89.9], platforms:['shopee','mercadolivre'], desc:'', descComp:'', log:{}, fisc:{} },
-            { id: 2, sku: 'PER-6MM-BR', name: 'Pérola Branca 6mm ABS (500g)', price: 35.00, cost: 18.00, stock: 430, cat: 'Pedrarias', hist:[39,38,36,35,35], platforms:['shopee'], desc:'', descComp:'', log:{}, fisc:{} }
-        ];
-        let mpRates = JSON.parse(localStorage.getItem('sostrass_rates')) || {};
-        let actLog = JSON.parse(localStorage.getItem('sostrass_logs')) || [];
-        let activeProd = null;
-        let massaSelecionados = new Set();
+  try{ 
+      const d = await apiPost('/api/ia/gerar', {prompt: prompt, model: geminiModel}); 
+      out.textContent = d.candidates?.[0]?.content?.parts?.[0]?.text?.replace(/\*/g,'') || 'Erro ao processar'; 
+  }catch(e){out.textContent='Erro de conexão: ' + e.message;}
+}
 
-        // --- 2. MATEMÁTICA ---
-        const f2 = n => parseFloat(n||0).toFixed(2);
-        const getBase = p => (parseFloat(p.cost)||0) + (parseFloat(p.log?.embExtra)||parseFloat(globalCosts.embalagem)) + (parseFloat(p.log?.freteExtra)||parseFloat(globalCosts.frete));
-        const calcSug = p => { const b = getBase(p); const d = 1 - (parseFloat(globalCosts.ganho) + parseFloat(globalCosts.imposto) + parseFloat(globalCosts.cartao))/100; return d>0 ? b/d : b*3; };
-        const calcMargin = (p, c) => p > 0 ? ((p - c)/p)*100 : 0;
-        const calcMkt = (bp, platId, prodId) => {
-            const rates = (mpRates[prodId] && mpRates[prodId][platId]) ? mpRates[prodId][platId] : {};
-            const pl = PLATS.find(x => x.id === platId);
-            let pct=0, fix=0; pl.fees.forEach(f => { const v = parseFloat(rates[f.k] ?? f.d)||0; if(f.l.includes('%')) pct+=v; else fix+=v; });
-            let res = bp + fix; return pct < 100 ? res / (1 - pct/100) : res;
-        };
+// ══ MASSA ══
+function renderMassa(){
+  document.getElementById('tbTitle').textContent='Atualização em Massa';
+  document.getElementById('tbSub').textContent=`${products.length} produtos · selecione e aplique alterações em lote`;
+  document.getElementById('phActions').innerHTML=`<div class="lock-btn ${dragLocked?'':'open'}" onclick="toggleLock()">${dragLocked?'🔒 Fixo':'🔓 Arrastável'}</div>`;
+  const area=document.getElementById('mainArea');
+  area.innerHTML=`
+  <div style="display:grid;grid-template-columns:1fr 310px;gap:12px;align-items:start;">
+    <div>
+      <div class="gc gc-sm" style="margin-bottom:8px;">
+        <div style="display:flex;gap:7px;flex-wrap:wrap;align-items:center;">
+          <input id="massaQI" type="text" placeholder="🔍 SKU ou nome..." oninput="massaQ=this.value;renderMassaList()" class="form-input" style="flex:1;min-width:130px;padding:6px 9px;">
+          <select id="massaCatS" onchange="massaCat=this.value;renderMassaList()" class="form-input" style="width:auto;padding:6px 9px;">
+            <option value="all">Todas categorias</option>${CATS.map(c=>`<option value="${c}">${c}</option>`).join('')}
+          </select>
+          <div style="display:flex;gap:4px;">
+            <button class="btn btn-ghost btn-xs" onclick="massaSelAll()">Sel. todos</button>
+            <button class="btn btn-ghost btn-xs" onclick="massaSelNone()">Limpar</button>
+          </div>
+          <span id="massaCount" style="font-size:11px;color:var(--accent);font-weight:600;white-space:nowrap;"></span>
+        </div>
+      </div>
+      <div style="background:var(--s2);border:1px solid var(--gb);border-radius:var(--r);overflow:hidden;">
+        <div class="ml-header">
+          <span></span><span>SKU</span><span>Produto</span>
+          <span style="text-align:right;">Preço</span><span style="text-align:right;">Custo</span>
+          <span style="text-align:right;">Margem</span><span>Plat.</span>
+        </div>
+        <div class="massa-list" id="massaList" style="max-height:calc(100vh - 290px);overflow-y:auto;"></div>
+      </div>
+    </div>
+    <div style="position:sticky;top:0;display:flex;flex-direction:column;gap:10px;">
+      <div class="me-panel">
+        <div style="font-size:10px;color:var(--t3);text-transform:uppercase;font-weight:700;letter-spacing:.6px;margin-bottom:10px;">✏️ O que editar?</div>
+        <div class="me-mode-row">
+          ${[['preco','💰 Preço Bling'],['custo','💸 Custo']].map(([k,l])=>`<button class="me-mode-btn ${massaMode===k?'on':''}" id="mmb-${k}" onclick="setMassaMode('${k}')">${l}</button>`).join('')}
+        </div>
+        <div style="font-size:10px;color:var(--t3);text-transform:uppercase;font-weight:700;letter-spacing:.6px;margin-bottom:6px;">Tipo de operação</div>
+        <div class="me-op-row">
+          ${[['set','Definir'],['addpct','+ %'],['addfix','+ R$']].map(([k,l])=>`<button class="me-op-btn ${massaOp===k?'on':''}" id="mop-${k}" onclick="setMassaOp('${k}')">${l}</button>`).join('')}
+        </div>
+        <div class="me-val-row">
+          <span style="color:var(--t3);font-size:13px;" id="mUnitPre">R$</span>
+          <input id="massaValI" type="number" value="0" step="0.01" min="0" oninput="renderMassaPreview()">
+          <span style="color:var(--t3);font-size:13px;" id="mUnitPos"></span>
+        </div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;">
+          <button class="btn btn-accent btn-sm" onclick="applyMassa(false)">✓ Aplicar local</button>
+        </div>
+      </div>
+      <div class="me-panel">
+        <div style="font-size:10px;color:var(--t3);text-transform:uppercase;font-weight:700;letter-spacing:.6px;margin-bottom:8px;">👁 Prévia</div>
+        <div id="massaPreview" style="font-size:11px;color:var(--t3);">Selecione produtos para ver o impacto.</div>
+      </div>
+    </div>
+  </div>`;
+  renderMassaList();updateMassaUnit();updateMassaCount();
+}
+function massaFiltered(){
+  const q=massaQ.toLowerCase();
+  return products.filter(p=>{
+    const qok=!q||p.name.toLowerCase().includes(q)||p.sku.toLowerCase().includes(q);
+    const cok=massaCat==='all'||p.cat===massaCat;
+    return qok&&cok;
+  });
+}
+function renderMassaList(){
+  const cont=document.getElementById('massaList');if(!cont) return;
+  const items=massaFiltered();
+  if(!items.length){cont.innerHTML='<div style="padding:20px;text-align:center;color:var(--t3);font-size:12px;">Nenhum produto</div>';return;}
+  cont.innerHTML=items.map(p=>{
+    const isSel=massaSel.has(p.id);
+    const base=getBaseCost(p);const marg=calcMargin(p.price,base);const ok=marg>15;
+    return`<div class="ml-item ${isSel?'sel':''}" onclick="toggleMassa(${p.id})">
+      <div class="ml-check">${isSel?'✓':''}</div>
+      <span style="font-size:10px;color:var(--accent);font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${p.sku}</span>
+      <span style="font-size:11px;color:var(--t1);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${p.name}">${p.name}</span>
+      <span style="font-size:12px;font-weight:700;color:var(--teal);text-align:right;white-space:nowrap;">R$ ${f2(p.price)}</span>
+      <span style="font-size:11px;color:var(--t3);text-align:right;white-space:nowrap;">R$ ${f2(p.cost)}</span>
+      <span style="font-size:11px;font-weight:600;color:${ok?'var(--ag)':'var(--aw)'};text-align:right;white-space:nowrap;">${f1(marg)}%</span>
+      <div style="display:flex;gap:2px;"></div>
+    </div>`;
+  }).join('');
+}
+function toggleMassa(id){if(massaSel.has(id))massaSel.delete(id);else massaSel.add(id);updateMassaCount();renderMassaList();renderMassaPreview();}
+function massaSelAll(){massaFiltered().forEach(p=>massaSel.add(p.id));updateMassaCount();renderMassaList();renderMassaPreview();}
+function massaSelNone(){massaSel.clear();updateMassaCount();renderMassaList();renderMassaPreview();}
+function updateMassaCount(){const el=document.getElementById('massaCount');if(el)el.textContent=massaSel.size===0?'Nenhum selecionado':`${massaSel.size} selecionado${massaSel.size>1?'s':''}`;}
+function setMassaMode(m){massaMode=m;document.querySelectorAll('.me-mode-btn').forEach(b=>b.classList.toggle('on',b.id==='mmb-'+m));updateMassaUnit();renderMassaPreview();}
+function setMassaOp(op){massaOp=op;document.querySelectorAll('.me-op-btn').forEach(b=>b.classList.toggle('on',b.id==='mop-'+op));updateMassaUnit();renderMassaPreview();}
+function updateMassaUnit(){
+  const isRs=['preco','custo'].includes(massaMode)&&['set','addfix'].includes(massaOp);
+  const isPct=massaOp==='addpct';
+  const pre=document.getElementById('mUnitPre');const pos=document.getElementById('mUnitPos');
+  if(pre)pre.textContent=isRs?'R$':'';
+  if(pos)pos.textContent=isPct?'%':'';
+}
+function calcMassaVal(p,iv){
+  let src=massaMode==='custo'?p.cost:p.price;
+  if(massaOp==='set') return Math.max(0,iv);
+  if(massaOp==='addpct') return Math.max(0,src*(1+iv/100));
+  if(massaOp==='addfix') return Math.max(0,src+iv);
+  return iv;
+}
+function renderMassaPreview(){
+  const area=document.getElementById('massaPreview');if(!area) return;
+  if(massaSel.size===0){area.innerHTML='<div style="font-size:11px;color:var(--t3);">Selecione produtos para ver o impacto.</div>';return;}
+  const iv=parseFloat(document.getElementById('massaValI')?.value)||0;
+  const selProds=products.filter(p=>massaSel.has(p.id));
+  const shown=selProds.slice(0,6);const more=selProds.length-6;
+  const rows=shown.map(p=>{
+    const nv=calcMassaVal(p,iv);
+    let old=massaMode==='preco'?p.price:p.cost;
+    const ch=Math.abs(nv-old)>0.001;const up=nv>old;
+    return`<div style="display:flex;align-items:center;gap:5px;padding:4px 0;border-bottom:1px solid rgba(255,255,255,.04);">
+      <span style="font-size:9px;color:var(--accent);font-weight:700;min-width:50px;">${p.sku}</span>
+      ${ch?`<span style="font-size:10px;color:var(--t3);">R$ ${f2(old)}</span><span style="font-size:10px;color:var(--t3);">→</span><span style="font-size:11px;font-weight:700;color:${up?'var(--ag)':'var(--ar)'};">R$ ${f2(nv)} ${up?'▲':'▼'}</span>`:`<span style="font-size:10px;color:var(--t3);">sem alteração</span>`}
+    </div>`;
+  }).join('');
+  area.innerHTML=`<div style="font-size:10px;color:var(--t3);margin-bottom:6px;font-weight:600;">${selProds.length} produto${selProds.length>1?'s':''} serão alterados</div>${rows}${more>0?`<div style="font-size:10px;color:var(--t3);margin-top:4px;">+${more} mais...</div>`:''}`;
+}
+function applyMassa(sendBling=false){
+  if(massaSel.size===0){toast('Selecione ao menos 1 produto',false);return;}
+  const iv=parseFloat(document.getElementById('massaValI')?.value)||0;
+  let count=0;const affected=[];
+  products.forEach(p=>{
+    if(!massaSel.has(p.id)) return;
+    const nv=calcMassaVal(p,iv);
+    if(massaMode==='preco')p.price=nv;else if(massaMode==='custo')p.cost=nv;
+    p.updated=new Date().toISOString().slice(0,10);affected.push(p);count++;
+  });
+  save();toast(`✓ ${count} produtos atualizados!`);
+  renderMassaList();renderMassaPreview();
+}
+ 
+// ══ PRECOS GLOBAL ══
+function renderPrecos(){
+  document.getElementById('tbTitle').textContent='Precificação Global';
+  document.getElementById('tbSub').textContent='Custos e taxas aplicados automaticamente em todos os produtos';
+  const gc=globalCosts;
+  PLATS.forEach(pl=>{if(!globalPlatRates[pl.id]){globalPlatRates[pl.id]={};pl.fees.forEach(f=>globalPlatRates[pl.id][f.k]=f.d);}});
+ 
+  document.getElementById('mainArea').innerHTML=`
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+    <div>
+      <div class="gc">
+        <div class="gc-hdr"><div class="gc-title">🌐 Parâmetros de Custo Global</div><button class="btn btn-green btn-sm" onclick="saveGlobal()">▲ Salvar</button></div>
+        <div class="ios-group">
+          <div class="ios-row"><span class="ir-label w">Embalagem média</span><div class="ir-val"><span class="unit">R$</span><input id="gcEmb" type="number" value="${gc.embalagem||0}" step="0.01" min="0"></div></div>
+          <div class="ios-row"><span class="ir-label w">Frete próprio médio</span><div class="ir-val"><span class="unit">R$</span><input id="gcFrete" type="number" value="${gc.frete||0}" step="0.01" min="0"></div></div>
+          <div class="ios-row"><span class="ir-label w">Impostos (PIS/COFINS etc)</span><div class="ir-val"><input id="gcImp" type="number" value="${gc.imposto||0}" step="0.5" min="0"><span class="unit">%</span></div></div>
+          <div class="ios-row"><span class="ir-label w">Cartão de crédito</span><div class="ir-val"><input id="gcCartao" type="number" value="${gc.cartao||0}" step="0.1" min="0"><span class="unit">%</span></div></div>
+          <div class="ios-row"><span class="ir-label w">Ganho desejado</span><div class="ir-val"><input id="gcGanho" type="number" value="${gc.ganho||0}" step="1" min="0"><span class="unit">%</span></div></div>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div class="gc">
+        <div class="gc-hdr"><div class="gc-title">🏪 Taxas padrão por marketplace</div></div>
+        ${PLATS.map(pl=>`<div class="gc gc-sm" style="margin-bottom:8px;">
+          <div class="gc-hdr" style="margin-bottom:8px;"><div style="display:flex;align-items:center;gap:8px;">${psvg(pl.id,18)}<span style="font-size:12px;font-weight:600;color:${pl.tc}">${pl.name}</span></div><button class="btn btn-green btn-xs" onclick="saveGlobalPlat('${pl.id}')">▲</button></div>
+          <div class="fee-row" style="grid-template-columns:repeat(auto-fill,minmax(130px,1fr));">
+            ${pl.fees.map(f=>{const v=parseFloat(globalPlatRates[pl.id]?.[f.k]??f.d)||0;return`<div class="fee-box"><div class="fee-lbl">${f.l}</div><div class="fee-inp-row">${f.u==='R$'?'<span class="fu">R$</span>':''}<input type="number" value="${v}" step="${f.u==='%'?'0.1':'0.01'}" min="0" oninput="globalPlatRates['${pl.id}']['${f.k}']=parseFloat(this.value)||0">${f.u==='%'?'<span class="fu">%</span>':''}</div></div>`;}).join('')}
+          </div></div>`).join('')}
+      </div>
+    </div>
+  </div>`;
+}
+function saveGlobal(){
+  globalCosts.imposto=parseFloat(document.getElementById('gcImp')?.value)||0;
+  globalCosts.embalagem=parseFloat(document.getElementById('gcEmb')?.value)||0;
+  globalCosts.cartao=parseFloat(document.getElementById('gcCartao')?.value)||0;
+  globalCosts.frete=parseFloat(document.getElementById('gcFrete')?.value)||0;
+  globalCosts.ganho=parseFloat(document.getElementById('gcGanho')?.value)||0;
+  save();toast('✓ Custos globais salvos!');renderPrecos();
+}
+function saveGlobalPlat(platId){save();toast(`✓ Taxas salvas!`);}
+ 
+// ══ SIMULADOR ══
+function renderSim(){
+  document.getElementById('tbTitle').textContent='Simulador de Preço';
+  document.getElementById('tbSub').textContent='Calcule cenários sem alterar produtos reais';
+  const gc=globalCosts;
+  document.getElementById('mainArea').innerHTML=`
+  <div style="display:grid;grid-template-columns:280px 1fr;gap:14px;">
+    <div>
+      <div class="gc">
+        <div class="gc-title">⚙️ Parâmetros</div>
+        <div class="ios-group">
+          <div class="ios-row"><span class="ir-label">Custo do produto</span><div class="ir-val"><span class="unit">R$</span><input id="simCost" type="number" value="50" step="1" min="1" oninput="runSim()"></div></div>
+          <div class="ios-row"><span class="ir-label">Embalagem</span><div class="ir-val"><span class="unit">R$</span><input id="simEmb" type="number" value="${gc.embalagem||0}" step="0.01" min="0" oninput="runSim()"></div></div>
+          <div class="ios-row"><span class="ir-label">Frete próprio</span><div class="ir-val"><span class="unit">R$</span><input id="simFrete" type="number" value="${gc.frete||0}" step="0.01" min="0" oninput="runSim()"></div></div>
+          <div class="ios-row"><span class="ir-label">Impostos %</span><div class="ir-val"><input id="simImp" type="number" value="${gc.imposto||0}" step="0.5" min="0" oninput="runSim()"><span class="unit">%</span></div></div>
+          <div class="ios-row"><span class="ir-label">Margem desejada</span><div class="ir-val"><input id="simGanho" type="number" value="${gc.ganho||0}" step="1" min="0" oninput="runSim()"><span class="unit">%</span></div></div>
+        </div>
+        <div style="background:rgba(20,184,166,.08);border:1px solid rgba(20,184,166,.2);border-radius:var(--rs);padding:10px 12px;margin-top:8px;">
+          <div style="font-size:10px;color:var(--t3);text-transform:uppercase;font-weight:700;margin-bottom:4px;">Preço Bling calculado</div>
+          <div id="simBRes" style="font-size:22px;font-weight:700;color:var(--teal);"></div>
+        </div>
+      </div>
+    </div>
+    <div class="gc">
+      <div class="gc-title">📊 Resultado por marketplace</div>
+      <div id="simResults"></div>
+    </div>
+  </div>`;
+  runSim();
+}
+function runSim(){
+  const cost=parseFloat(document.getElementById('simCost')?.value)||50;
+  const emb=parseFloat(document.getElementById('simEmb')?.value)||0;
+  const frete=parseFloat(document.getElementById('simFrete')?.value)||0;
+  const imp=parseFloat(document.getElementById('simImp')?.value)||0;
+  const ganho=parseFloat(document.getElementById('simGanho')?.value)||0;
+  const base=cost+emb+frete;
+  const den=1-(ganho+imp)/100;
+  const blingP=den>0?base/den:base*3;
+  const br=document.getElementById('simBRes');if(br)br.textContent=`R$ ${f2(blingP)}`;
+  const div=document.getElementById('simResults');if(!div) return;
+  div.innerHTML=PLATS.map(pl=>{
+    const r={};pl.fees.forEach(f=>r[f.k]=parseFloat(globalPlatRates[pl.id]?.[f.k]??f.d)||0);
+    const fp=calcMktPrice(blingP,pl.id,r);
+    const mg=calcMargin(fp,base);const ok=mg>15;
+    let pct=0,fixed=0;pl.fees.forEach(f=>{const v=r[f.k]||0;if(f.u==='%')pct+=v;else fixed+=v;});
+    return`<div style="display:grid;grid-template-columns:auto 1fr auto auto auto;align-items:center;gap:9px;padding:9px 11px;background:var(--s1);border-radius:var(--rm);margin-bottom:5px;border:1px solid var(--gb);">
+      ${psvg(pl.id,16)}<span style="color:${pl.tc};font-size:12px;font-weight:600;">${pl.name}</span>
+      <span style="font-size:10px;color:var(--t3);">−${f1(pct)}% +R$${f2(fixed)}</span>
+      <span style="font-size:15px;font-weight:700;color:${ok?'var(--teal)':'var(--ar)'};">R$ ${f2(fp)}</span>
+      <span style="font-size:11px;font-weight:600;color:${ok?'var(--ag)':'var(--ar)'};min-width:42px;text-align:right;">${ok?'+':''}${f1(mg)}%</span>
+    </div>`;
+  }).join('');
+}
+ 
+// ══ LOG ══
+function renderLog(){
+  document.getElementById('tbTitle').textContent='Log de Atividades';
+  document.getElementById('tbSub').textContent='Registro de todas as operações';
+  const b=document.getElementById('logBadge');if(b)b.style.display='none';
+  document.getElementById('phActions').innerHTML=`<button class="btn btn-ghost btn-xs" onclick="if(confirm('Limpar log?')){actLog=[];save();renderLog();}">🗑 Limpar</button>`;
+  const cont=document.getElementById('mainArea');
+  if(!actLog.length){cont.innerHTML='<div style="padding:20px;text-align:center;color:var(--t3);font-size:12px;">Nenhum registro</div>';return;}
+  cont.innerHTML='<div class="gc" style="padding:0;"><div id="logEntries" style="max-height:calc(100vh - 200px);overflow-y:auto;">' + actLog.map(e=>{
+    const d=new Date(e.ts);
+    const time=`${d.toLocaleDateString('pt-BR')} ${d.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})}`;
+    const cls={ok:'log-ok',err:'log-err',warn:'log-warn',info:'log-info'}[e.type]||'log-info';
+    return`<div class="log-entry ${cls}"><div class="log-dot"></div><div style="flex:1;"><div style="font-size:12px;color:var(--t1);">${e.msg}</div></div><div style="font-size:10px;color:var(--t3);flex-shrink:0;">${time}</div></div>`;
+  }).join('') + '</div></div>';
+}
+ 
+// ══ CONFIG ══
+function renderConfig(){
+  document.getElementById('tbTitle').textContent='Configurações';
+  document.getElementById('tbSub').textContent='Backend, modelo de IA e dados do sistema';
+  document.getElementById('mainArea').innerHTML=`
+  <div style="max-width:680px;">
+    <div class="gc">
+      <div class="gc-hdr"><div class="gc-title">🔒 Backend Proxy (Segurança)</div></div>
+      <div class="ios-group">
+        <div class="ios-row"><span class="ir-label w">URL do servidor backend</span><div class="ir-val"><input id="cfgApiBase" type="text" value="${localStorage.getItem('bmp4_apibase')||'http://localhost:3000'}" placeholder="https://seu-backend.railway.app"></div></div>
+        <div class="ios-row"><span class="ir-label w">Modelo Gemini</span><div class="ir-val">
+          <select id="cfgModel">${GEMINI_MODELS.map(m=>`<option value="${m.id}" ${geminiModel===m.id?'selected':''}>${m.label}</option>`).join('')}</select>
+        </div></div>
+      </div>
+      <div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap;">
+        <button class="btn btn-accent btn-sm" onclick="saveCfg()">💾 Salvar</button>
+        <button class="btn btn-ghost btn-sm" onclick="testServer()">🔍 Testar servidor</button>
+      </div>
+    </div>
+  </div>`;
+}
 
-        // --- 3. UI E NAVEGAÇÃO ---
-        function toast(msg) {
-            const c = document.getElementById('toast-container'); const t = document.createElement('div');
-            t.className = `toast-enter bg-emerald-600 text-white px-5 py-3 rounded-lg shadow-xl font-bold text-sm flex items-center gap-2`;
-            t.innerHTML = `<i class="fas fa-check-circle"></i> ${msg}`; c.appendChild(t);
-            setTimeout(() => { t.style.opacity='0'; setTimeout(()=>t.remove(),300); }, 3000);
-        }
-        function log(msg) { actLog.unshift({ ts: new Date().toLocaleTimeString(), msg }); if(actLog.length > 50) actLog.pop(); localStorage.setItem('sostrass_logs', JSON.stringify(actLog)); renderLogs(); }
-        function renderLogs() { const c = document.getElementById('activity-logs'); if(c) c.innerHTML = actLog.map(l => `<div class="timeline-item"><span class="text-slate-400">[${l.ts}]</span> <span class="font-bold text-slate-700">${l.msg}</span></div>`).join(''); }
+async function genAI(tipo){
+  const p=sel;if(!p)return;
+  const out = document.getElementById('aoComp'); const spin = document.getElementById('spComp');
+  if(out){out.textContent='⏳ Gerando ficha completa no servidor...';out.style.color='var(--t3)';}
+  const prompt=`Produto: ${p.name}\nSKU: ${p.sku}\nPreço: R$ ${f2(p.price)}\n\nCrie uma descrição detalhada em bullet points abordando: Especificações, Benefícios e Embalagem.`;
+  try{
+    const d=await apiPost('/api/ia/gerar',{prompt,model:geminiModel});
+    const t=d.candidates?.[0]?.content?.parts?.[0]?.text;
+    if(out){out.textContent=t?t.replace(/\*/g,'').trim():'❌ Sem resposta da IA.';out.style.color=t?'var(--t1)':'var(--ar)';}
+  }catch(e){if(out){out.textContent=`❌ ${e.message}`;out.style.color='var(--ar)';}}
+}
+function applyAI(tipo){
+  const t=document.getElementById('aoComp')?.textContent||'';
+  if(t&&!['⏳','❌','Clique'].some(b=>t.startsWith(b))){document.getElementById('dComp').value=t;toast('✓ Aplicado!');}
+}
 
-        function navTo(view) {
-            ['catalogo','massa','automacoes','simulador','config'].forEach(v => document.getElementById(`view-${v}`).classList.add('hidden'));
-            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('bg-indigo-600','text-white','shadow-lg','active'));
-            document.getElementById(`view-${view}`).classList.remove('hidden');
-            document.getElementById(`nav-${view}`).classList.add('bg-indigo-600','text-white','shadow-lg','active');
-            if(view === 'catalogo') renderCatalogo(); if(view === 'massa') renderMassaList(); if(view === 'config') renderLogs();
-        }
-
-        // --- 4. DATA GRID (CATÁLOGO) ---
-        function renderCatalogo(filtro = '') {
-            const tb = document.getElementById('tabela-produtos'); tb.innerHTML = '';
-            products.filter(p => p.sku.toLowerCase().includes(filtro.toLowerCase()) || p.name.toLowerCase().includes(filtro.toLowerCase())).forEach((p, i) => {
-                const base = getBase(p); const marg = calcMargin(p.price, base);
-                tb.innerHTML += `
-                    <tr class="hover:bg-slate-50 transition border-b border-slate-100 group cursor-pointer" onclick="abrirPim(${p.id})">
-                        <td class="px-6 py-4"><div class="font-black text-slate-800">${p.sku}</div><div class="text-[10px] text-slate-400 truncate w-48" title="${p.name}">${p.name}</div></td>
-                        <td class="px-6 py-4 text-right font-bold text-rose-400">R$ ${f2(base)}</td>
-                        <td class="px-6 py-4 text-right font-black text-indigo-600">R$ ${f2(p.price)}</td>
-                        <td class="px-6 py-4 text-center"><span class="px-2 py-1 rounded-md text-[10px] font-black ${marg>=30?'bg-emerald-100 text-emerald-700':'bg-rose-100 text-rose-700'}">${marg.toFixed(1)}%</span></td>
-                        <td class="px-6 py-4"><canvas id="spark-${i}" width="100" height="25"></canvas></td>
-                        <td class="px-6 py-4 text-right"><button class="opacity-0 group-hover:opacity-100 bg-white border border-slate-200 px-3 py-1.5 rounded-lg text-[10px] font-bold text-slate-600 hover:bg-indigo-600 hover:text-white transition shadow-sm">GERENCIAR</button></td>
-                    </tr>`;
-            });
-            products.forEach((p, i) => {
-                const ctx = document.getElementById(`spark-${i}`); if(!ctx) return;
-                new Chart(ctx, { type:'line', data:{ labels:p.hist, datasets:[{ data:p.hist, borderColor:'#6366f1', borderWidth:2, pointRadius:0, tension:0.4 }] }, options:{ events:[], plugins:{legend:{display:false}}, scales:{x:{display:false},y:{display:false}} }});
-            });
-        }
-
-        // --- 5. O SUPER MODAL (PIM ENTERPRISE) ---
-        function abrirPim(id) {
-            activeProd = products.find(x => x.id === id);
-            document.getElementById('m-nome').innerText = activeProd.name; document.getElementById('m-sku').innerText = activeProd.sku;
-            document.getElementById('m-inp-cat').value = activeProd.cat || ''; document.getElementById('m-inp-stock').value = activeProd.stock || 0;
-            document.getElementById('m-inp-cost').value = activeProd.cost || 0; document.getElementById('m-inp-price').value = activeProd.price || 0;
-            document.getElementById('m-inp-desc').value = activeProd.desc || ''; document.getElementById('m-inp-descComp').value = activeProd.descComp || '';
-            document.getElementById('m-log-peso').value = activeProd.log?.peso || ''; document.getElementById('m-log-alt').value = activeProd.log?.alt || '';
-            document.getElementById('m-log-lar').value = activeProd.log?.lar || ''; document.getElementById('m-log-pro').value = activeProd.log?.pro || '';
-            document.getElementById('m-log-embex').value = activeProd.log?.embExtra || ''; document.getElementById('m-log-freex').value = activeProd.log?.freteExtra || '';
-            document.getElementById('m-fisc-ncm').value = activeProd.fisc?.ncm || ''; document.getElementById('m-fisc-cfop').value = activeProd.fisc?.cfop || '';
-            document.getElementById('m-fisc-icms').value = activeProd.fisc?.icms || '';
-            
-            recalcPim(); mTab('geral');
-            document.getElementById('modal-pim').classList.remove('hidden');
-        }
-
-        function fecharModal() { document.getElementById('modal-pim').classList.add('hidden'); }
-
-        function mTab(t) {
-            ['geral','desc','mkt','fisc','radar'].forEach(v => document.getElementById(`m-view-${v}`).classList.add('hidden'));
-            document.querySelectorAll('[id^="btn-m-"]').forEach(b => { b.classList.remove('bg-indigo-600','text-white','shadow-md'); b.classList.add('bg-slate-100','text-slate-500'); });
-            document.getElementById(`m-view-${t}`).classList.remove('hidden');
-            const btn = document.getElementById(`btn-m-${t}`); btn.classList.remove('bg-slate-100','text-slate-500'); btn.classList.add('bg-indigo-600','text-white','shadow-md');
-            if(t==='mkt') renderMktPim();
-        }
-
-        function recalcPim() {
-            if(!activeProd) return;
-            const cost = parseFloat(document.getElementById('m-inp-cost').value)||0; const price = parseFloat(document.getElementById('m-inp-price').value)||0;
-            const mockProd = { cost: cost, log: { embExtra: document.getElementById('m-log-embex').value, freteExtra: document.getElementById('m-log-freex').value } };
-            const base = getBase(mockProd); const sug = calcSug(mockProd); const marg = calcMargin(price, base);
-            
-            document.getElementById('m-res-custo').innerText = `R$ ${f2(base)}`; document.getElementById('m-res-preco').innerText = `R$ ${f2(price)}`;
-            document.getElementById('m-res-sug').innerText = `R$ ${f2(sug)}`; document.getElementById('m-res-margem').innerText = `${marg.toFixed(1)}%`;
-            updateMktMute(price, base);
-        }
-
-        function renderMktPim() {
-            const container = document.getElementById('m-view-mkt'); container.innerHTML = '';
-            PLATS.forEach(pl => {
-                const rates = mpRates[activeProd.id]?.[pl.id] || {};
-                let inputs = ''; pl.fees.forEach(f => { inputs += `<div><label class="text-[10px] font-bold text-slate-400">${f.l}</label><input type="number" step="0.1" value="${rates[f.k] ?? f.d}" class="ios-input p-2 text-xs font-bold" oninput="saveRate('${pl.id}','${f.k}',this.value)"></div>`; });
-                container.innerHTML += `
-                    <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col transition hover:border-indigo-300">
-                        <div class="flex justify-between items-center mb-4 border-b pb-2"><span class="font-black text-sm text-${pl.color}-500 uppercase flex items-center gap-2">${getSvg(pl.id, 16)}${pl.name}</span><span class="text-xl font-black text-slate-800" id="mkt-p-${pl.id}">R$ 0,00</span></div>
-                        <div class="grid grid-cols-${pl.fees.length} gap-3">${inputs}</div>
-                        <div class="mt-4 pt-3 border-t border-slate-100 text-[10px] font-bold text-slate-400 flex justify-between items-center">LUCRO FINAL: <span class="text-emerald-500 text-sm" id="mkt-m-${pl.id}">R$ 0,00</span></div>
-                    </div>`;
-            });
-            recalcPim();
-        }
-
-        function updateMktMute(price, base) {
-            PLATS.forEach(pl => {
-                const mp = calcMkt(price, pl.id, activeProd.id); const lucro = mp - base; const mg = calcMargin(mp, base);
-                const e1 = document.getElementById(`mkt-p-${pl.id}`); if(e1) e1.innerText = `R$ ${f2(mp)}`;
-                const e2 = document.getElementById(`mkt-m-${pl.id}`); if(e2) { e2.innerText = `R$ ${f2(lucro)} (${mg.toFixed(1)}%)`; e2.className = mg >= 15 ? 'text-emerald-500 text-sm font-black' : 'text-rose-500 text-sm font-black'; }
-            });
-        }
-
-        function saveRate(p, k, v) { if(!mpRates[activeProd.id]) mpRates[activeProd.id]={}; if(!mpRates[activeProd.id][p]) mpRates[activeProd.id][p]={}; mpRates[activeProd.id][p][k]=parseFloat(v); localStorage.setItem('sostrass_rates', JSON.stringify(mpRates)); recalcPim(); }
-
-        function salvarProdutoPim() {
-            activeProd.cost = parseFloat(document.getElementById('m-inp-cost').value); activeProd.price = parseFloat(document.getElementById('m-inp-price').value);
-            activeProd.cat = document.getElementById('m-inp-cat').value; activeProd.stock = document.getElementById('m-inp-stock').value;
-            activeProd.desc = document.getElementById('m-inp-desc').value; activeProd.descComp = document.getElementById('m-inp-descComp').value;
-            activeProd.log = { peso: document.getElementById('m-log-peso').value, alt: document.getElementById('m-log-alt').value, lar: document.getElementById('m-log-lar').value, pro: document.getElementById('m-log-pro').value, embExtra: document.getElementById('m-log-embex').value, freteExtra: document.getElementById('m-log-freex').value };
-            activeProd.fisc = { ncm: document.getElementById('m-fisc-ncm').value, cfop: document.getElementById('m-fisc-cfop').value, icms: document.getElementById('m-fisc-icms').value };
-            localStorage.setItem('sostrass_prods', JSON.stringify(products)); renderCatalogo(); fecharModal(); toast("Ficha do Produto atualizada!"); log(`Atualizou SKU ${activeProd.sku}`);
-        }
-
-        // --- 6. INTEGRAÇÕES (I.A. E SCRAPER) ---
-        async function gerarIAPim(tipo) {
-            if(!serverOnline) return alert("Conecte ao Proxy Railway nas Configurações!");
-            const out = document.getElementById('m-ia-out'); const skel = document.getElementById('ia-pim-skeleton');
-            out.classList.add('hidden'); skel.classList.remove('hidden');
-            const prompt = `Produto: ${activeProd.name}. Instrução: ${document.getElementById('m-ia-context').value}. ${tipo==='curta'?'Crie um título atrativo (max 200 char).':'Crie ficha técnica extrema com bullets.'}`;
-            try { const r = await fetch(`${API_BASE}/api/ia/gerar`, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({prompt, model:MODELO_IA}) }); const d = await r.json(); out.innerText = d.candidates?.[0]?.content?.parts?.[0]?.text.replace(/\*/g,'') || "Sem resposta."; } catch(e) { out.innerText = "Erro na API."; }
-            skel.classList.add('hidden'); out.classList.remove('hidden');
-        }
-        function applyPimIA(target) { document.getElementById(target).value = document.getElementById('m-ia-out').innerText; toast("Texto aplicado!"); }
-
-        async function executarRadarPim() {
-            if(!serverOnline) return alert("Conecte ao Proxy Railway!");
-            const urls = document.getElementById('m-radar-url').value.split('\n').filter(Boolean); if(!urls.length) return;
-            const res = document.getElementById('m-radar-res'); res.innerHTML = '<i class="fas fa-circle-notch fa-spin text-indigo-500 mb-2 text-2xl"></i><br>Raspando JSON-LD...';
-            try { const r = await fetch(`${API_BASE}/api/scraper/precos-multiplos`, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({urls}) }); const d = await r.json();
-                res.innerHTML = d.resultados.map(i => i.sucesso ? `<div class="bg-slate-800 p-3 rounded-lg flex justify-between"><span class="text-slate-400 text-xs truncate w-1/2">${i.url}</span><span class="text-emerald-400 font-bold">R$ ${i.preco}</span></div>` : `<div class="bg-rose-900/30 text-rose-400 p-2 rounded text-xs">Falha: ${i.url}</div>`).join('');
-            } catch(e) { res.innerHTML = "Erro de conexão."; }
-        }
-
-        // --- 7. CONFIGURAÇÕES E STARTUP ---
-        function simularPrecoBase() {
-            const c=parseFloat(document.getElementById('sim-custo').value)||0, imp=parseFloat(document.getElementById('cg-imp').value)||0, car=parseFloat(document.getElementById('cg-cartao').value)||0, emb=parseFloat(document.getElementById('cg-emb').value)||0, fre=parseFloat(document.getElementById('cg-frete').value)||0, gan=parseFloat(document.getElementById('cg-ganho').value)||0;
-            const r = (1 - (gan+imp+car)/100) > 0 ? (c+emb+fre)/(1 - (gan+imp+car)/100) : 0; document.getElementById('sim-resultado').innerText = `R$ ${f2(r)}`;
-        }
-        function salvarCustosGlobais() { globalCosts = { imposto: document.getElementById('cg-imp').value, cartao: document.getElementById('cg-cartao').value, embalagem: document.getElementById('cg-emb').value, frete: document.getElementById('cg-frete').value, ganho: document.getElementById('cg-ganho').value }; localStorage.setItem('sostrass_gc', JSON.stringify(globalCosts)); toast("Parâmetros salvos."); renderCatalogo(); }
-        function salvarConfig() { API_BASE = document.getElementById('cfg-proxy').value; MODELO_IA = document.getElementById('cfg-model').value; localStorage.setItem('sostrass_apibase', API_BASE); localStorage.setItem('sostrass_model', MODELO_IA); toast("Conexão Salva."); testServer(); }
-        
-        async function testServer() {
-            const bar = document.getElementById('serverBar'); const pill = document.getElementById('status-pill');
-            bar.innerHTML = '<i class="fas fa-circle-notch fa-spin mr-1"></i> PROXY...'; bar.className = "px-4 py-1.5 bg-slate-100 rounded-full text-[10px] font-black border border-slate-200 text-slate-500";
-            try { const r = await fetch(`${API_BASE}/`, { signal: AbortSignal.timeout(5000) }); if(r.ok) { serverOnline = true; pill.innerText='ONLINE'; pill.className='px-3 py-1 bg-emerald-50 text-emerald-600 border border-emerald-200 rounded-full text-[10px] font-black'; bar.innerHTML='<i class="fas fa-shield-check text-emerald-500"></i> Proxy Ativo'; bar.classList.replace('text-slate-500','text-emerald-700'); } else throw new Error(); } 
-            catch(e) { serverOnline = false; pill.innerText='OFFLINE'; pill.className='px-3 py-1 bg-rose-50 text-rose-600 border border-rose-200 rounded-full text-[10px] font-black'; bar.innerHTML='<i class="fas fa-exclamation-triangle text-rose-500"></i> Proxy Offline'; bar.classList.replace('text-slate-500','text-rose-700'); }
-        }
-
-        window.onload = () => {
-            document.getElementById('cg-imp').value = globalCosts.imposto; document.getElementById('cg-cartao').value = globalCosts.cartao; document.getElementById('cg-emb').value = globalCosts.embalagem; document.getElementById('cg-frete').value = globalCosts.frete; document.getElementById('cg-ganho').value = globalCosts.ganho;
-            document.getElementById('cfg-proxy').value = API_BASE; document.getElementById('cfg-model').value = MODELO_IA;
-            navTo('catalogo'); testServer(); simularPrecoBase();
-        };
-    </script>
+function saveCfg(){
+  const url=document.getElementById('cfgApiBase')?.value||'';
+  if(url)localStorage.setItem('bmp4_apibase',url);
+  geminiModel=document.getElementById('cfgModel')?.value||geminiModel;
+  save();toast('✓ Configurações salvas!');
+  checkServer();
+}
+ 
+// ══ INIT ══
+checkServer();
+navTo('catalogo');
+</script>
 </body>
 </html>
