@@ -567,15 +567,69 @@
         }
 
         function renderMktPim() {
-            const container = document.getElementById('m-view-mkt'); container.innerHTML = '';
+            const container = document.getElementById('m-view-mkt'); 
+            // Mudamos para flex-col para empilhar os cards horizontais
+            container.className = 'flex flex-col gap-4 text-slate-300';
+            container.innerHTML = `
+                <div class="glass-dark rounded-xl p-5 border border-indigo-500/20 bg-indigo-900/10 mb-2">
+                    <p class="text-[10px] font-bold uppercase tracking-widest text-indigo-400 mb-2">Como o preço do marketplace é calculado:</p>
+                    <ul class="text-xs text-indigo-200/80 space-y-1 ml-1">
+                        <li><i class="fas fa-info-circle mr-1"></i> <strong>Preço Base</strong> embutido: custo + embalagem + margem global + impostos globais</li>
+                        <li><i class="fas fa-info-circle mr-1"></i> O Preço do Marketplace absorve as taxas da plataforma para garantir a margem líquida exata.</li>
+                    </ul>
+                </div>
+            `;
+
             PLATS.forEach(pl => {
                 const rates = mpRates[activeProd.id]?.[pl.id] || {};
-                let inputs = ''; pl.fees.forEach(f => { inputs += `<div><label class="text-[10px] font-bold text-slate-400">${f.l}</label><input type="number" step="0.1" value="${rates[f.k] ?? f.d}" class="ios-input p-2 text-xs font-bold" oninput="saveRate('${pl.id}','${f.k}',this.value)"></div>`; });
+                
+                // Gera os inputs dinamicamente baseado na plataforma
+                let inputs = ''; 
+                pl.fees.forEach(f => { 
+                    inputs += `
+                    <div>
+                        <label class="text-[10px] font-bold text-slate-500 uppercase flex justify-between items-center bg-[#151517] border border-white/5 px-3 py-1.5 rounded-t-lg border-b-0">${f.l}</label>
+                        <div class="relative">
+                            <input type="number" step="0.1" value="${rates[f.k] ?? f.d}" class="w-24 bg-[#0B0B0C] border border-white/10 p-2 text-xs font-bold text-white text-right rounded-b-lg outline-none focus:border-indigo-500 transition" oninput="saveRate('${pl.id}','${f.k}',this.value)">
+                            ${f.l.includes('%') ? '<span class="absolute right-3 top-2 text-xs text-slate-500">%</span>' : '<span class="absolute left-3 top-2 text-xs text-slate-500">R$</span>'}
+                        </div>
+                    </div>`; 
+                });
+
                 container.innerHTML += `
-                    <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col transition hover:border-indigo-300">
-                        <div class="flex justify-between items-center mb-4 border-b pb-2"><span class="font-black text-sm text-${pl.color}-500 uppercase flex items-center gap-2">${getSvg(pl.id, 16)}${pl.name}</span><span class="text-xl font-black text-slate-800" id="mkt-p-${pl.id}">R$ 0,00</span></div>
-                        <div class="grid grid-cols-${pl.fees.length} gap-3">${inputs}</div>
-                        <div class="mt-4 pt-3 border-t border-slate-100 text-[10px] font-bold text-slate-400 flex justify-between items-center">LUCRO FINAL: <span class="text-emerald-500 text-sm" id="mkt-m-${pl.id}">R$ 0,00</span></div>
+                    <div class="glass-dark rounded-xl p-0 border border-white/5 flex flex-col transition-all hover:border-white/10 group">
+                        
+                        <div class="flex justify-between items-center p-4 border-b border-white/5 bg-[#111113] rounded-t-xl">
+                            <div class="flex items-center gap-3">
+                                ${getSvg(pl.id, 18)}
+                                <span class="font-bold text-sm text-slate-200">${pl.name}</span>
+                                <span class="px-2 py-0.5 rounded text-[9px] font-black bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 uppercase tracking-wider">Ativo</span>
+                            </div>
+                            <div class="text-[10px] font-mono text-slate-500 bg-black/50 px-2 py-1 rounded">
+                                Atualização em tempo real (Local)
+                            </div>
+                        </div>
+
+                        <div class="p-5 flex items-center justify-between gap-8">
+                            
+                            <div class="flex gap-4">
+                                ${inputs}
+                            </div>
+
+                            <div class="flex-1 flex items-center justify-end gap-8">
+                                <div class="text-right">
+                                    <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Preço Sugerido</p>
+                                    <p class="text-2xl font-black text-white" id="mkt-p-${pl.id}">R$ 0,00</p>
+                                    <p class="text-[9px] text-slate-500 mt-1">Fórmula: Base + Taxas absorvidas</p>
+                                </div>
+                                <div class="h-10 w-px bg-white/5"></div> <div class="text-right w-32">
+                                    <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Margem Líquida</p>
+                                    <p class="text-lg font-black text-emerald-400" id="mkt-m-${pl.id}">0%</p>
+                                </div>
+                                
+                                <button class="h-10 px-4 btn-dark rounded-lg text-xs font-bold transition opacity-0 group-hover:opacity-100"><i class="fas fa-check text-emerald-400"></i></button>
+                            </div>
+                        </div>
                     </div>`;
             });
             recalcPim();
@@ -592,12 +646,28 @@
         function saveRate(p, k, v) { if(!mpRates[activeProd.id]) mpRates[activeProd.id]={}; if(!mpRates[activeProd.id][p]) mpRates[activeProd.id][p]={}; mpRates[activeProd.id][p][k]=parseFloat(v); localStorage.setItem('sostrass_rates', JSON.stringify(mpRates)); recalcPim(); }
 
         function salvarProdutoPim() {
-            activeProd.cost = parseFloat(document.getElementById('m-inp-cost').value); activeProd.price = parseFloat(document.getElementById('m-inp-price').value);
-            activeProd.cat = document.getElementById('m-inp-cat').value; activeProd.stock = document.getElementById('m-inp-stock').value;
-            activeProd.desc = document.getElementById('m-inp-desc').value; activeProd.descComp = document.getElementById('m-inp-descComp').value;
-            activeProd.log = { peso: document.getElementById('m-log-peso').value, alt: document.getElementById('m-log-alt').value, lar: document.getElementById('m-log-lar').value, pro: document.getElementById('m-log-pro').value, embExtra: document.getElementById('m-log-embex').value, freteExtra: document.getElementById('m-log-freex').value };
-            activeProd.fisc = { ncm: document.getElementById('m-fisc-ncm').value, cfop: document.getElementById('m-fisc-cfop').value, icms: document.getElementById('m-fisc-icms').value };
-            localStorage.setItem('sostrass_prods', JSON.stringify(products)); renderCatalogo(); fecharModal(); toast("Ficha do Produto atualizada!"); log(`Atualizou SKU ${activeProd.sku}`);
+            // Salva dados básicos
+            activeProd.cost = parseFloat(document.getElementById('m-inp-cost').value); 
+            activeProd.price = parseFloat(document.getElementById('m-inp-price').value);
+            activeProd.cat = document.getElementById('m-inp-cat').value; 
+            activeProd.stock = document.getElementById('m-inp-stock').value;
+            activeProd.desc = document.getElementById('m-inp-desc').value; 
+            activeProd.descComp = document.getElementById('m-inp-descComp').value;
+            
+            // Marca o produto como pendente de envio para o Bling
+            activeProd.pendenteBling = true; 
+
+            localStorage.setItem('sostrass_prods', JSON.stringify(products)); 
+            
+            // Atualiza a tabela principal
+            renderCatalogo(); 
+            
+            // Exibe notificação de staging
+            toast("Salvo localmente! Produto na fila para envio ao Bling."); 
+            log(`SKU ${activeProd.sku} editado e aguardando sync.`);
+            
+            // Opcional: fechar o modal ou apenas avisar
+            // fecharModal(); 
         }
 
         // --- 6. INTEGRAÇÕES (I.A. E SCRAPER) ---
