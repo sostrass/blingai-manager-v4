@@ -227,31 +227,9 @@
                         <div class="flex items-center gap-2 mb-2 text-slate-400"><i class="fas fa-bars"></i> <i class="fas fa-link"></i> <span class="text-xs font-bold uppercase tracking-wider text-white">Plataformas vinculadas</span></div>
                         <p class="text-xs text-slate-500 mb-6">Clique para ativar/desativar. Preço exibido = preço sugerido no marketplace com taxas globais.</p>
                         
-                        <div class="flex flex-wrap gap-3 mb-6 border-b border-white/5 pb-6">
-                            <button class="flex items-center gap-2 px-4 py-1.5 rounded-lg border border-rose-500 bg-[#151517] text-xs font-bold text-slate-300"><div class="w-2 h-3 bg-rose-500 rounded-sm"></div> Shopee</button>
-                            <button class="flex items-center gap-2 px-4 py-1.5 rounded-lg border border-amber-400 bg-[#151517] text-xs font-bold text-slate-300"><i class="fas fa-handshake text-amber-400"></i> Mercado Livre</button>
-                            <button class="flex items-center gap-2 px-4 py-1.5 rounded-lg border border-cyan-400 bg-black text-xs font-bold text-slate-300"><i class="fab fa-tiktok text-cyan-400"></i> TikTok Shop</button>
-                            <button class="flex items-center gap-2 px-4 py-1.5 rounded-lg border border-purple-500 bg-[#151517] text-xs font-bold text-slate-300"><i class="fas fa-tshirt text-purple-500"></i> Shein</button>
-                            <button class="flex items-center gap-2 px-4 py-1.5 rounded-lg border border-amber-600 bg-[#151517] text-xs font-bold text-slate-300"><i class="fab fa-amazon text-amber-600"></i> Amazon</button>
-                            <button class="flex items-center gap-2 px-4 py-1.5 rounded-lg border border-blue-500 bg-[#151517] text-xs font-bold text-slate-300"><div class="w-3 h-3 bg-blue-500 rounded-sm"></div> Magalu</button>
-                            <button class="flex items-center gap-2 px-4 py-1.5 rounded-lg border border-red-600 bg-[#151517] text-xs font-bold text-slate-300"><i class="fas fa-shopping-basket text-red-600"></i> Americanas</button>
-                            <button class="flex items-center gap-2 px-4 py-1.5 rounded-lg border border-indigo-600 bg-[#151517] text-xs font-bold text-slate-300"><i class="fas fa-cloud text-indigo-600"></i> Nuvemshop</button>
-                        </div>
+                        <div class="flex flex-wrap gap-3 mb-6 border-b border-white/5 pb-6 transition-all" id="vg-platform-pills"></div>
 
-                        <div class="space-y-1">
-                            <div class="flex justify-between items-center py-3 px-2 hover:bg-white/5 rounded-lg transition">
-                                <div class="flex items-center gap-3 text-sm font-medium text-slate-300"><i class="fas fa-cloud text-indigo-600 w-4 text-center"></i> Nuvemshop</div>
-                                <div class="flex items-center gap-4"><span class="text-[#10b981] font-bold">R$ 12,27</span> <span class="text-[#10b981]/60 text-xs">80,9%</span></div>
-                            </div>
-                            <div class="flex justify-between items-center py-3 px-2 bg-white/5 rounded-lg transition">
-                                <div class="flex items-center gap-3 text-sm font-medium text-slate-300"><div class="w-3 h-4 bg-rose-500 rounded-sm ml-0.5"></div> Shopee</div>
-                                <div class="flex items-center gap-4"><span class="text-[#10b981] font-bold">R$ 21,54</span> <span class="text-[#10b981]/60 text-xs">89,1%</span></div>
-                            </div>
-                            <div class="flex justify-between items-center py-3 px-2 hover:bg-white/5 rounded-lg transition border-t border-white/5">
-                                <div class="flex items-center gap-3 text-sm font-medium text-slate-300"><i class="fas fa-handshake text-amber-400 w-4 text-center"></i> Mercado Livre</div>
-                                <div class="flex items-center gap-4"><span class="text-[#10b981] font-bold">R$ 16,69</span> <span class="text-[#10b981]/60 text-xs">86,0%</span></div>
-                            </div>
-                        </div>
+                        <div class="space-y-1" id="vg-platform-list"></div>
                     </div>
 
                     <div class="glass-dark rounded-2xl p-6">
@@ -302,17 +280,11 @@
 
                 <div id="m-view-desc" class="hidden space-y-4">
                     <div class="glass-dark rounded-xl p-4 border border-white/5">
-                        <div class="flex items-center gap-2 mb-4 text-slate-500"><i class="fas fa-bars"></i> <i class="fas fa-link"></i> <span class="text-[10px] font-bold uppercase tracking-widest text-slate-300">Plataformas</span></div>
-                        <div class="flex flex-wrap gap-2">
-                            <button class="flex items-center gap-2 px-4 py-1.5 rounded-lg border border-rose-500/50 bg-[#151517] text-xs font-bold text-slate-300 hover:bg-[#1a1a1c] transition"><div class="w-2 h-3 bg-rose-500 rounded-sm"></div> Shopee</button>
-                            <button class="flex items-center gap-2 px-4 py-1.5 rounded-lg border border-amber-400/50 bg-[#151517] text-xs font-bold text-slate-300 hover:bg-[#1a1a1c] transition"><i class="fas fa-handshake text-amber-400"></i> Mercado Livre</button>
-                            <button class="flex items-center gap-2 px-4 py-1.5 rounded-lg border border-cyan-400/50 bg-[#0B0B0C] text-xs font-bold text-slate-300 shadow-inner"><i class="fab fa-tiktok text-cyan-400"></i> TikTok Shop</button>
-                            <button class="flex items-center gap-2 px-4 py-1.5 rounded-lg border border-purple-500/50 bg-[#151517] text-xs font-bold text-slate-300 hover:bg-[#1a1a1c] transition"><i class="fas fa-tshirt text-purple-500"></i> Shein</button>
-                            <button class="flex items-center gap-2 px-4 py-1.5 rounded-lg border border-amber-600/50 bg-[#151517] text-xs font-bold text-slate-300 hover:bg-[#1a1a1c] transition"><i class="fab fa-amazon text-amber-600"></i> Amazon</button>
-                            <button class="flex items-center gap-2 px-4 py-1.5 rounded-lg border border-blue-500/50 bg-[#151517] text-xs font-bold text-slate-300 hover:bg-[#1a1a1c] transition"><div class="w-3 h-3 bg-blue-500 rounded-sm"></div> Magalu</button>
-                            <button class="flex items-center gap-2 px-4 py-1.5 rounded-lg border border-red-600/50 bg-[#151517] text-xs font-bold text-slate-300 hover:bg-[#1a1a1c] transition"><i class="fas fa-shopping-basket text-red-600"></i> Americanas</button>
-                            <button class="flex items-center gap-2 px-4 py-1.5 rounded-lg border border-indigo-600/50 bg-[#151517] text-xs font-bold text-slate-300 hover:bg-[#1a1a1c] transition"><i class="fas fa-cloud text-indigo-600"></i> Nuvemshop</button>
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="flex items-center gap-2 text-slate-500"><i class="fas fa-bars"></i> <i class="fas fa-link"></i> <span class="text-[10px] font-bold uppercase tracking-widest text-slate-300">Escolha o alvo da Descrição</span></div>
+                            <span id="lbl-desc-alvo" class="text-[10px] font-bold text-indigo-400 bg-indigo-500/20 px-3 py-1 rounded-full border border-indigo-500/30">Editando: Padrão (Global)</span>
                         </div>
+                        <div class="flex flex-wrap gap-2" id="desc-platform-pills"></div>
                     </div>
 
                     <div class="glass-dark rounded-xl p-5 border border-white/5">
@@ -442,12 +414,12 @@
 
         const PLATS = [
             { id: 'shopee', name: 'Shopee', color: 'rose', fees: [{k:'com',l:'Comissão %',d:14},{k:'fix',l:'Taxa R$',d:3}] },
-            { id: 'mercadolivre', name: 'Mercado Livre', color: 'yellow', fees: [{k:'com',l:'Comissão %',d:16},{k:'fre',l:'Frete R$',d:0}] },
-            { id: 'tiktok', name: 'TikTok Shop', color: 'slate', fees: [{k:'com',l:'Comissão %',d:5},{k:'fix',l:'Fixo R$',d:0}] },
-            { id: 'shein', name: 'Shein', color: 'slate', fees: [{k:'com',l:'Comissão %',d:18}] },
-            { id: 'amazon', name: 'Amazon', color: 'orange', fees: [{k:'com',l:'Comissão %',d:15}] },
+            { id: 'mercadolivre', name: 'Mercado Livre', color: 'amber', fees: [{k:'com',l:'Comissão %',d:16},{k:'fre',l:'Frete R$',d:0}] },
+            { id: 'tiktok', name: 'TikTok Shop', color: 'cyan', fees: [{k:'com',l:'Comissão %',d:5},{k:'fix',l:'Fixo R$',d:0}] },
+            { id: 'shein', name: 'Shein', color: 'purple', fees: [{k:'com',l:'Comissão %',d:18}] },
+            { id: 'amazon', name: 'Amazon', color: 'amber', fees: [{k:'com',l:'Comissão %',d:15}] },
             { id: 'magalu', name: 'Magalu', color: 'blue', fees: [{k:'com',l:'Comissão %',d:16}] },
-            { id: 'americanas', name: 'Americanas', color: 'rose', fees: [{k:'com',l:'Comissão %',d:16}] },
+            { id: 'americanas', name: 'Americanas', color: 'red', fees: [{k:'com',l:'Comissão %',d:16}] },
             { id: 'nuvemshop', name: 'Nuvemshop', color: 'indigo', fees: [{k:'gate',l:'Gateway %',d:2},{k:'fix',l:'Fixo R$',d:0}] }
         ];
 
@@ -457,13 +429,14 @@
         
         let globalCosts = JSON.parse(localStorage.getItem('sostrass_gc')) || { imposto: 12, embalagem: 3, cartao: 2.5, frete: 0, ganho: 30 };
         let products = JSON.parse(localStorage.getItem('sostrass_prods')) || [
-            { id: 1, sku: 'CX-ORG-30', name: 'Kit 30 Caixas Organizadoras 20x19cm', price: 89.90, cost: 45.00, stock: 145, cat: 'Caixas', hist:[80,85,89.9,89.9,89.9], platforms:['shopee','mercadolivre'], desc:'', descComp:'', log:{}, fisc:{}, pendenteBling: false },
-            { id: 2, sku: 'PER-6MM-BR', name: 'Pérola Branca 6mm ABS (500g)', price: 35.00, cost: 18.00, stock: 430, cat: 'Pedrarias', hist:[39,38,36,35,35], platforms:['shopee'], desc:'', descComp:'', log:{}, fisc:{}, pendenteBling: false }
+            { id: 1, sku: 'CX-ORG-30', name: 'Kit 30 Caixas Organizadoras 20x19cm', price: 89.90, cost: 45.00, stock: 145, cat: 'Caixas', hist:[80,85,89.9,89.9,89.9], platforms:['shopee','mercadolivre'], desc:'', descComp:'', descData:{}, log:{}, fisc:{}, pendenteBling: false },
+            { id: 2, sku: 'PER-6MM-BR', name: 'Pérola Branca 6mm ABS (500g)', price: 35.00, cost: 18.00, stock: 430, cat: 'Pedrarias', hist:[39,38,36,35,35], platforms:['shopee'], desc:'', descComp:'', descData:{}, log:{}, fisc:{}, pendenteBling: false }
         ];
         let mpRates = JSON.parse(localStorage.getItem('sostrass_rates')) || {};
         let actLog = JSON.parse(localStorage.getItem('sostrass_logs')) || [];
         let activeProd = null;
         let massaSelecionados = new Set();
+        let edicaoDescAlvo = 'padrao'; // Variável para controlar qual descrição estamos editando
 
         // --- 2. MATEMÁTICA ---
         const f2 = n => parseFloat(n||0).toFixed(2);
@@ -495,12 +468,95 @@
             if(view === 'catalogo') renderCatalogo(); if(view === 'massa') renderMassaList(); if(view === 'config') renderLogs();
         }
 
+        // --- DINÂMICA DE PLATAFORMAS ---
+        function togglePlataforma(platId) {
+            if(!activeProd.platforms) activeProd.platforms = [];
+            const index = activeProd.platforms.indexOf(platId);
+            
+            if(index > -1) {
+                activeProd.platforms.splice(index, 1);
+                toast(`${PLATS.find(x=>x.id===platId).name} desvinculada.`);
+            } else {
+                activeProd.platforms.push(platId);
+                toast(`${PLATS.find(x=>x.id===platId).name} vinculada!`);
+            }
+            activeProd.pendenteBling = true;
+            
+            // Se desativou a plataforma que estava editando na aba descrição, volta pro padrão
+            if(edicaoDescAlvo === platId) selecionarDescPlataforma('padrao');
+            
+            renderPlataformasUI();
+            if(document.getElementById('m-view-mkt').classList.contains('hidden') === false) {
+                renderMktPim(); // Atualiza a aba de marketplaces se estiver aberta
+            }
+        }
+
+        function selecionarDescPlataforma(platId) {
+            if(!activeProd.platforms?.includes(platId) && platId !== 'padrao') return;
+            
+            salvarDescricaoLocal(); // Salva a atual antes de trocar
+            
+            edicaoDescAlvo = platId;
+            document.getElementById('lbl-desc-alvo').innerText = platId === 'padrao' ? 'Editando: Padrão (Global)' : `Editando: ${PLATS.find(x=>x.id===platId).name}`;
+            
+            if(!activeProd.descData) activeProd.descData = {};
+            document.getElementById('m-inp-desc').value = platId === 'padrao' ? (activeProd.desc || '') : (activeProd.descData[platId]?.curta || activeProd.desc || '');
+            document.getElementById('m-inp-descComp').value = platId === 'padrao' ? (activeProd.descComp || '') : (activeProd.descData[platId]?.comp || activeProd.descComp || '');
+            
+            renderPlataformasUI();
+        }
+
+        function renderPlataformasUI() {
+            const vgPills = document.getElementById('vg-platform-pills');
+            const vgList = document.getElementById('vg-platform-list');
+            const descPills = document.getElementById('desc-platform-pills');
+            if(!vgPills || !vgList || !descPills || !activeProd) return;
+
+            vgPills.innerHTML = ''; vgList.innerHTML = ''; descPills.innerHTML = '';
+            if(!activeProd.platforms) activeProd.platforms = [];
+
+            // Botão Global da Descrição
+            descPills.innerHTML += `<button onclick="selecionarDescPlataforma('padrao')" class="flex items-center gap-2 px-4 py-1.5 rounded-lg border text-xs font-bold transition ${edicaoDescAlvo === 'padrao' ? 'border-indigo-500 bg-indigo-500/20 text-indigo-300' : 'border-white/10 bg-black text-slate-400 hover:bg-white/5'}"><i class="fas fa-globe"></i> Global</button>`;
+
+            const price = parseFloat(document.getElementById('m-inp-price').value) || activeProd.price;
+            const base = getBase(activeProd);
+
+            PLATS.forEach(pl => {
+                const isAtiva = activeProd.platforms.includes(pl.id);
+                
+                // Aba Visão Geral - Pills
+                const btnClassVg = isAtiva 
+                    ? `border-${pl.color}-500/50 bg-[#151517] text-slate-200 shadow-inner` 
+                    : `border-white/5 bg-black text-slate-500 opacity-40 hover:opacity-100 hover:border-white/20`;
+                
+                vgPills.innerHTML += `<button onclick="togglePlataforma('${pl.id}')" class="flex items-center gap-2 px-4 py-1.5 rounded-lg border text-xs font-bold transition ${btnClassVg}">${getSvg(pl.id, 14)} ${pl.name}</button>`;
+
+                // Aba Visão Geral - Lista de Preços (Só renderiza se ativa)
+                if(isAtiva) {
+                    const mpPrice = calcMkt(price, pl.id, activeProd.id);
+                    const mg = calcMargin(mpPrice, base);
+                    vgList.innerHTML += `
+                        <div class="flex justify-between items-center py-3 px-2 hover:bg-white/5 rounded-lg transition border-t border-white/5">
+                            <div class="flex items-center gap-3 text-sm font-medium text-slate-300">${getSvg(pl.id, 16)} ${pl.name}</div>
+                            <div class="flex items-center gap-4"><span class="text-[#10b981] font-bold">R$ ${f2(mpPrice)}</span> <span class="${mg >= 15 ? 'text-[#10b981]/60' : 'text-rose-500/80'} text-xs">${mg.toFixed(1)}%</span></div>
+                        </div>`;
+                }
+
+                // Aba Descrição - Pills
+                const isEdicao = edicaoDescAlvo === pl.id;
+                const btnClassDesc = isAtiva 
+                    ? (isEdicao ? `border-indigo-500 bg-indigo-500/20 text-indigo-300` : `border-${pl.color}-500/30 bg-[#151517] text-slate-300 hover:bg-[#1a1a1c]`)
+                    : `border-white/5 bg-transparent text-slate-700 cursor-not-allowed opacity-30`;
+                    
+                descPills.innerHTML += `<button onclick="${isAtiva ? `selecionarDescPlataforma('${pl.id}')` : ''}" class="flex items-center gap-2 px-4 py-1.5 rounded-lg border text-xs font-bold transition ${btnClassDesc}">${getSvg(pl.id, 14)} ${pl.name}</button>`;
+            });
+        }
+
         // --- 4. DATA GRID (CATÁLOGO) ---
         function renderCatalogo(filtro = '') {
             const tb = document.getElementById('tabela-produtos'); tb.innerHTML = '';
             products.filter(p => p.sku.toLowerCase().includes(filtro.toLowerCase()) || p.name.toLowerCase().includes(filtro.toLowerCase())).forEach((p, i) => {
                 const base = getBase(p); const marg = calcMargin(p.price, base);
-                // Flag visual caso esteja pendente de sincronização
                 const syncFlag = p.pendenteBling ? `<span class="ml-2 px-2 py-0.5 rounded text-[9px] font-black bg-amber-100 text-amber-600 border border-amber-200 uppercase" title="Alterações salvas localmente, aguardando envio ao Bling">Fila Bling</span>` : '';
                 
                 tb.innerHTML += `
@@ -522,10 +578,15 @@
         // --- 5. O SUPER MODAL (PIM ENTERPRISE) ---
         function abrirPim(id) {
             activeProd = products.find(x => x.id === id);
+            if(!activeProd.platforms) activeProd.platforms = [];
+            edicaoDescAlvo = 'padrao';
+            
             document.getElementById('m-nome').innerText = activeProd.name; document.getElementById('m-sku').innerText = activeProd.sku;
             document.getElementById('m-inp-cat').value = activeProd.cat || ''; document.getElementById('m-inp-stock').value = activeProd.stock || 0;
             document.getElementById('m-inp-cost').value = activeProd.cost || 0; document.getElementById('m-inp-price').value = activeProd.price || 0;
+            
             document.getElementById('m-inp-desc').value = activeProd.desc || ''; document.getElementById('m-inp-descComp').value = activeProd.descComp || '';
+            
             document.getElementById('m-log-peso').value = activeProd.log?.peso || ''; document.getElementById('m-log-alt').value = activeProd.log?.alt || '';
             document.getElementById('m-log-lar').value = activeProd.log?.lar || ''; document.getElementById('m-log-pro').value = activeProd.log?.pro || '';
             document.getElementById('m-log-embex').value = activeProd.log?.embExtra || ''; document.getElementById('m-log-freex').value = activeProd.log?.freteExtra || '';
@@ -540,6 +601,7 @@
             document.getElementById('m-res-emb').innerText = `R$ ${f2(globalCosts.embalagem)}`;
             
             recalcPim(); mTab('geral');
+            renderPlataformasUI();
             document.getElementById('modal-pim').classList.remove('hidden');
         }
 
@@ -571,12 +633,13 @@
             
             document.getElementById('m-res-custo').innerText = `R$ ${f2(base)}`; document.getElementById('m-res-preco').innerText = `R$ ${f2(price)}`;
             document.getElementById('m-res-sug').innerText = `R$ ${f2(sug)}`; document.getElementById('m-res-margem').innerText = `${marg.toFixed(1)}%`;
+            
             updateMktMute(price, base);
+            renderPlataformasUI();
         }
 
         function renderMktPim() {
             const container = document.getElementById('m-view-mkt'); 
-            // Mudamos para flex-col para empilhar os cards horizontais
             container.className = 'flex flex-col gap-4 text-slate-300';
             container.innerHTML = `
                 <div class="glass-dark rounded-xl p-5 border border-indigo-500/20 bg-indigo-900/10 mb-2">
@@ -588,10 +651,17 @@
                 </div>
             `;
 
-            PLATS.forEach(pl => {
+            // Renderiza os cards apenas para as plataformas que estão ATIVAS
+            const plataformasAtivas = PLATS.filter(pl => activeProd.platforms?.includes(pl.id));
+            
+            if(plataformasAtivas.length === 0) {
+                container.innerHTML += `<div class="p-8 text-center text-slate-500"><i class="fas fa-link mb-2 text-2xl"></i><p>Nenhuma plataforma vinculada a este produto.</p></div>`;
+                return;
+            }
+
+            plataformasAtivas.forEach(pl => {
                 const rates = mpRates[activeProd.id]?.[pl.id] || {};
                 
-                // Gera os inputs dinamicamente baseado na plataforma
                 let inputs = ''; 
                 pl.fees.forEach(f => { 
                     inputs += `
@@ -606,7 +676,6 @@
 
                 container.innerHTML += `
                     <div class="glass-dark rounded-xl p-0 border border-white/5 flex flex-col transition-all hover:border-white/10 group">
-                        
                         <div class="flex justify-between items-center p-4 border-b border-white/5 bg-[#111113] rounded-t-xl">
                             <div class="flex items-center gap-3">
                                 ${getSvg(pl.id, 18)}
@@ -619,11 +688,9 @@
                         </div>
 
                         <div class="p-5 flex items-center justify-between gap-8">
-                            
                             <div class="flex gap-4">
                                 ${inputs}
                             </div>
-
                             <div class="flex-1 flex items-center justify-end gap-8">
                                 <div class="text-right">
                                     <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Preço Sugerido</p>
@@ -635,8 +702,6 @@
                                     <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Margem Líquida</p>
                                     <p class="text-lg font-black text-emerald-400" id="mkt-m-${pl.id}">0%</p>
                                 </div>
-                                
-                                <button class="h-10 px-4 btn-dark rounded-lg text-xs font-bold transition opacity-0 group-hover:opacity-100"><i class="fas fa-check text-emerald-400"></i></button>
                             </div>
                         </div>
                     </div>`;
@@ -646,32 +711,44 @@
 
         function updateMktMute(price, base) {
             PLATS.forEach(pl => {
-                const mp = calcMkt(price, pl.id, activeProd.id); const lucro = mp - base; const mg = calcMargin(mp, base);
-                const e1 = document.getElementById(`mkt-p-${pl.id}`); if(e1) e1.innerText = `R$ ${f2(mp)}`;
-                const e2 = document.getElementById(`mkt-m-${pl.id}`); if(e2) { e2.innerText = `R$ ${f2(lucro)} (${mg.toFixed(1)}%)`; e2.className = mg >= 15 ? 'text-emerald-500 text-sm font-black' : 'text-rose-500 text-sm font-black'; }
+                if(activeProd.platforms?.includes(pl.id)) {
+                    const mp = calcMkt(price, pl.id, activeProd.id); const lucro = mp - base; const mg = calcMargin(mp, base);
+                    const e1 = document.getElementById(`mkt-p-${pl.id}`); if(e1) e1.innerText = `R$ ${f2(mp)}`;
+                    const e2 = document.getElementById(`mkt-m-${pl.id}`); if(e2) { e2.innerText = `R$ ${f2(lucro)} (${mg.toFixed(1)}%)`; e2.className = mg >= 15 ? 'text-emerald-500 text-sm font-black' : 'text-rose-500 text-sm font-black'; }
+                }
             });
         }
 
         function saveRate(p, k, v) { if(!mpRates[activeProd.id]) mpRates[activeProd.id]={}; if(!mpRates[activeProd.id][p]) mpRates[activeProd.id][p]={}; mpRates[activeProd.id][p][k]=parseFloat(v); localStorage.setItem('sostrass_rates', JSON.stringify(mpRates)); recalcPim(); }
 
+        function salvarDescricaoLocal() {
+            if(!activeProd) return;
+            if(!activeProd.descData) activeProd.descData = {};
+            
+            if(edicaoDescAlvo === 'padrao') {
+                activeProd.desc = document.getElementById('m-inp-desc').value;
+                activeProd.descComp = document.getElementById('m-inp-descComp').value;
+            } else {
+                activeProd.descData[edicaoDescAlvo] = { 
+                    curta: document.getElementById('m-inp-desc').value, 
+                    comp: document.getElementById('m-inp-descComp').value 
+                };
+            }
+        }
+
         function salvarProdutoPim() {
-            // Salva dados básicos
+            salvarDescricaoLocal(); // Salva a descrição da aba atual antes de fechar/salvar
+            
             activeProd.cost = parseFloat(document.getElementById('m-inp-cost').value); 
             activeProd.price = parseFloat(document.getElementById('m-inp-price').value);
             activeProd.cat = document.getElementById('m-inp-cat').value; 
             activeProd.stock = document.getElementById('m-inp-stock').value;
-            activeProd.desc = document.getElementById('m-inp-desc').value; 
-            activeProd.descComp = document.getElementById('m-inp-descComp').value;
             
-            // Marca o produto como pendente de envio para o Bling
             activeProd.pendenteBling = true; 
 
             localStorage.setItem('sostrass_prods', JSON.stringify(products)); 
             
-            // Atualiza a tabela principal
             renderCatalogo(); 
-            
-            // Exibe notificação de staging
             toast("Salvo localmente! Produto na fila para envio ao Bling."); 
             log(`SKU ${activeProd.sku} editado e aguardando sync.`);
         }
@@ -682,12 +759,11 @@
                 return;
             }
             if(confirm(`Você está prestes a enviar as atualizações do SKU ${activeProd.sku} para o Bling. Confirma?`)) {
-                // Aqui iria o fetch() real para o seu proxy/Bling
-                activeProd.pendenteBling = false; // Tira da fila
+                activeProd.pendenteBling = false;
                 localStorage.setItem('sostrass_prods', JSON.stringify(products));
                 toast("Bling atualizado com sucesso!");
                 log(`Sync Realizado: SKU ${activeProd.sku} enviado ao Bling.`);
-                renderCatalogo(); // Atualiza a tabela para tirar a flag amarela
+                renderCatalogo();
             }
         }
 
@@ -695,7 +771,6 @@
         async function gerarIAPim(tipo) {
             if(!serverOnline) return alert("Conecte ao Proxy Railway nas Configurações!");
             
-            // Define qual caixa de texto vai receber a saída
             const outId = tipo === 'curta' ? 'm-ia-out-curta' : 'm-ia-out-comp';
             const out = document.getElementById(outId);
             
@@ -714,6 +789,7 @@
 
         function applyPimIA(targetInputId, sourceBoxId) { 
             document.getElementById(targetInputId).value = document.getElementById(sourceBoxId).innerText; 
+            salvarDescricaoLocal(); // Salva na hora que aplica
             toast("Texto da I.A. aplicado com sucesso!"); 
         }
 
