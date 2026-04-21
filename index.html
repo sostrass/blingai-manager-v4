@@ -293,37 +293,82 @@
                     </div>
                 </div>
 
-                <div id="m-view-desc" class="hidden space-y-6">
-                    <div class="grid grid-cols-2 gap-6">
-                        <div class="space-y-6">
-                            <div class="glass-panel p-5 rounded-2xl bg-white text-slate-800">
-                                <label class="text-[10px] font-bold text-slate-500 uppercase block mb-2"><i class="fas fa-heading mr-1 text-slate-400"></i> Título / Descrição Curta</label>
-                                <textarea id="m-inp-desc" rows="2" class="ios-input w-full resize-none font-medium text-slate-700"></textarea>
-                            </div>
-                            <div class="glass-panel p-5 rounded-2xl bg-white text-slate-800">
-                                <label class="text-[10px] font-bold text-slate-500 uppercase block mb-2"><i class="fas fa-align-left mr-1 text-slate-400"></i> Descrição Completa</label>
-                                <textarea id="m-inp-descComp" rows="10" class="ios-input w-full resize-none text-xs font-mono leading-relaxed text-slate-600"></textarea>
-                            </div>
-                        </div>
-                        <div class="glass-panel p-6 rounded-2xl border-indigo-200 bg-indigo-50/30 flex flex-col text-slate-800">
-                            <h4 class="font-bold text-indigo-800 mb-4"><i class="fas fa-sparkles text-amber-500 mr-2"></i> AI Estúdio</h4>
-                            <label class="text-[10px] font-bold text-slate-500 uppercase mb-1">Instrução de Contexto</label>
-                            <textarea id="m-ia-context" rows="3" class="ios-input text-xs mb-4 resize-none" placeholder="Ex: Destacar que é à prova d'água, ideal para mecânicos..."></textarea>
-                            <div class="flex gap-2 mb-4">
-                                <button onclick="gerarIAPim('curta')" class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 rounded-lg text-xs shadow transition">Gerar Título</button>
-                                <button onclick="gerarIAPim('comp')" class="flex-1 bg-slate-800 hover:bg-slate-900 text-white font-bold py-2 rounded-lg text-xs shadow transition">Gerar Completa</button>
-                            </div>
-                            <div class="bg-slate-900 rounded-xl p-4 flex-1 flex flex-col relative group shadow-inner">
-                                <div id="ia-pim-skeleton" class="hidden space-y-2 mt-2"><div class="skeleton h-3 w-full"></div><div class="skeleton h-3 w-5/6"></div></div>
-                                <div id="m-ia-out" class="text-xs text-slate-300 font-mono flex-1 overflow-y-auto whitespace-pre-wrap">Aguardando comando...</div>
-                                <div class="mt-3 pt-3 border-t border-slate-700 flex gap-2">
-                                    <button onclick="applyPimIA('m-inp-desc')" class="text-[10px] font-bold text-indigo-400 hover:text-indigo-300">← Aplicar Título</button>
-                                    <button onclick="applyPimIA('m-inp-descComp')" class="text-[10px] font-bold text-indigo-400 hover:text-indigo-300 ml-auto">← Aplicar Completa</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                <div id="m-view-desc" class="hidden space-y-4">
+    
+    <div class="glass-dark rounded-xl p-4 border border-white/5">
+        <div class="flex items-center gap-2 mb-4 text-slate-500"><i class="fas fa-bars"></i> <i class="fas fa-link"></i> <span class="text-[10px] font-bold uppercase tracking-widest text-slate-300">Plataformas</span></div>
+        <div class="flex flex-wrap gap-2">
+            <button class="flex items-center gap-2 px-4 py-1.5 rounded-lg border border-rose-500/50 bg-[#151517] text-xs font-bold text-slate-300 hover:bg-[#1a1a1c] transition"><div class="w-2 h-3 bg-rose-500 rounded-sm"></div> Shopee</button>
+            <button class="flex items-center gap-2 px-4 py-1.5 rounded-lg border border-amber-400/50 bg-[#151517] text-xs font-bold text-slate-300 hover:bg-[#1a1a1c] transition"><i class="fas fa-handshake text-amber-400"></i> Mercado Livre</button>
+            <button class="flex items-center gap-2 px-4 py-1.5 rounded-lg border border-cyan-400/50 bg-[#0B0B0C] text-xs font-bold text-slate-300 shadow-inner"><i class="fab fa-tiktok text-cyan-400"></i> TikTok Shop</button>
+            <button class="flex items-center gap-2 px-4 py-1.5 rounded-lg border border-purple-500/50 bg-[#151517] text-xs font-bold text-slate-300 hover:bg-[#1a1a1c] transition"><i class="fas fa-tshirt text-purple-500"></i> Shein</button>
+            <button class="flex items-center gap-2 px-4 py-1.5 rounded-lg border border-amber-600/50 bg-[#151517] text-xs font-bold text-slate-300 hover:bg-[#1a1a1c] transition"><i class="fab fa-amazon text-amber-600"></i> Amazon</button>
+            <button class="flex items-center gap-2 px-4 py-1.5 rounded-lg border border-blue-500/50 bg-[#151517] text-xs font-bold text-slate-300 hover:bg-[#1a1a1c] transition"><div class="w-3 h-3 bg-blue-500 rounded-sm"></div> Magalu</button>
+            <button class="flex items-center gap-2 px-4 py-1.5 rounded-lg border border-red-600/50 bg-[#151517] text-xs font-bold text-slate-300 hover:bg-[#1a1a1c] transition"><i class="fas fa-shopping-basket text-red-600"></i> Americanas</button>
+            <button class="flex items-center gap-2 px-4 py-1.5 rounded-lg border border-indigo-600/50 bg-[#151517] text-xs font-bold text-slate-300 hover:bg-[#1a1a1c] transition"><i class="fas fa-cloud text-indigo-600"></i> Nuvemshop</button>
+        </div>
+    </div>
+
+    <div class="glass-dark rounded-xl p-5 border border-white/5">
+        <div class="flex items-center gap-2 mb-1 text-slate-500"><i class="fas fa-bars"></i> <i class="fas fa-edit"></i> <span class="text-[10px] font-bold uppercase tracking-widest text-slate-300">Título / Descrição Curta</span></div>
+        <p class="text-[11px] text-slate-500 mb-4 ml-7">Título exibido no marketplace. Máx. 200 chars — foco no benefício principal.</p>
+        <textarea id="m-inp-desc" rows="2" class="w-full bg-[#151517] border border-white/10 rounded-lg p-4 text-sm text-slate-300 focus:border-indigo-500 focus:bg-[#0B0B0C] outline-none resize-none transition-all shadow-inner" placeholder="Câmera IP Full HD 1080p com visão noturna infravermelho de até 30 metros..."></textarea>
+        <div class="text-right text-[10px] text-slate-500 mt-2 font-mono">138/200 chars</div>
+    </div>
+
+    <div class="glass-dark rounded-xl p-5 border border-white/5">
+        <div class="flex items-center justify-between mb-4">
+            <div class="flex items-center gap-2 text-slate-500"><i class="fas fa-bars"></i> <i class="fas fa-sparkles text-indigo-400"></i> <span class="text-[10px] font-bold uppercase tracking-widest text-slate-300">Gemini AI — Descrição Curta</span> <i class="fas fa-question-circle text-[10px] text-indigo-500/60 ml-1"></i></div>
+        </div>
+        <div class="flex gap-3 mb-4">
+            <button onclick="gerarIAPim('curta')" class="px-5 py-2 bg-indigo-500/10 text-indigo-400 border border-indigo-500/30 hover:bg-indigo-500/20 rounded-lg text-xs font-bold transition flex items-center gap-2"><i class="fas fa-plus"></i> Gerar novo</button>
+            <button class="px-5 py-2 btn-dark rounded-lg text-xs font-bold transition flex items-center gap-2"><i class="fas fa-magic text-amber-400/80"></i> Melhorar atual</button>
+            <button class="px-5 py-2 btn-dark rounded-lg text-xs font-bold transition flex items-center gap-2"><i class="fas fa-bolt text-emerald-400/80"></i> Gerar ambas</button>
+        </div>
+        <div class="bg-[#080809] border border-white/5 rounded-lg p-4 font-mono text-[13px] text-slate-400 mb-4 min-h-[70px] shadow-inner" id="m-ia-out-curta">Clique em "Gerar novo"...</div>
+        <div class="flex justify-between items-center">
+            <button onclick="applyPimIA('m-inp-desc', 'm-ia-out-curta')" class="px-4 py-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg text-[11px] font-bold text-slate-300 transition flex items-center gap-2"><i class="fas fa-arrow-left"></i> Aplicar ao título</button>
+            <span class="text-[10px] font-mono text-slate-600 bg-black/50 px-2 py-1 rounded">Modelo: gemini-2.5-flash</span>
+        </div>
+    </div>
+
+    <div class="glass-dark rounded-xl p-5 border border-white/5">
+         <div class="flex items-center gap-2 mb-4 text-slate-500"><i class="fas fa-bars"></i> <i class="fas fa-brain text-rose-400"></i> <span class="text-[10px] font-bold uppercase tracking-widest text-slate-300">Instrução para a IA</span></div>
+         <div class="bg-indigo-900/10 border border-indigo-500/20 rounded-lg p-3 flex items-start gap-3 mb-5">
+             <i class="fas fa-lightbulb text-amber-400 mt-0.5"></i>
+             <p class="text-xs text-indigo-300/80"><span class="font-bold text-indigo-300">Regras específicas para este produto.</span> Ex: "Tom técnico, incluir IP66, garantia 12 meses. Público: eletricistas."</p>
+         </div>
+         <div class="space-y-4">
+             <div>
+                 <label class="text-[10px] font-mono uppercase text-slate-500 mb-1.5 block ml-1">Instrução específica</label>
+                 <textarea id="m-ia-context" rows="2" class="w-full bg-[#151517] border border-white/10 rounded-lg p-4 text-sm text-slate-300 focus:border-indigo-500 focus:bg-[#0B0B0C] outline-none resize-none transition shadow-inner" placeholder="Mencionar sempre: garantia 12 meses, IP66, ANATEL..."></textarea>
+             </div>
+             <div>
+                 <label class="text-[10px] font-mono uppercase text-slate-500 mb-1.5 block ml-1">Contexto extra</label>
+                 <textarea rows="2" class="w-full bg-[#151517] border border-white/10 rounded-lg p-4 text-sm text-slate-300 focus:border-indigo-500 focus:bg-[#0B0B0C] outline-none resize-none transition shadow-inner" placeholder="Importado direto, exclusividade, diferenciais..."></textarea>
+             </div>
+         </div>
+    </div>
+
+    <div class="glass-dark rounded-xl p-5 border border-white/5 pb-0">
+        <div class="flex items-center gap-2 mb-1 text-slate-500"><i class="fas fa-bars"></i> <i class="fas fa-align-left text-emerald-400"></i> <span class="text-[10px] font-bold uppercase tracking-widest text-slate-300">Descrição Complementar / Detalhada</span></div>
+        <p class="text-[11px] text-slate-500 mb-4 ml-7">Especificações técnicas, embalagem, modo de uso. Use bullet points (•).</p>
+        
+        <textarea id="m-inp-descComp" rows="10" class="w-full bg-[#151517] border border-white/10 rounded-t-lg p-5 text-[13px] leading-relaxed font-mono text-slate-300 focus:border-emerald-500/50 outline-none resize-none transition shadow-inner" placeholder="Especificações técnicas:
+• Resolução: 1920x1080 (2MP)
+• Lente: 3.6mm f/2.0..."></textarea>
+        
+        <div class="border border-white/10 border-t-0 rounded-b-lg bg-[#080809] p-5 -mx-5 px-5 mb-0">
+            <div class="flex justify-between items-center mb-4">
+                <span class="text-[10px] font-bold uppercase tracking-widest text-indigo-400 flex items-center gap-2"><i class="fas fa-sparkles"></i> Saída IA — Descrição complementar</span>
+                <button onclick="gerarIAPim('comp')" class="px-5 py-1.5 bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 hover:bg-indigo-500/30 rounded-lg text-[10px] font-bold transition flex items-center gap-1">Gerar</button>
+            </div>
+            <div class="bg-[#151517] border border-white/5 rounded-lg p-4 font-mono text-[13px] text-slate-400 mb-4 min-h-[60px]" id="m-ia-out-comp">Clique em "Gerar"...</div>
+            <button onclick="applyPimIA('m-inp-descComp', 'm-ia-out-comp')" class="px-4 py-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg text-[11px] font-bold text-slate-300 transition flex items-center gap-2"><i class="fas fa-arrow-left"></i> Aplicar ao campo</button>
+        </div>
+    </div>
+
+</div>
 
                 <div id="m-view-mkt" class="hidden grid grid-cols-2 lg:grid-cols-3 gap-4 text-slate-800"></div>
 
@@ -558,21 +603,28 @@
         // --- 6. INTEGRAÇÕES (I.A. E SCRAPER) ---
         async function gerarIAPim(tipo) {
             if(!serverOnline) return alert("Conecte ao Proxy Railway nas Configurações!");
-            const out = document.getElementById('m-ia-out'); const skel = document.getElementById('ia-pim-skeleton');
-            out.classList.add('hidden'); skel.classList.remove('hidden');
+            
+            // Define qual caixa de texto vai receber a saída
+            const outId = tipo === 'curta' ? 'm-ia-out-curta' : 'm-ia-out-comp';
+            const out = document.getElementById(outId);
+            
+            out.innerHTML = '<i class="fas fa-circle-notch fa-spin text-indigo-500 mr-2"></i> Gerando...';
+            
             const prompt = `Produto: ${activeProd.name}. Instrução: ${document.getElementById('m-ia-context').value}. ${tipo==='curta'?'Crie um título atrativo (max 200 char).':'Crie ficha técnica extrema com bullets.'}`;
-            try { const r = await fetch(`${API_BASE}/api/ia/gerar`, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({prompt, model:MODELO_IA}) }); const d = await r.json(); out.innerText = d.candidates?.[0]?.content?.parts?.[0]?.text.replace(/\*/g,'') || "Sem resposta."; } catch(e) { out.innerText = "Erro na API."; }
-            skel.classList.add('hidden'); out.classList.remove('hidden');
+            
+            try { 
+                const r = await fetch(`${API_BASE}/api/ia/gerar`, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({prompt, model:MODELO_IA}) }); 
+                const d = await r.json(); 
+                out.innerText = d.candidates?.[0]?.content?.parts?.[0]?.text.replace(/\*/g,'') || "Sem resposta."; 
+            } catch(e) { 
+                out.innerText = "Erro na comunicação com a API."; 
+            }
         }
-        function applyPimIA(target) { document.getElementById(target).value = document.getElementById('m-ia-out').innerText; toast("Texto aplicado!"); }
 
-        async function executarRadarPim() {
-            if(!serverOnline) return alert("Conecte ao Proxy Railway!");
-            const urls = document.getElementById('m-radar-url').value.split('\n').filter(Boolean); if(!urls.length) return;
-            const res = document.getElementById('m-radar-res'); res.innerHTML = '<i class="fas fa-circle-notch fa-spin text-indigo-500 mb-2 text-2xl"></i><br>Raspando JSON-LD...';
-            try { const r = await fetch(`${API_BASE}/api/scraper/precos-multiplos`, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({urls}) }); const d = await r.json();
-                res.innerHTML = d.resultados.map(i => i.sucesso ? `<div class="bg-slate-800 p-3 rounded-lg flex justify-between"><span class="text-slate-400 text-xs truncate w-1/2">${i.url}</span><span class="text-emerald-400 font-bold">R$ ${i.preco}</span></div>` : `<div class="bg-rose-900/30 text-rose-400 p-2 rounded text-xs">Falha: ${i.url}</div>`).join('');
-            } catch(e) { res.innerHTML = "Erro de conexão."; }
+        // Atualizado para receber qual ID de origem e destino usar
+        function applyPimIA(targetInputId, sourceBoxId) { 
+            document.getElementById(targetInputId).value = document.getElementById(sourceBoxId).innerText; 
+            toast("Texto da I.A. aplicado com sucesso!"); 
         }
 
         // --- 7. CONFIGURAÇÕES E STARTUP ---
