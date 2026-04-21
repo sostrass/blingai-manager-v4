@@ -12,6 +12,8 @@
         * { box-sizing: border-box; font-family: 'Inter', sans-serif; }
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        
+        /* Estilos Light Mode Padrão */
         .glass-panel { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(16px); border: 1px solid rgba(226, 232, 240, 0.8); box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03); }
         .ios-input { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 10px 14px; outline: none; transition: all 0.2s; font-size: 13px; width: 100%; color: #1e293b;}
         .ios-input:focus { border-color: #6366f1; background: #fff; box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15); }
@@ -20,7 +22,7 @@
         .timeline-item { position: relative; padding-left: 20px; padding-bottom: 12px; border-left: 2px solid #e2e8f0; }
         .timeline-item::before { content: ''; position: absolute; left: -5px; top: 2px; width: 8px; height: 8px; border-radius: 50%; background: #6366f1; }
         
-        /* Estilos Premium Dark Mode (Modal) */
+        /* Estilos Premium Dark Mode (Modal PIM) */
         .glass-dark { background: rgba(20, 20, 22, 0.65); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); border: 1px solid rgba(255, 255, 255, 0.06); box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4); }
         .input-ghost { background: transparent; border: none; color: #fff; text-align: right; outline: none; width: 100%; max-width: 120px; font-weight: 500; transition: all 0.2s; }
         .input-ghost:focus { background: rgba(255, 255, 255, 0.05); border-radius: 6px; padding-right: 8px; }
@@ -181,13 +183,18 @@
                     <div class="w-12 h-12 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-slate-300 text-xl"><i class="fas fa-box-open"></i></div>
                     <div><h3 class="font-black text-2xl text-white leading-tight" id="m-nome">Produto</h3><p class="text-xs font-mono font-bold text-slate-500 mt-1" id="m-sku">SKU</p></div>
                 </div>
-                <div class="flex gap-2">
+                <div class="flex gap-2 items-center">
                     <button onclick="mTab('geral')" id="btn-m-geral" class="px-4 py-2 rounded-lg text-xs font-bold bg-indigo-600 text-white shadow-md transition">Visão Geral</button>
                     <button onclick="mTab('desc')" id="btn-m-desc" class="btn-dark px-4 py-2 rounded-lg text-xs font-bold transition">Descrição & I.A.</button>
                     <button onclick="mTab('mkt')" id="btn-m-mkt" class="btn-dark px-4 py-2 rounded-lg text-xs font-bold transition">Marketplaces</button>
                     <button onclick="mTab('fisc')" id="btn-m-fisc" class="btn-dark px-4 py-2 rounded-lg text-xs font-bold transition">Fiscal / Logística</button>
                     <button onclick="mTab('radar')" id="btn-m-radar" class="btn-dark px-4 py-2 rounded-lg text-xs font-bold transition border border-indigo-500/30 text-indigo-400"><i class="fas fa-radar mr-1"></i> Radar</button>
-                    <button onclick="fecharModal()" class="ml-4 text-slate-500 hover:text-rose-500 text-xl w-10 h-10 rounded-full hover:bg-white/5 transition"><i class="fas fa-times"></i></button>
+                    
+                    <div class="w-px h-6 bg-white/10 mx-2"></div> <button onclick="prepararEnvioBling()" class="px-5 py-2 rounded-lg text-xs font-bold bg-emerald-600/20 text-emerald-400 border border-emerald-500/30 hover:bg-emerald-600 hover:text-white transition flex items-center gap-2">
+                        <i class="fas fa-cloud-upload-alt"></i> Atualizar Bling
+                    </button>
+
+                    <button onclick="fecharModal()" class="ml-2 text-slate-500 hover:text-rose-500 text-xl w-10 h-10 rounded-full hover:bg-white/5 transition"><i class="fas fa-times"></i></button>
                 </div>
             </div>
 
@@ -294,83 +301,81 @@
                 </div>
 
                 <div id="m-view-desc" class="hidden space-y-4">
-    
-    <div class="glass-dark rounded-xl p-4 border border-white/5">
-        <div class="flex items-center gap-2 mb-4 text-slate-500"><i class="fas fa-bars"></i> <i class="fas fa-link"></i> <span class="text-[10px] font-bold uppercase tracking-widest text-slate-300">Plataformas</span></div>
-        <div class="flex flex-wrap gap-2">
-            <button class="flex items-center gap-2 px-4 py-1.5 rounded-lg border border-rose-500/50 bg-[#151517] text-xs font-bold text-slate-300 hover:bg-[#1a1a1c] transition"><div class="w-2 h-3 bg-rose-500 rounded-sm"></div> Shopee</button>
-            <button class="flex items-center gap-2 px-4 py-1.5 rounded-lg border border-amber-400/50 bg-[#151517] text-xs font-bold text-slate-300 hover:bg-[#1a1a1c] transition"><i class="fas fa-handshake text-amber-400"></i> Mercado Livre</button>
-            <button class="flex items-center gap-2 px-4 py-1.5 rounded-lg border border-cyan-400/50 bg-[#0B0B0C] text-xs font-bold text-slate-300 shadow-inner"><i class="fab fa-tiktok text-cyan-400"></i> TikTok Shop</button>
-            <button class="flex items-center gap-2 px-4 py-1.5 rounded-lg border border-purple-500/50 bg-[#151517] text-xs font-bold text-slate-300 hover:bg-[#1a1a1c] transition"><i class="fas fa-tshirt text-purple-500"></i> Shein</button>
-            <button class="flex items-center gap-2 px-4 py-1.5 rounded-lg border border-amber-600/50 bg-[#151517] text-xs font-bold text-slate-300 hover:bg-[#1a1a1c] transition"><i class="fab fa-amazon text-amber-600"></i> Amazon</button>
-            <button class="flex items-center gap-2 px-4 py-1.5 rounded-lg border border-blue-500/50 bg-[#151517] text-xs font-bold text-slate-300 hover:bg-[#1a1a1c] transition"><div class="w-3 h-3 bg-blue-500 rounded-sm"></div> Magalu</button>
-            <button class="flex items-center gap-2 px-4 py-1.5 rounded-lg border border-red-600/50 bg-[#151517] text-xs font-bold text-slate-300 hover:bg-[#1a1a1c] transition"><i class="fas fa-shopping-basket text-red-600"></i> Americanas</button>
-            <button class="flex items-center gap-2 px-4 py-1.5 rounded-lg border border-indigo-600/50 bg-[#151517] text-xs font-bold text-slate-300 hover:bg-[#1a1a1c] transition"><i class="fas fa-cloud text-indigo-600"></i> Nuvemshop</button>
-        </div>
-    </div>
+                    <div class="glass-dark rounded-xl p-4 border border-white/5">
+                        <div class="flex items-center gap-2 mb-4 text-slate-500"><i class="fas fa-bars"></i> <i class="fas fa-link"></i> <span class="text-[10px] font-bold uppercase tracking-widest text-slate-300">Plataformas</span></div>
+                        <div class="flex flex-wrap gap-2">
+                            <button class="flex items-center gap-2 px-4 py-1.5 rounded-lg border border-rose-500/50 bg-[#151517] text-xs font-bold text-slate-300 hover:bg-[#1a1a1c] transition"><div class="w-2 h-3 bg-rose-500 rounded-sm"></div> Shopee</button>
+                            <button class="flex items-center gap-2 px-4 py-1.5 rounded-lg border border-amber-400/50 bg-[#151517] text-xs font-bold text-slate-300 hover:bg-[#1a1a1c] transition"><i class="fas fa-handshake text-amber-400"></i> Mercado Livre</button>
+                            <button class="flex items-center gap-2 px-4 py-1.5 rounded-lg border border-cyan-400/50 bg-[#0B0B0C] text-xs font-bold text-slate-300 shadow-inner"><i class="fab fa-tiktok text-cyan-400"></i> TikTok Shop</button>
+                            <button class="flex items-center gap-2 px-4 py-1.5 rounded-lg border border-purple-500/50 bg-[#151517] text-xs font-bold text-slate-300 hover:bg-[#1a1a1c] transition"><i class="fas fa-tshirt text-purple-500"></i> Shein</button>
+                            <button class="flex items-center gap-2 px-4 py-1.5 rounded-lg border border-amber-600/50 bg-[#151517] text-xs font-bold text-slate-300 hover:bg-[#1a1a1c] transition"><i class="fab fa-amazon text-amber-600"></i> Amazon</button>
+                            <button class="flex items-center gap-2 px-4 py-1.5 rounded-lg border border-blue-500/50 bg-[#151517] text-xs font-bold text-slate-300 hover:bg-[#1a1a1c] transition"><div class="w-3 h-3 bg-blue-500 rounded-sm"></div> Magalu</button>
+                            <button class="flex items-center gap-2 px-4 py-1.5 rounded-lg border border-red-600/50 bg-[#151517] text-xs font-bold text-slate-300 hover:bg-[#1a1a1c] transition"><i class="fas fa-shopping-basket text-red-600"></i> Americanas</button>
+                            <button class="flex items-center gap-2 px-4 py-1.5 rounded-lg border border-indigo-600/50 bg-[#151517] text-xs font-bold text-slate-300 hover:bg-[#1a1a1c] transition"><i class="fas fa-cloud text-indigo-600"></i> Nuvemshop</button>
+                        </div>
+                    </div>
 
-    <div class="glass-dark rounded-xl p-5 border border-white/5">
-        <div class="flex items-center gap-2 mb-1 text-slate-500"><i class="fas fa-bars"></i> <i class="fas fa-edit"></i> <span class="text-[10px] font-bold uppercase tracking-widest text-slate-300">Título / Descrição Curta</span></div>
-        <p class="text-[11px] text-slate-500 mb-4 ml-7">Título exibido no marketplace. Máx. 200 chars — foco no benefício principal.</p>
-        <textarea id="m-inp-desc" rows="2" class="w-full bg-[#151517] border border-white/10 rounded-lg p-4 text-sm text-slate-300 focus:border-indigo-500 focus:bg-[#0B0B0C] outline-none resize-none transition-all shadow-inner" placeholder="Câmera IP Full HD 1080p com visão noturna infravermelho de até 30 metros..."></textarea>
-        <div class="text-right text-[10px] text-slate-500 mt-2 font-mono">138/200 chars</div>
-    </div>
+                    <div class="glass-dark rounded-xl p-5 border border-white/5">
+                        <div class="flex items-center gap-2 mb-1 text-slate-500"><i class="fas fa-bars"></i> <i class="fas fa-edit"></i> <span class="text-[10px] font-bold uppercase tracking-widest text-slate-300">Título / Descrição Curta</span></div>
+                        <p class="text-[11px] text-slate-500 mb-4 ml-7">Título exibido no marketplace. Máx. 200 chars — foco no benefício principal.</p>
+                        <textarea id="m-inp-desc" rows="2" class="w-full bg-[#151517] border border-white/10 rounded-lg p-4 text-sm text-slate-300 focus:border-indigo-500 focus:bg-[#0B0B0C] outline-none resize-none transition-all shadow-inner" placeholder="Câmera IP Full HD 1080p com visão noturna infravermelho de até 30 metros..."></textarea>
+                        <div class="text-right text-[10px] text-slate-500 mt-2 font-mono">138/200 chars</div>
+                    </div>
 
-    <div class="glass-dark rounded-xl p-5 border border-white/5">
-        <div class="flex items-center justify-between mb-4">
-            <div class="flex items-center gap-2 text-slate-500"><i class="fas fa-bars"></i> <i class="fas fa-sparkles text-indigo-400"></i> <span class="text-[10px] font-bold uppercase tracking-widest text-slate-300">Gemini AI — Descrição Curta</span> <i class="fas fa-question-circle text-[10px] text-indigo-500/60 ml-1"></i></div>
-        </div>
-        <div class="flex gap-3 mb-4">
-            <button onclick="gerarIAPim('curta')" class="px-5 py-2 bg-indigo-500/10 text-indigo-400 border border-indigo-500/30 hover:bg-indigo-500/20 rounded-lg text-xs font-bold transition flex items-center gap-2"><i class="fas fa-plus"></i> Gerar novo</button>
-            <button class="px-5 py-2 btn-dark rounded-lg text-xs font-bold transition flex items-center gap-2"><i class="fas fa-magic text-amber-400/80"></i> Melhorar atual</button>
-            <button class="px-5 py-2 btn-dark rounded-lg text-xs font-bold transition flex items-center gap-2"><i class="fas fa-bolt text-emerald-400/80"></i> Gerar ambas</button>
-        </div>
-        <div class="bg-[#080809] border border-white/5 rounded-lg p-4 font-mono text-[13px] text-slate-400 mb-4 min-h-[70px] shadow-inner" id="m-ia-out-curta">Clique em "Gerar novo"...</div>
-        <div class="flex justify-between items-center">
-            <button onclick="applyPimIA('m-inp-desc', 'm-ia-out-curta')" class="px-4 py-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg text-[11px] font-bold text-slate-300 transition flex items-center gap-2"><i class="fas fa-arrow-left"></i> Aplicar ao título</button>
-            <span class="text-[10px] font-mono text-slate-600 bg-black/50 px-2 py-1 rounded">Modelo: gemini-2.5-flash</span>
-        </div>
-    </div>
+                    <div class="glass-dark rounded-xl p-5 border border-white/5">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="flex items-center gap-2 text-slate-500"><i class="fas fa-bars"></i> <i class="fas fa-sparkles text-indigo-400"></i> <span class="text-[10px] font-bold uppercase tracking-widest text-slate-300">Gemini AI — Descrição Curta</span> <i class="fas fa-question-circle text-[10px] text-indigo-500/60 ml-1"></i></div>
+                        </div>
+                        <div class="flex gap-3 mb-4">
+                            <button onclick="gerarIAPim('curta')" class="px-5 py-2 bg-indigo-500/10 text-indigo-400 border border-indigo-500/30 hover:bg-indigo-500/20 rounded-lg text-xs font-bold transition flex items-center gap-2"><i class="fas fa-plus"></i> Gerar novo</button>
+                            <button class="px-5 py-2 btn-dark rounded-lg text-xs font-bold transition flex items-center gap-2"><i class="fas fa-magic text-amber-400/80"></i> Melhorar atual</button>
+                            <button class="px-5 py-2 btn-dark rounded-lg text-xs font-bold transition flex items-center gap-2"><i class="fas fa-bolt text-emerald-400/80"></i> Gerar ambas</button>
+                        </div>
+                        <div class="bg-[#080809] border border-white/5 rounded-lg p-4 font-mono text-[13px] text-slate-400 mb-4 min-h-[70px] shadow-inner" id="m-ia-out-curta">Clique em "Gerar novo"...</div>
+                        <div class="flex justify-between items-center">
+                            <button onclick="applyPimIA('m-inp-desc', 'm-ia-out-curta')" class="px-4 py-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg text-[11px] font-bold text-slate-300 transition flex items-center gap-2"><i class="fas fa-arrow-left"></i> Aplicar ao título</button>
+                            <span class="text-[10px] font-mono text-slate-600 bg-black/50 px-2 py-1 rounded">Modelo: gemini-2.5-flash</span>
+                        </div>
+                    </div>
 
-    <div class="glass-dark rounded-xl p-5 border border-white/5">
-         <div class="flex items-center gap-2 mb-4 text-slate-500"><i class="fas fa-bars"></i> <i class="fas fa-brain text-rose-400"></i> <span class="text-[10px] font-bold uppercase tracking-widest text-slate-300">Instrução para a IA</span></div>
-         <div class="bg-indigo-900/10 border border-indigo-500/20 rounded-lg p-3 flex items-start gap-3 mb-5">
-             <i class="fas fa-lightbulb text-amber-400 mt-0.5"></i>
-             <p class="text-xs text-indigo-300/80"><span class="font-bold text-indigo-300">Regras específicas para este produto.</span> Ex: "Tom técnico, incluir IP66, garantia 12 meses. Público: eletricistas."</p>
-         </div>
-         <div class="space-y-4">
-             <div>
-                 <label class="text-[10px] font-mono uppercase text-slate-500 mb-1.5 block ml-1">Instrução específica</label>
-                 <textarea id="m-ia-context" rows="2" class="w-full bg-[#151517] border border-white/10 rounded-lg p-4 text-sm text-slate-300 focus:border-indigo-500 focus:bg-[#0B0B0C] outline-none resize-none transition shadow-inner" placeholder="Mencionar sempre: garantia 12 meses, IP66, ANATEL..."></textarea>
-             </div>
-             <div>
-                 <label class="text-[10px] font-mono uppercase text-slate-500 mb-1.5 block ml-1">Contexto extra</label>
-                 <textarea rows="2" class="w-full bg-[#151517] border border-white/10 rounded-lg p-4 text-sm text-slate-300 focus:border-indigo-500 focus:bg-[#0B0B0C] outline-none resize-none transition shadow-inner" placeholder="Importado direto, exclusividade, diferenciais..."></textarea>
-             </div>
-         </div>
-    </div>
+                    <div class="glass-dark rounded-xl p-5 border border-white/5">
+                        <div class="flex items-center gap-2 mb-4 text-slate-500"><i class="fas fa-bars"></i> <i class="fas fa-brain text-rose-400"></i> <span class="text-[10px] font-bold uppercase tracking-widest text-slate-300">Instrução para a IA</span></div>
+                        <div class="bg-indigo-900/10 border border-indigo-500/20 rounded-lg p-3 flex items-start gap-3 mb-5">
+                            <i class="fas fa-lightbulb text-amber-400 mt-0.5"></i>
+                            <p class="text-xs text-indigo-300/80"><span class="font-bold text-indigo-300">Regras específicas para este produto.</span> Ex: "Tom técnico, incluir IP66, garantia 12 meses. Público: eletricistas."</p>
+                        </div>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="text-[10px] font-mono uppercase text-slate-500 mb-1.5 block ml-1">Instrução específica</label>
+                                <textarea id="m-ia-context" rows="2" class="w-full bg-[#151517] border border-white/10 rounded-lg p-4 text-sm text-slate-300 focus:border-indigo-500 focus:bg-[#0B0B0C] outline-none resize-none transition shadow-inner" placeholder="Mencionar sempre: garantia 12 meses, IP66, ANATEL..."></textarea>
+                            </div>
+                            <div>
+                                <label class="text-[10px] font-mono uppercase text-slate-500 mb-1.5 block ml-1">Contexto extra</label>
+                                <textarea rows="2" class="w-full bg-[#151517] border border-white/10 rounded-lg p-4 text-sm text-slate-300 focus:border-indigo-500 focus:bg-[#0B0B0C] outline-none resize-none transition shadow-inner" placeholder="Importado direto, exclusividade, diferenciais..."></textarea>
+                            </div>
+                        </div>
+                    </div>
 
-    <div class="glass-dark rounded-xl p-5 border border-white/5 pb-0">
-        <div class="flex items-center gap-2 mb-1 text-slate-500"><i class="fas fa-bars"></i> <i class="fas fa-align-left text-emerald-400"></i> <span class="text-[10px] font-bold uppercase tracking-widest text-slate-300">Descrição Complementar / Detalhada</span></div>
-        <p class="text-[11px] text-slate-500 mb-4 ml-7">Especificações técnicas, embalagem, modo de uso. Use bullet points (•).</p>
-        
-        <textarea id="m-inp-descComp" rows="10" class="w-full bg-[#151517] border border-white/10 rounded-t-lg p-5 text-[13px] leading-relaxed font-mono text-slate-300 focus:border-emerald-500/50 outline-none resize-none transition shadow-inner" placeholder="Especificações técnicas:
+                    <div class="glass-dark rounded-xl p-5 border border-white/5 pb-0">
+                        <div class="flex items-center gap-2 mb-1 text-slate-500"><i class="fas fa-bars"></i> <i class="fas fa-align-left text-emerald-400"></i> <span class="text-[10px] font-bold uppercase tracking-widest text-slate-300">Descrição Complementar / Detalhada</span></div>
+                        <p class="text-[11px] text-slate-500 mb-4 ml-7">Especificações técnicas, embalagem, modo de uso. Use bullet points (•).</p>
+                        
+                        <textarea id="m-inp-descComp" rows="10" class="w-full bg-[#151517] border border-white/10 rounded-t-lg p-5 text-[13px] leading-relaxed font-mono text-slate-300 focus:border-emerald-500/50 outline-none resize-none transition shadow-inner" placeholder="Especificações técnicas:
 • Resolução: 1920x1080 (2MP)
 • Lente: 3.6mm f/2.0..."></textarea>
-        
-        <div class="border border-white/10 border-t-0 rounded-b-lg bg-[#080809] p-5 -mx-5 px-5 mb-0">
-            <div class="flex justify-between items-center mb-4">
-                <span class="text-[10px] font-bold uppercase tracking-widest text-indigo-400 flex items-center gap-2"><i class="fas fa-sparkles"></i> Saída IA — Descrição complementar</span>
-                <button onclick="gerarIAPim('comp')" class="px-5 py-1.5 bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 hover:bg-indigo-500/30 rounded-lg text-[10px] font-bold transition flex items-center gap-1">Gerar</button>
-            </div>
-            <div class="bg-[#151517] border border-white/5 rounded-lg p-4 font-mono text-[13px] text-slate-400 mb-4 min-h-[60px]" id="m-ia-out-comp">Clique em "Gerar"...</div>
-            <button onclick="applyPimIA('m-inp-descComp', 'm-ia-out-comp')" class="px-4 py-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg text-[11px] font-bold text-slate-300 transition flex items-center gap-2"><i class="fas fa-arrow-left"></i> Aplicar ao campo</button>
-        </div>
-    </div>
+                        
+                        <div class="border border-white/10 border-t-0 rounded-b-lg bg-[#080809] p-5 -mx-5 px-5 mb-0">
+                            <div class="flex justify-between items-center mb-4">
+                                <span class="text-[10px] font-bold uppercase tracking-widest text-indigo-400 flex items-center gap-2"><i class="fas fa-sparkles"></i> Saída IA — Descrição complementar</span>
+                                <button onclick="gerarIAPim('comp')" class="px-5 py-1.5 bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 hover:bg-indigo-500/30 rounded-lg text-[10px] font-bold transition flex items-center gap-1">Gerar</button>
+                            </div>
+                            <div class="bg-[#151517] border border-white/5 rounded-lg p-4 font-mono text-[13px] text-slate-400 mb-4 min-h-[60px]" id="m-ia-out-comp">Clique em "Gerar"...</div>
+                            <button onclick="applyPimIA('m-inp-descComp', 'm-ia-out-comp')" class="px-4 py-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg text-[11px] font-bold text-slate-300 transition flex items-center gap-2"><i class="fas fa-arrow-left"></i> Aplicar ao campo</button>
+                        </div>
+                    </div>
+                </div>
 
-</div>
-
-                <div id="m-view-mkt" class="hidden grid grid-cols-2 lg:grid-cols-3 gap-4 text-slate-800"></div>
+                <div id="m-view-mkt" class="hidden flex flex-col gap-4 text-slate-300"></div>
 
                 <div id="m-view-fisc" class="hidden grid grid-cols-2 gap-8 text-slate-800">
                     <div class="glass-panel bg-white p-6 rounded-2xl">
@@ -452,8 +457,8 @@
         
         let globalCosts = JSON.parse(localStorage.getItem('sostrass_gc')) || { imposto: 12, embalagem: 3, cartao: 2.5, frete: 0, ganho: 30 };
         let products = JSON.parse(localStorage.getItem('sostrass_prods')) || [
-            { id: 1, sku: 'CX-ORG-30', name: 'Kit 30 Caixas Organizadoras 20x19cm', price: 89.90, cost: 45.00, stock: 145, cat: 'Caixas', hist:[80,85,89.9,89.9,89.9], platforms:['shopee','mercadolivre'], desc:'', descComp:'', log:{}, fisc:{} },
-            { id: 2, sku: 'PER-6MM-BR', name: 'Pérola Branca 6mm ABS (500g)', price: 35.00, cost: 18.00, stock: 430, cat: 'Pedrarias', hist:[39,38,36,35,35], platforms:['shopee'], desc:'', descComp:'', log:{}, fisc:{} }
+            { id: 1, sku: 'CX-ORG-30', name: 'Kit 30 Caixas Organizadoras 20x19cm', price: 89.90, cost: 45.00, stock: 145, cat: 'Caixas', hist:[80,85,89.9,89.9,89.9], platforms:['shopee','mercadolivre'], desc:'', descComp:'', log:{}, fisc:{}, pendenteBling: false },
+            { id: 2, sku: 'PER-6MM-BR', name: 'Pérola Branca 6mm ABS (500g)', price: 35.00, cost: 18.00, stock: 430, cat: 'Pedrarias', hist:[39,38,36,35,35], platforms:['shopee'], desc:'', descComp:'', log:{}, fisc:{}, pendenteBling: false }
         ];
         let mpRates = JSON.parse(localStorage.getItem('sostrass_rates')) || {};
         let actLog = JSON.parse(localStorage.getItem('sostrass_logs')) || [];
@@ -495,9 +500,12 @@
             const tb = document.getElementById('tabela-produtos'); tb.innerHTML = '';
             products.filter(p => p.sku.toLowerCase().includes(filtro.toLowerCase()) || p.name.toLowerCase().includes(filtro.toLowerCase())).forEach((p, i) => {
                 const base = getBase(p); const marg = calcMargin(p.price, base);
+                // Flag visual caso esteja pendente de sincronização
+                const syncFlag = p.pendenteBling ? `<span class="ml-2 px-2 py-0.5 rounded text-[9px] font-black bg-amber-100 text-amber-600 border border-amber-200 uppercase" title="Alterações salvas localmente, aguardando envio ao Bling">Fila Bling</span>` : '';
+                
                 tb.innerHTML += `
                     <tr class="hover:bg-slate-50 transition border-b border-slate-100 group cursor-pointer" onclick="abrirPim(${p.id})">
-                        <td class="px-6 py-4"><div class="font-black text-slate-800">${p.sku}</div><div class="text-[10px] text-slate-400 truncate w-48" title="${p.name}">${p.name}</div></td>
+                        <td class="px-6 py-4"><div class="font-black text-slate-800 flex items-center">${p.sku} ${syncFlag}</div><div class="text-[10px] text-slate-400 truncate w-48" title="${p.name}">${p.name}</div></td>
                         <td class="px-6 py-4 text-right font-bold text-rose-400">R$ ${f2(base)}</td>
                         <td class="px-6 py-4 text-right font-black text-indigo-600">R$ ${f2(p.price)}</td>
                         <td class="px-6 py-4 text-center"><span class="px-2 py-1 rounded-md text-[10px] font-black ${marg>=30?'bg-emerald-100 text-emerald-700':'bg-rose-100 text-rose-700'}">${marg.toFixed(1)}%</span></td>
@@ -622,7 +630,8 @@
                                     <p class="text-2xl font-black text-white" id="mkt-p-${pl.id}">R$ 0,00</p>
                                     <p class="text-[9px] text-slate-500 mt-1">Fórmula: Base + Taxas absorvidas</p>
                                 </div>
-                                <div class="h-10 w-px bg-white/5"></div> <div class="text-right w-32">
+                                <div class="h-10 w-px bg-white/5"></div> 
+                                <div class="text-right w-32">
                                     <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Margem Líquida</p>
                                     <p class="text-lg font-black text-emerald-400" id="mkt-m-${pl.id}">0%</p>
                                 </div>
@@ -665,9 +674,21 @@
             // Exibe notificação de staging
             toast("Salvo localmente! Produto na fila para envio ao Bling."); 
             log(`SKU ${activeProd.sku} editado e aguardando sync.`);
-            
-            // Opcional: fechar o modal ou apenas avisar
-            // fecharModal(); 
+        }
+
+        function prepararEnvioBling() {
+            if(!activeProd.pendenteBling) {
+                alert("Nenhuma alteração local nova para enviar deste produto.");
+                return;
+            }
+            if(confirm(`Você está prestes a enviar as atualizações do SKU ${activeProd.sku} para o Bling. Confirma?`)) {
+                // Aqui iria o fetch() real para o seu proxy/Bling
+                activeProd.pendenteBling = false; // Tira da fila
+                localStorage.setItem('sostrass_prods', JSON.stringify(products));
+                toast("Bling atualizado com sucesso!");
+                log(`Sync Realizado: SKU ${activeProd.sku} enviado ao Bling.`);
+                renderCatalogo(); // Atualiza a tabela para tirar a flag amarela
+            }
         }
 
         // --- 6. INTEGRAÇÕES (I.A. E SCRAPER) ---
@@ -691,10 +712,18 @@
             }
         }
 
-        // Atualizado para receber qual ID de origem e destino usar
         function applyPimIA(targetInputId, sourceBoxId) { 
             document.getElementById(targetInputId).value = document.getElementById(sourceBoxId).innerText; 
             toast("Texto da I.A. aplicado com sucesso!"); 
+        }
+
+        async function executarRadarPim() {
+            if(!serverOnline) return alert("Conecte ao Proxy Railway!");
+            const urls = document.getElementById('m-radar-url').value.split('\n').filter(Boolean); if(!urls.length) return;
+            const res = document.getElementById('m-radar-res'); res.innerHTML = '<i class="fas fa-circle-notch fa-spin text-indigo-500 mb-2 text-2xl"></i><br>Raspando JSON-LD...';
+            try { const r = await fetch(`${API_BASE}/api/scraper/precos-multiplos`, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({urls}) }); const d = await r.json();
+                res.innerHTML = d.resultados.map(i => i.sucesso ? `<div class="bg-slate-800 p-3 rounded-lg flex justify-between"><span class="text-slate-400 text-xs truncate w-1/2">${i.url}</span><span class="text-emerald-400 font-bold">R$ ${i.preco}</span></div>` : `<div class="bg-rose-900/30 text-rose-400 p-2 rounded text-xs">Falha: ${i.url}</div>`).join('');
+            } catch(e) { res.innerHTML = "Erro de conexão."; }
         }
 
         // --- 7. CONFIGURAÇÕES E STARTUP ---
