@@ -555,7 +555,9 @@
             activeProd = products.find(x => x.id === id);
             if(!activeProd.platforms) activeProd.platforms = []; edicaoDescAlvo = 'padrao';
             
-            document.getElementById('m-nome').innerText = activeProd.name; document.getElementById('m-sku').innerText = activeProd.sku; document.getElementById('m-codigo').innerText = `Cód: ${activeProd.code || '---'}`;
+            document.getElementById('m-nome').innerText = activeProd.name; 
+            document.getElementById('m-sku').innerText = activeProd.sku;
+            document.getElementById('m-codigo').innerText = `Cód: ${activeProd.code || '---'}`; 
             
             document.getElementById('m-inp-cat').value = activeProd.cat || ''; document.getElementById('m-inp-stock').value = activeProd.stock || 0;
             document.getElementById('m-inp-cost').value = activeProd.cost || 0; document.getElementById('m-inp-price').value = activeProd.price || 0;
