@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sóstrass PIM Enterprise v8.0</title>
+    <title>Sóstrass PIM Enterprise v8.1</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -17,7 +17,7 @@
         .ios-input { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 8px 12px; outline: none; transition: all 0.2s; font-size: 12px; width: 100%; color: #1e293b;}
         .ios-input:focus { border-color: #6366f1; background: #fff; box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15); }
         
-        /* Estilos Premium Dark Mode (Modal PIM) - Foco em tipografia suave */
+        /* Estilos Premium Dark Mode (Modal PIM) */
         .glass-dark { background: rgba(15, 15, 17, 0.75); backdrop-filter: blur(24px); border: 1px solid rgba(255, 255, 255, 0.05); box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3); }
         .input-ghost { background: transparent; border: none; color: #fff; text-align: right; outline: none; width: 100%; max-width: 100px; font-weight: 600; transition: all 0.2s; font-size: 13px;}
         .input-ghost:focus { background: rgba(255, 255, 255, 0.05); border-radius: 6px; padding-right: 8px; }
@@ -39,13 +39,13 @@
         </div>
         <div class="flex-1 py-6 px-3 space-y-1 overflow-y-auto">
             <p class="px-3 text-[9px] font-bold text-slate-500 uppercase tracking-wider mb-2">Operacional</p>
-            <button onclick="navTo('catalogo')" id="nav-catalogo" class="nav-btn w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-medium transition bg-indigo-600 text-white shadow"><i class="fas fa-chart-line w-5 text-center"></i> Monitoramento</button>
-            <button onclick="navTo('massa')" id="nav-massa" class="nav-btn w-full flex items-center gap-3 px-3 py-2 hover:text-white hover:bg-slate-800 rounded-lg text-xs transition"><i class="fas fa-bolt w-5 text-amber-400 text-center"></i> Op. em Massa</button>
-            <button onclick="navTo('automacoes')" id="nav-automacoes" class="nav-btn w-full flex items-center gap-3 px-3 py-2 hover:text-white hover:bg-slate-800 rounded-lg text-xs transition"><i class="fas fa-robot w-5 text-emerald-400 text-center"></i> Central I.A.</button>
+            <button type="button" onclick="navTo('catalogo')" id="nav-catalogo" class="nav-btn w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-medium transition bg-indigo-600 text-white shadow"><i class="fas fa-chart-line w-5 text-center"></i> Monitoramento</button>
+            <button type="button" onclick="navTo('massa')" id="nav-massa" class="nav-btn w-full flex items-center gap-3 px-3 py-2 hover:text-white hover:bg-slate-800 rounded-lg text-xs transition"><i class="fas fa-bolt w-5 text-amber-400 text-center"></i> Op. em Massa</button>
+            <button type="button" onclick="navTo('automacoes')" id="nav-automacoes" class="nav-btn w-full flex items-center gap-3 px-3 py-2 hover:text-white hover:bg-slate-800 rounded-lg text-xs transition"><i class="fas fa-robot w-5 text-emerald-400 text-center"></i> Central I.A.</button>
             <div class="my-4 border-t border-slate-800"></div>
             <p class="px-3 text-[9px] font-bold text-slate-500 uppercase tracking-wider mb-2">Sistema</p>
-            <button onclick="navTo('simulador')" id="nav-simulador" class="nav-btn w-full flex items-center gap-3 px-3 py-2 hover:text-white hover:bg-slate-800 rounded-lg text-xs transition"><i class="fas fa-globe w-5 text-center"></i> Custos Globais</button>
-            <button onclick="navTo('config')" id="nav-config" class="nav-btn w-full flex items-center gap-3 px-3 py-2 hover:text-white hover:bg-slate-800 rounded-lg text-xs transition"><i class="fas fa-cog w-5 text-center"></i> Configurações</button>
+            <button type="button" onclick="navTo('simulador')" id="nav-simulador" class="nav-btn w-full flex items-center gap-3 px-3 py-2 hover:text-white hover:bg-slate-800 rounded-lg text-xs transition"><i class="fas fa-globe w-5 text-center"></i> Custos Globais</button>
+            <button type="button" onclick="navTo('config')" id="nav-config" class="nav-btn w-full flex items-center gap-3 px-3 py-2 hover:text-white hover:bg-slate-800 rounded-lg text-xs transition"><i class="fas fa-cog w-5 text-center"></i> Configurações</button>
         </div>
     </aside>
 
@@ -84,9 +84,9 @@
             </div>
 
             <div id="view-massa" class="hidden space-y-6"><h2 class="text-2xl font-bold text-amber-600">Ações em Lote</h2></div>
-            <div id="view-automacoes" class="hidden space-y-6"><h2 class="text-2xl font-bold text-emerald-600">AI Core</h2></div>
+            <div id="view-automacoes" class="hidden space-y-6"><h2 class="text-2xl font-bold text-emerald-600">AI Core Services</h2></div>
             <div id="view-simulador" class="hidden space-y-6"><h2 class="text-2xl font-bold text-indigo-600">Precificação Global</h2></div>
-            <div id="view-config" class="hidden space-y-6"><h2 class="text-2xl font-bold text-slate-800">Infraestrutura</h2></div>
+            <div id="view-config" class="hidden space-y-6"><h2 class="text-2xl font-bold text-slate-800">Infraestrutura & Configurações</h2></div>
         </main>
     </div>
 
@@ -107,25 +107,24 @@
                 </div>
 
                 <div class="flex flex-wrap gap-2 items-center bg-[#151517] p-1.5 rounded-xl border border-white/5">
-                    <button onclick="mTab('geral')" id="btn-m-geral" class="px-4 py-1.5 rounded-lg text-[11px] font-bold btn-active transition">Visão Geral</button>
-                    <button onclick="mTab('desc')" id="btn-m-desc" class="px-4 py-1.5 rounded-lg text-[11px] font-bold btn-dark transition">Produto</button>
-                    <button onclick="mTab('mkt')" id="btn-m-mkt" class="px-4 py-1.5 rounded-lg text-[11px] font-bold btn-dark transition">Marketplaces</button>
-                    <button onclick="mTab('radar')" id="btn-m-radar" class="px-4 py-1.5 rounded-lg text-[11px] font-bold btn-dark transition"><i class="fas fa-radar text-indigo-400 mr-1"></i> Radar</button>
+                    <button type="button" onclick="mTab('geral')" id="btn-m-geral" class="px-4 py-1.5 rounded-lg text-[11px] font-bold btn-active transition">Visão Geral</button>
+                    <button type="button" onclick="mTab('desc')" id="btn-m-desc" class="px-4 py-1.5 rounded-lg text-[11px] font-bold btn-dark transition">Produto</button>
+                    <button type="button" onclick="mTab('mkt')" id="btn-m-mkt" class="px-4 py-1.5 rounded-lg text-[11px] font-bold btn-dark transition">Marketplaces</button>
+                    <button type="button" onclick="mTab('radar')" id="btn-m-radar" class="px-4 py-1.5 rounded-lg text-[11px] font-bold btn-dark transition"><i class="fas fa-radar text-indigo-400 mr-1"></i> Radar</button>
                 </div>
                 
                 <div class="flex items-center gap-3">
-                    <button onclick="prepararEnvioBling()" class="px-4 py-1.5 rounded-lg text-[11px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 hover:bg-emerald-500 hover:text-white transition flex items-center gap-1.5">
+                    <button type="button" onclick="prepararEnvioBling()" class="px-4 py-1.5 rounded-lg text-[11px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 hover:bg-emerald-500 hover:text-white transition flex items-center gap-1.5">
                         <i class="fas fa-cloud-upload-alt"></i> Sincronizar Bling
                     </button>
                     <div class="w-px h-5 bg-white/10 mx-1"></div>
-                    <button onclick="fecharModal()" class="text-slate-500 hover:text-rose-400 text-lg w-8 h-8 rounded-full hover:bg-white/5 transition flex items-center justify-center"><i class="fas fa-times"></i></button>
+                    <button type="button" onclick="fecharModal()" class="text-slate-500 hover:text-rose-400 text-lg w-8 h-8 rounded-full hover:bg-white/5 transition flex items-center justify-center"><i class="fas fa-times"></i></button>
                 </div>
             </div>
 
             <div class="flex-1 overflow-y-auto p-6 bg-[#0B0B0C] relative scroll-smooth">
                 
                 <div id="m-view-geral" class="space-y-4 max-w-5xl mx-auto">
-                    
                     <div class="grid grid-cols-4 gap-4">
                         <div class="glass-dark p-4 rounded-xl flex flex-col justify-center">
                             <p class="text-[9px] font-bold text-slate-500 uppercase tracking-widest mb-1">Preço Bling (Global)</p>
@@ -173,20 +172,19 @@
                                 <p class="text-[9px] font-bold uppercase tracking-widest text-slate-500 mb-1">Preço Matemático Sugerido</p>
                                 <p class="text-3xl font-bold text-[#10b981] mb-1" id="m-res-sug">R$ 0,00</p>
                                 <p class="text-[10px] text-slate-500 mb-3">Calculado para manter ganho de <strong class="text-white"><span id="m-res-ganho-alvo">...</span></strong> com as taxas globais.</p>
-                                <button onclick="salvarProdutoPim()" class="px-4 py-2 bg-indigo-600/20 hover:bg-indigo-600 text-indigo-400 hover:text-white border border-indigo-500/30 rounded-lg text-[10px] font-bold transition flex items-center justify-center w-max gap-2"><i class="fas fa-save"></i> Salvar Alterações</button>
+                                <button type="button" onclick="salvarProdutoPim()" class="px-4 py-2 bg-indigo-600/20 hover:bg-indigo-600 text-indigo-400 hover:text-white border border-indigo-500/30 rounded-lg text-[10px] font-bold transition flex items-center justify-center w-max gap-2"><i class="fas fa-save"></i> Salvar Alterações</button>
                             </div>
                         </div>
                     </div>
                 </div>
 
                 <div id="m-view-desc" class="hidden space-y-4 max-w-5xl mx-auto">
-                    
                     <div class="glass-dark rounded-xl p-3 flex justify-between items-center sticky top-0 z-20 shadow-md">
                         <div class="flex items-center gap-3">
                             <span class="text-[9px] font-bold uppercase tracking-widest text-slate-500 px-2">Canal de Edição:</span>
                             <div class="flex flex-wrap gap-1.5" id="desc-platform-pills"></div>
                         </div>
-                        <button onclick="salvarProdutoPim()" class="px-4 py-1.5 bg-emerald-600 text-white rounded text-[10px] font-bold shadow transition hover:bg-emerald-500"><i class="fas fa-check mr-1"></i> Salvar Ficha</button>
+                        <button type="button" onclick="salvarProdutoPim()" class="px-4 py-1.5 bg-emerald-600 text-white rounded text-[10px] font-bold shadow transition hover:bg-emerald-500"><i class="fas fa-check mr-1"></i> Salvar Ficha</button>
                     </div>
 
                     <div class="glass-dark rounded-xl p-5 border-l-2 border-indigo-500">
@@ -223,8 +221,8 @@
                             <textarea id="m-ia-context" rows="3" class="w-full bg-[#0B0B0C] border border-white/5 rounded-lg p-3 text-[11px] text-slate-300 focus:border-indigo-500 outline-none resize-none transition shadow-inner mb-4" placeholder="Ex: Detalhar que a pérola é ABS e não de vidro. Focar em artesãs. Listar que não descasca..."></textarea>
                             
                             <div class="grid grid-cols-2 gap-2 mb-4">
-                                <button onclick="gerarIAPim('curta')" class="py-2 bg-[#151517] hover:bg-[#1a1a1c] border border-white/5 rounded-lg text-[10px] font-bold text-slate-300 transition flex items-center justify-center gap-1.5"><i class="fas fa-magic text-indigo-400"></i> Gerar Título</button>
-                                <button onclick="gerarIAPim('comp')" class="py-2 bg-[#151517] hover:bg-[#1a1a1c] border border-white/5 rounded-lg text-[10px] font-bold text-slate-300 transition flex items-center justify-center gap-1.5"><i class="fas fa-align-left text-emerald-400"></i> Gerar Desc. Detalhada</button>
+                                <button type="button" onclick="gerarIAPim('curta')" class="py-2 bg-[#151517] hover:bg-[#1a1a1c] border border-white/5 rounded-lg text-[10px] font-bold text-slate-300 transition flex items-center justify-center gap-1.5"><i class="fas fa-magic text-indigo-400"></i> Gerar Título</button>
+                                <button type="button" onclick="gerarIAPim('comp')" class="py-2 bg-[#151517] hover:bg-[#1a1a1c] border border-white/5 rounded-lg text-[10px] font-bold text-slate-300 transition flex items-center justify-center gap-1.5"><i class="fas fa-align-left text-emerald-400"></i> Gerar Detalhada</button>
                             </div>
 
                             <div class="relative flex-1 flex flex-col">
@@ -233,33 +231,30 @@
                             </div>
 
                             <div class="grid grid-cols-2 gap-2 mt-3 pt-3 border-t border-white/5">
-                                <button onclick="applyPimIA('m-inp-desc', 'm-ia-out')" class="py-1.5 bg-indigo-600/10 hover:bg-indigo-600/20 text-indigo-400 rounded text-[10px] font-bold transition">Aplicar Título</button>
-                                <button onclick="applyPimIA('m-inp-descComp', 'm-ia-out')" class="py-1.5 bg-emerald-600/10 hover:bg-emerald-600/20 text-emerald-400 rounded text-[10px] font-bold transition">Aplicar Descrição</button>
+                                <button type="button" onclick="applyPimIA('m-inp-desc', 'm-ia-out')" class="py-1.5 bg-indigo-600/10 hover:bg-indigo-600/20 text-indigo-400 rounded text-[10px] font-bold transition">Aplicar Título</button>
+                                <button type="button" onclick="applyPimIA('m-inp-descComp', 'm-ia-out')" class="py-1.5 bg-emerald-600/10 hover:bg-emerald-600/20 text-emerald-400 rounded text-[10px] font-bold transition">Aplicar Descrição</button>
                             </div>
                         </div>
                     </div>
                 </div>
 
                 <div id="m-view-mkt" class="hidden flex flex-col gap-4 max-w-5xl mx-auto">
-                    
                     <div class="glass-dark rounded-xl p-4 border border-indigo-500/20 bg-indigo-900/5 flex items-start gap-3">
                         <i class="fas fa-info-circle text-indigo-400 mt-0.5"></i>
                         <div>
                             <p class="text-[10px] font-bold uppercase tracking-widest text-indigo-300 mb-0.5">Dinâmica de Precificação</p>
-                            <p class="text-[11px] text-indigo-200/60 leading-tight">O "Preço Sugerido" embute seu Custo, Embalagem e Margem Alvo, e sobre isso, aplica a matemática reversa das taxas do marketplace. Assim você garante a margem exata configurada globalmente. Valores salvos aqui ficam na fila para atualização no Bling.</p>
+                            <p class="text-[11px] text-indigo-200/60 leading-tight">O "Preço Sugerido" embute seu Custo, Embalagem e Margem Alvo, e aplica a matemática reversa das taxas. Valores salvos aqui ficam na fila para atualização.</p>
                         </div>
                     </div>
-
                     <div id="mkt-cards-container" class="space-y-4"></div>
                 </div>
 
                 <div id="m-view-radar" class="hidden flex gap-4 max-w-6xl mx-auto h-[65vh]">
-                    
                     <div class="w-1/3 glass-dark p-5 rounded-xl flex flex-col">
                         <div class="flex items-center gap-2 mb-3"><i class="fas fa-satellite-dish text-indigo-400 text-sm"></i> <span class="text-[11px] font-bold uppercase tracking-widest text-white">Spider Engine</span></div>
-                        <p class="text-[10px] text-slate-500 mb-3">Insira URLs de concorrentes (Mercado Livre, Shopee, etc). O sistema varrerá as páginas em background para extrair preços.</p>
-                        <textarea id="m-radar-url" class="w-full flex-1 bg-[#151517] border border-white/5 rounded-lg p-3 text-[10px] font-mono text-slate-300 focus:border-indigo-500 outline-none resize-none shadow-inner mb-3 whitespace-pre" placeholder="https://produto.mercadolivre.com.br/...\nhttps://shopee.com.br/..."></textarea>
-                        <button onclick="executarRadarPim()" class="w-full py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-xs font-bold shadow transition flex items-center justify-center gap-2"><i class="fas fa-search-dollar"></i> Varrer Mercado</button>
+                        <p class="text-[10px] text-slate-500 mb-3">Insira URLs de concorrentes. O sistema varrerá as páginas para extrair preços.</p>
+                        <textarea id="m-radar-url" class="w-full flex-1 bg-[#151517] border border-white/5 rounded-lg p-3 text-[10px] font-mono text-slate-300 focus:border-indigo-500 outline-none resize-none shadow-inner mb-3 whitespace-pre" placeholder="https://produto.mercadolivre.com.br/..."></textarea>
+                        <button type="button" onclick="executarRadarPim()" class="w-full py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-xs font-bold shadow transition flex items-center justify-center gap-2"><i class="fas fa-search-dollar"></i> Varrer Mercado</button>
                     </div>
 
                     <div class="w-2/3 glass-dark p-5 rounded-xl flex flex-col relative overflow-hidden">
@@ -267,7 +262,6 @@
                             <span class="text-[11px] font-bold uppercase tracking-widest text-slate-300">Inteligência Competitiva</span>
                             <span class="text-[9px] font-mono text-slate-500">Seu Preço Global Atual: <strong class="text-[#10b981]">R$ <span id="radar-meu-preco">0,00</span></strong></span>
                         </div>
-                        
                         <div id="m-radar-res" class="flex-1 overflow-y-auto space-y-2 pr-2">
                             <div class="h-full flex flex-col items-center justify-center text-slate-600">
                                 <i class="fas fa-radar text-4xl mb-3 opacity-20"></i>
@@ -282,7 +276,15 @@
     </div>
 
     <script>
-        // --- 1. DADOS E SVGS DAS PLATAFORMAS ---
+        // FUNÇÕES DUMMY PARA EVITAR ERROS DE CLIQUE NO MENU
+        function renderMassaList() {}
+        function renderMassa() {}
+        function massaSelAll() {}
+        function aplicarMassa() {}
+        function gerarSAC() {}
+        function gerarBlindagem() {}
+
+        // --- DADOS DAS PLATAFORMAS ---
         const PSVG = {
             shopee: `<svg viewBox="0 0 48 48"><rect width="48" height="48" rx="10" fill="#EE4D2D"/><path d="M24 8c-5.5 0-9.5 3.8-9.5 8.5 0 1.2.3 2.3.7 3.3H13c-1.7 0-3 1.4-3 3.1l1.5 14.5c.2 1.5 1.4 2.6 2.9 2.6h19.2c1.5 0 2.7-1.1 2.9-2.6L38 22.9c0-1.7-1.3-3.1-3-3.1h-2.2c.4-1 .7-2.1.7-3.3C33.5 11.8 29.5 8 24 8zm0 3c3.6 0 6.5 2.5 6.5 5.5 0 1.2-.4 2.3-1.1 3.3h-10.8c-.7-1-1.1-2.1-1.1-3.3C17.5 13.5 20.4 11 24 11zm-6 16a2 2 0 110 4 2 2 0 010-4zm12 0a2 2 0 110 4 2 2 0 010-4z" fill="#fff"/></svg>`,
             mercadolivre: `<svg viewBox="0 0 48 48"><rect width="48" height="48" rx="10" fill="#FFE600"/><ellipse cx="24" cy="24" rx="13" ry="13" fill="#333"/><path d="M17 23c0-3.9 3.1-7 7-7s7 3.1 7 7" fill="none" stroke="#FFE600" stroke-width="2.5" stroke-linecap="round"/><rect x="21" y="22" width="6" height="7" rx="1.5" fill="#FFE600"/></svg>`,
@@ -315,13 +317,11 @@
             { id: 2, sku: 'PER-6MM-BR', code: '40028923', ean: '', marca: '', cond: 'Novo', formato: 'Simples', name: 'Pérola Branca 6mm ABS (500g)', price: 35.00, cost: 18.00, stock: 430, cat: 'Pedrarias', hist:[39,38,36,35,35], platforms:['shopee'], desc:'', descComp:'', descData:{}, log:{}, fisc:{}, pendenteBling: false, mktPrices: {} }
         ];
         let mpRates = JSON.parse(localStorage.getItem('sostrass_rates')) || {};
-        let actLog = JSON.parse(localStorage.getItem('sostrass_logs')) || [];
         let activeProd = null;
         let edicaoDescAlvo = 'padrao'; 
 
-        // --- 2. MATEMÁTICA ---
         const f2 = n => parseFloat(n||0).toFixed(2);
-        const getBase = p => (parseFloat(p.cost)||0) + (parseFloat(p.log?.embExtra)||parseFloat(globalCosts.embalagem)) + (parseFloat(p.log?.freteExtra)||parseFloat(globalCosts.frete));
+        const getBase = p => (parseFloat(p.cost)||0) + (parseFloat(globalCosts.embalagem)) + (parseFloat(globalCosts.frete));
         const calcSug = p => { const b = getBase(p); const d = 1 - (parseFloat(globalCosts.ganho) + parseFloat(globalCosts.imposto) + parseFloat(globalCosts.cartao))/100; return d>0 ? b/d : b*3; };
         const calcMargin = (p, c) => p > 0 ? ((p - c)/p)*100 : 0;
         
@@ -343,7 +343,6 @@
             let res = bp + fix; return pct < 100 ? res / (1 - pct/100) : res;
         };
 
-        // --- 3. UI ---
         function toast(msg) {
             const c = document.getElementById('toast-container'); const t = document.createElement('div');
             t.className = `toast-enter bg-slate-800 border border-white/10 text-white px-4 py-3 rounded-lg shadow-2xl font-bold text-[11px] flex items-center gap-3 relative overflow-hidden`;
@@ -389,7 +388,7 @@
             if(!vgPills || !vgList || !descPills || !activeProd) return;
             vgPills.innerHTML = ''; vgList.innerHTML = ''; descPills.innerHTML = '';
 
-            descPills.innerHTML += `<button onclick="selecionarDescPlataforma('padrao')" class="flex items-center gap-1.5 px-3 py-1 rounded border text-[10px] font-bold transition ${edicaoDescAlvo === 'padrao' ? 'border-indigo-500 bg-indigo-500/20 text-indigo-300' : 'border-white/10 bg-[#151517] text-slate-400 hover:bg-white/5'}"><i class="fas fa-globe"></i> Global</button>`;
+            descPills.innerHTML += `<button type="button" onclick="selecionarDescPlataforma('padrao')" class="flex items-center gap-1.5 px-3 py-1 rounded border text-[10px] font-bold transition ${edicaoDescAlvo === 'padrao' ? 'border-indigo-500 bg-indigo-500/20 text-indigo-300' : 'border-white/10 bg-[#151517] text-slate-400 hover:bg-white/5'}"><i class="fas fa-globe"></i> Global</button>`;
 
             const price = parseFloat(document.getElementById('m-inp-price').value) || activeProd.price;
             const base = getBase(activeProd);
@@ -397,11 +396,9 @@
             PLATS.forEach(pl => {
                 const isAtiva = activeProd.platforms?.includes(pl.id);
                 
-                // Visão Geral - Botões
                 const btnClassVg = isAtiva ? `border-${pl.color}-500/50 bg-[#151517] text-slate-200 shadow-inner` : `border-white/5 bg-transparent text-slate-600 opacity-50 hover:opacity-100 hover:border-white/20`;
-                vgPills.innerHTML += `<button onclick="togglePlataforma('${pl.id}')" class="flex items-center gap-2 px-3 py-1.5 rounded-lg border text-[10px] font-bold transition ${btnClassVg}">${getSvg(pl.id, 12)} ${pl.name}</button>`;
+                vgPills.innerHTML += `<button type="button" onclick="togglePlataforma('${pl.id}')" class="flex items-center gap-2 px-3 py-1.5 rounded-lg border text-[10px] font-bold transition ${btnClassVg}">${getSvg(pl.id, 12)} ${pl.name}</button>`;
 
-                // Visão Geral - Lista Vertical
                 if(isAtiva) {
                     const mpPrice = calcMkt(price, pl.id, activeProd.id);
                     const mg = calcMargin(mpPrice, base);
@@ -412,14 +409,12 @@
                         </div>`;
                 }
 
-                // Descrição - Abas Menores
                 const isEdicao = edicaoDescAlvo === pl.id;
                 const btnClassDesc = isAtiva ? (isEdicao ? `border-${pl.color}-500 bg-${pl.color}-500/20 text-white` : `border-white/10 bg-[#151517] text-slate-400 hover:text-slate-200 hover:bg-[#1a1a1c]`) : `hidden`;
-                if(isAtiva) descPills.innerHTML += `<button onclick="selecionarDescPlataforma('${pl.id}')" class="flex items-center gap-1.5 px-3 py-1 rounded border text-[10px] font-bold transition ${btnClassDesc}">${getSvg(pl.id, 12)} ${pl.name}</button>`;
+                if(isAtiva) descPills.innerHTML += `<button type="button" onclick="selecionarDescPlataforma('${pl.id}')" class="flex items-center gap-1.5 px-3 py-1 rounded border text-[10px] font-bold transition ${btnClassDesc}">${getSvg(pl.id, 12)} ${pl.name}</button>`;
             });
         }
 
-        // --- 4. MODAL PIM E MARKETPLACES ---
         function renderMktPim() {
             const container = document.getElementById('mkt-cards-container'); container.innerHTML = '';
             const ativas = PLATS.filter(pl => activeProd.platforms?.includes(pl.id));
@@ -465,7 +460,7 @@
                                     <p class="text-xl font-bold text-white leading-none" id="mkt-p-${pl.id}">R$ 0,00</p>
                                     <p class="text-[9px] font-bold text-emerald-400 mt-1 bg-emerald-500/10 inline-block px-1.5 py-0.5 rounded" id="mkt-m-${pl.id}">0%</p>
                                 </div>
-                                <button onclick="acatarSugestao('${pl.id}')" class="h-10 px-3 bg-indigo-600/20 hover:bg-indigo-600 text-indigo-400 hover:text-white border border-indigo-500/30 rounded text-[10px] font-bold transition flex items-center gap-1.5">
+                                <button type="button" onclick="acatarSugestao('${pl.id}')" class="h-10 px-3 bg-indigo-600/20 hover:bg-indigo-600 text-indigo-400 hover:text-white border border-indigo-500/30 rounded text-[10px] font-bold transition flex items-center gap-1.5">
                                     <i class="fas fa-check"></i> Acatar
                                 </button>
                             </div>
@@ -499,12 +494,11 @@
         function acatarSugestao(platId) { const price = parseFloat(document.getElementById('m-inp-price').value) || activeProd.price; activeProd.mktPrices[platId] = calcMkt(price, platId, activeProd.id); activeProd.pendenteBling = true; toast("Sugestão acatada!"); renderMktPim(); }
         function saveRate(p, k, v) { if(!mpRates[activeProd.id]) mpRates[activeProd.id]={}; if(!mpRates[activeProd.id][p]) mpRates[activeProd.id][p]={}; mpRates[activeProd.id][p][k]=parseFloat(v); localStorage.setItem('sostrass_rates', JSON.stringify(mpRates)); recalcPim(); }
 
-        // --- 5. CORE MODAL ---
         function mTab(t) {
-            ['geral','desc','mkt','fisc','radar'].forEach(v => document.getElementById(`m-view-${v}`).classList.add('hidden'));
+            ['geral','desc','mkt','fisc','radar'].forEach(v => document.getElementById(`m-view-${v}`)?.classList.add('hidden'));
             document.querySelectorAll('[id^="btn-m-"]').forEach(b => { b.classList.remove('btn-active'); b.classList.add('btn-dark'); });
-            document.getElementById(`m-view-${t}`).classList.remove('hidden');
-            const btn = document.getElementById(`btn-m-${t}`); btn.classList.remove('btn-dark'); btn.classList.add('btn-active');
+            document.getElementById(`m-view-${t}`)?.classList.remove('hidden');
+            const btn = document.getElementById(`btn-m-${t}`); if(btn) { btn.classList.remove('btn-dark'); btn.classList.add('btn-active'); }
             if(t==='mkt') renderMktPim();
             if(t==='radar') document.getElementById('radar-meu-preco').innerText = f2(document.getElementById('m-inp-price').value || activeProd.price);
         }
@@ -524,7 +518,7 @@
             if(!activeProd) return;
             if(!activeProd.descData) activeProd.descData = {};
             
-            activeProd.code = document.getElementById('m-inp-codigo')?.innerText?.replace('Cód: ', '') || activeProd.code;
+            activeProd.code = document.getElementById('m-codigo')?.innerText?.replace('Cód: ', '') || activeProd.code;
             activeProd.ean = document.getElementById('m-inp-ean').value;
             activeProd.marca = document.getElementById('m-inp-marca').value;
             activeProd.cond = document.getElementById('m-inp-cond').value;
@@ -573,13 +567,13 @@
 
         function fecharModal() { document.getElementById('modal-pim').classList.add('hidden'); }
 
-        // --- 6. GRID E SCRAPER ---
         function renderCatalogo(filtro = '') {
             const tb = document.getElementById('tabela-produtos'); tb.innerHTML = '';
             products.filter(p => p.sku.toLowerCase().includes(filtro.toLowerCase()) || p.name.toLowerCase().includes(filtro.toLowerCase())).forEach((p, i) => {
                 const base = getBase(p); const marg = calcMargin(p.price, base);
                 const syncFlag = p.pendenteBling ? `<span class="ml-2 px-1.5 py-0.5 rounded text-[8px] font-bold bg-amber-500/20 text-amber-600 border border-amber-200 uppercase" title="Pendente de envio ao Bling"><i class="fas fa-exclamation-triangle mr-0.5"></i> Fila Bling</span>` : '';
                 
+                // NOTA: Adicionei o event.stopPropagation() no botão para evitar conflito com a linha
                 tb.innerHTML += `
                     <tr class="hover:bg-slate-50 transition border-b border-slate-100 group cursor-pointer" onclick="abrirPim(${p.id})">
                         <td class="px-5 py-3"><div class="font-bold text-slate-800 flex items-center text-xs">${p.sku} ${syncFlag}</div><div class="text-[9px] text-slate-400 truncate w-48 mt-0.5">${p.name}</div></td>
@@ -587,7 +581,7 @@
                         <td class="px-5 py-3 text-right font-bold text-indigo-600">R$ ${f2(p.price)}</td>
                         <td class="px-5 py-3 text-center"><span class="px-2 py-0.5 rounded text-[9px] font-bold ${marg>=30?'bg-emerald-100 text-emerald-700':'bg-rose-100 text-rose-700'}">${marg.toFixed(1)}%</span></td>
                         <td class="px-5 py-3"><canvas id="spark-${i}" width="80" height="20"></canvas></td>
-                        <td class="px-5 py-3 text-right"><button class="opacity-0 group-hover:opacity-100 bg-white border border-slate-200 px-3 py-1.5 rounded-lg text-[9px] font-bold text-slate-600 hover:bg-indigo-600 hover:text-white transition shadow-sm">EDITAR</button></td>
+                        <td class="px-5 py-3 text-right"><button type="button" onclick="abrirPim(${p.id}); event.stopPropagation();" class="opacity-0 group-hover:opacity-100 bg-white border border-slate-200 px-3 py-1.5 rounded-lg text-[9px] font-bold text-slate-600 hover:bg-indigo-600 hover:text-white transition shadow-sm">EDITAR</button></td>
                     </tr>`;
             });
             products.forEach((p, i) => {
@@ -607,7 +601,6 @@
             salvarDescricaoLocal(); toast("Texto aplicado na Ficha!"); 
         }
 
-        // NOVO RADAR CONCORRÊNCIA
         function executarRadarPim() {
             const res = document.getElementById('m-radar-res');
             res.innerHTML = '<div class="h-full flex flex-col items-center justify-center text-indigo-400"><i class="fas fa-circle-notch fa-spin text-3xl mb-2"></i><p class="text-[10px] font-bold uppercase tracking-widest mt-2">Buscando na Web...</p></div>';
@@ -634,7 +627,7 @@
                         </div>
                         <div class="flex items-center gap-4">
                             <div class="text-xl font-bold text-white">R$ ${f2(m.preco)}</div>
-                            <button onclick="acatarConcorrencia(${m.preco})" class="opacity-0 group-hover:opacity-100 px-3 py-1.5 bg-indigo-600/20 hover:bg-indigo-600 text-indigo-400 hover:text-white rounded text-[10px] font-bold transition border border-indigo-500/30">Acatar Preço Base</button>
+                            <button type="button" onclick="acatarConcorrencia(${m.preco})" class="opacity-0 group-hover:opacity-100 px-3 py-1.5 bg-indigo-600/20 hover:bg-indigo-600 text-indigo-400 hover:text-white rounded text-[10px] font-bold transition border border-indigo-500/30">Acatar Preço Base</button>
                         </div>
                     </div>`;
                 });
@@ -645,8 +638,7 @@
         function acatarConcorrencia(novoPreco) {
             document.getElementById('m-inp-price').value = novoPreco;
             document.getElementById('radar-meu-preco').innerText = f2(novoPreco);
-            recalcPim();
-            toast("Preço Global Atualizado!");
+            recalcPim(); toast("Preço Global Atualizado!");
         }
 
         window.onload = () => { navTo('catalogo'); };
