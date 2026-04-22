@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sóstrass PIM Enterprise v8.1</title>
+    <title>Sóstrass PIM Enterprise v8.5</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
         * { box-sizing: border-box; font-family: 'Inter', sans-serif; }
         ::-webkit-scrollbar { width: 5px; height: 5px; }
         ::-webkit-scrollbar-thumb { background: #475569; border-radius: 10px; }
@@ -17,7 +17,7 @@
         .ios-input { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 8px 12px; outline: none; transition: all 0.2s; font-size: 12px; width: 100%; color: #1e293b;}
         .ios-input:focus { border-color: #6366f1; background: #fff; box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15); }
         
-        /* Estilos Premium Dark Mode (Modal PIM) */
+        /* Premium Dark Mode */
         .glass-dark { background: rgba(15, 15, 17, 0.75); backdrop-filter: blur(24px); border: 1px solid rgba(255, 255, 255, 0.05); box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3); }
         .input-ghost { background: transparent; border: none; color: #fff; text-align: right; outline: none; width: 100%; max-width: 100px; font-weight: 600; transition: all 0.2s; font-size: 13px;}
         .input-ghost:focus { background: rgba(255, 255, 255, 0.05); border-radius: 6px; padding-right: 8px; }
@@ -27,6 +27,9 @@
         .btn-dark { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); color: #94a3b8; transition: all 0.2s; }
         .btn-dark:hover { background: rgba(255, 255, 255, 0.08); border-color: rgba(255, 255, 255, 0.15); color: #fff;}
         .btn-active { background: #4f46e5; border-color: #6366f1; color: #fff; box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3); }
+
+        /* Animação Circular do Health Check */
+        .circle-progress { transition: stroke-dashoffset 0.8s ease-out; stroke-linecap: round; }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-800 h-screen flex overflow-hidden bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]">
@@ -110,6 +113,7 @@
                     <button type="button" onclick="mTab('geral')" id="btn-m-geral" class="px-4 py-1.5 rounded-lg text-[11px] font-bold btn-active transition">Visão Geral</button>
                     <button type="button" onclick="mTab('desc')" id="btn-m-desc" class="px-4 py-1.5 rounded-lg text-[11px] font-bold btn-dark transition">Produto</button>
                     <button type="button" onclick="mTab('mkt')" id="btn-m-mkt" class="px-4 py-1.5 rounded-lg text-[11px] font-bold btn-dark transition">Marketplaces</button>
+                    <button type="button" onclick="mTab('fisc')" id="btn-m-fisc" class="px-4 py-1.5 rounded-lg text-[11px] font-bold btn-dark transition">Fiscal/Log</button>
                     <button type="button" onclick="mTab('radar')" id="btn-m-radar" class="px-4 py-1.5 rounded-lg text-[11px] font-bold btn-dark transition"><i class="fas fa-radar text-indigo-400 mr-1"></i> Radar</button>
                 </div>
                 
@@ -187,14 +191,38 @@
                         <button type="button" onclick="salvarProdutoPim()" class="px-4 py-1.5 bg-emerald-600 text-white rounded text-[10px] font-bold shadow transition hover:bg-emerald-500"><i class="fas fa-check mr-1"></i> Salvar Ficha</button>
                     </div>
 
-                    <div class="glass-dark rounded-xl p-5 border-l-2 border-indigo-500">
-                        <div class="flex items-center gap-2 mb-3"><i class="fas fa-tags text-indigo-400 text-sm"></i> <span class="text-[10px] font-bold uppercase tracking-widest text-white">Dados Básicos (Sincroniza c/ Bling)</span></div>
-                        <div class="grid grid-cols-4 gap-4">
-                            <div><label class="block text-[9px] uppercase font-bold text-slate-500 mb-1">GTIN / EAN</label><input type="text" id="m-inp-ean" class="input-dark font-mono text-[11px]" placeholder="Ex: 7890000000000"></div>
-                            <div><label class="block text-[9px] uppercase font-bold text-slate-500 mb-1">Marca</label><input type="text" id="m-inp-marca" class="input-dark" placeholder="Ex: Sóstrass"></div>
-                            <div><label class="block text-[9px] uppercase font-bold text-slate-500 mb-1">Condição</label><select id="m-inp-cond" class="input-dark"><option value="Novo">Novo</option><option value="Usado">Usado</option></select></div>
-                            <div><label class="block text-[9px] uppercase font-bold text-slate-500 mb-1">Formato</label><select id="m-inp-formato" class="input-dark"><option value="Simples">Simples</option><option value="Com Variação">Com Variação</option></select></div>
+                    <div class="grid grid-cols-3 gap-4">
+                        
+                        <div class="col-span-2 glass-dark rounded-xl p-5 border-l-2 border-indigo-500 flex flex-col justify-center">
+                            <div class="flex items-center gap-2 mb-3"><i class="fas fa-tags text-indigo-400 text-sm"></i> <span class="text-[10px] font-bold uppercase tracking-widest text-white">Dados Básicos</span></div>
+                            <div class="grid grid-cols-2 gap-3">
+                                <div><label class="block text-[9px] uppercase font-bold text-slate-500 mb-1">GTIN / EAN</label><input type="text" id="m-inp-ean" class="input-dark font-mono text-[11px]" oninput="calcularSaude()" placeholder="Ex: 7890000000000"></div>
+                                <div><label class="block text-[9px] uppercase font-bold text-slate-500 mb-1">Marca</label><input type="text" id="m-inp-marca" class="input-dark" placeholder="Ex: Sóstrass"></div>
+                                <div><label class="block text-[9px] uppercase font-bold text-slate-500 mb-1">Condição</label><select id="m-inp-cond" class="input-dark"><option value="Novo">Novo</option><option value="Usado">Usado</option></select></div>
+                                <div><label class="block text-[9px] uppercase font-bold text-slate-500 mb-1">Formato</label><select id="m-inp-formato" class="input-dark"><option value="Simples">Simples</option><option value="Com Variação">Com Variação</option></select></div>
+                            </div>
                         </div>
+
+                        <div class="glass-dark rounded-xl p-4 border border-white/5 flex flex-col relative overflow-hidden bg-gradient-to-br from-[#0B0B0C] to-[#151517]">
+                            <div class="flex items-center gap-2 mb-2"><i class="fas fa-heartbeat text-slate-400"></i> <span class="text-[9px] font-bold uppercase tracking-widest text-slate-400">Saúde do Anúncio</span></div>
+                            <div class="flex-1 flex items-center justify-between gap-4">
+                                <div class="relative w-16 h-16 flex-shrink-0">
+                                    <svg class="w-full h-full transform -rotate-90">
+                                        <circle cx="32" cy="32" r="28" stroke="currentColor" stroke-width="6" fill="transparent" class="text-slate-800" />
+                                        <circle cx="32" cy="32" r="28" stroke="currentColor" stroke-width="6" fill="transparent" stroke-dasharray="175.9" stroke-dashoffset="175.9" class="circle-progress text-rose-500" id="health-circle" />
+                                    </svg>
+                                    <div class="absolute inset-0 flex items-center justify-center flex-col">
+                                        <span class="text-sm font-black text-rose-500 leading-none" id="health-score-txt">0</span>
+                                    </div>
+                                </div>
+                                <div class="flex-1 space-y-1.5 text-[9px] font-bold text-slate-500">
+                                    <div class="flex justify-between"><span id="chk-tit">Título (Min. 30)</span> <i class="fas fa-times text-rose-500" id="icn-tit"></i></div>
+                                    <div class="flex justify-between"><span id="chk-desc">Desc. (Min. 200)</span> <i class="fas fa-times text-rose-500" id="icn-desc"></i></div>
+                                    <div class="flex justify-between"><span id="chk-ean">EAN Preenchido</span> <i class="fas fa-times text-rose-500" id="icn-ean"></i></div>
+                                </div>
+                            </div>
+                        </div>
+
                     </div>
 
                     <div class="grid grid-cols-2 gap-4">
@@ -202,15 +230,15 @@
                             <div class="glass-dark rounded-xl p-5">
                                 <div class="flex justify-between items-end mb-2">
                                     <div class="flex items-center gap-2"><i class="fas fa-heading text-slate-400 text-sm"></i> <span class="text-[10px] font-bold uppercase tracking-widest text-white">Título do Anúncio</span></div>
-                                    <span class="text-[9px] font-mono text-slate-500">Máx 200</span>
+                                    <span class="text-[9px] font-mono text-slate-500" id="char-count-tit">0/200</span>
                                 </div>
-                                <textarea id="m-inp-desc" rows="2" class="w-full bg-[#151517] border border-white/5 rounded-lg p-3 text-xs font-medium text-slate-200 focus:border-indigo-500 outline-none resize-none transition shadow-inner placeholder:text-slate-600"></textarea>
+                                <textarea id="m-inp-desc" rows="2" class="w-full bg-[#151517] border border-white/5 rounded-lg p-3 text-xs font-medium text-slate-200 focus:border-indigo-500 outline-none resize-none transition shadow-inner placeholder:text-slate-600" oninput="calcularSaude()"></textarea>
                             </div>
 
                             <div class="glass-dark rounded-xl p-5 flex-1">
                                 <div class="flex items-center gap-2 mb-2"><i class="fas fa-align-left text-slate-400 text-sm"></i> <span class="text-[10px] font-bold uppercase tracking-widest text-white">Descrição Completa</span></div>
                                 <p class="text-[9px] text-slate-500 mb-3">Evite devoluções: detalhe uso, material, medidas reais e o que vem na embalagem.</p>
-                                <textarea id="m-inp-descComp" rows="14" class="w-full bg-[#151517] border border-white/5 rounded-lg p-4 text-[12px] leading-relaxed font-mono text-slate-300 focus:border-indigo-500 outline-none resize-none transition shadow-inner placeholder:text-slate-600"></textarea>
+                                <textarea id="m-inp-descComp" rows="10" class="w-full bg-[#151517] border border-white/5 rounded-lg p-4 text-[12px] leading-relaxed font-mono text-slate-300 focus:border-indigo-500 outline-none resize-none transition shadow-inner placeholder:text-slate-600" oninput="calcularSaude()"></textarea>
                             </div>
                         </div>
 
@@ -218,7 +246,7 @@
                             <div class="flex items-center gap-2 mb-3"><i class="fas fa-sparkles text-indigo-400"></i> <span class="text-[10px] font-bold uppercase tracking-widest text-indigo-300">Gemini AI Studio</span></div>
                             
                             <label class="text-[9px] font-bold uppercase tracking-widest text-slate-500 mb-1">Instruções Anti-Devolução (Prompt)</label>
-                            <textarea id="m-ia-context" rows="3" class="w-full bg-[#0B0B0C] border border-white/5 rounded-lg p-3 text-[11px] text-slate-300 focus:border-indigo-500 outline-none resize-none transition shadow-inner mb-4" placeholder="Ex: Detalhar que a pérola é ABS e não de vidro. Focar em artesãs. Listar que não descasca..."></textarea>
+                            <textarea id="m-ia-context" rows="2" class="w-full bg-[#0B0B0C] border border-white/5 rounded-lg p-3 text-[11px] text-slate-300 focus:border-indigo-500 outline-none resize-none transition shadow-inner mb-4" placeholder="Ex: Detalhar que a pérola é ABS..."></textarea>
                             
                             <div class="grid grid-cols-2 gap-2 mb-4">
                                 <button type="button" onclick="gerarIAPim('curta')" class="py-2 bg-[#151517] hover:bg-[#1a1a1c] border border-white/5 rounded-lg text-[10px] font-bold text-slate-300 transition flex items-center justify-center gap-1.5"><i class="fas fa-magic text-indigo-400"></i> Gerar Título</button>
@@ -227,7 +255,7 @@
 
                             <div class="relative flex-1 flex flex-col">
                                 <div class="absolute -top-2.5 left-3 bg-[#0B0B0C] px-1 text-[8px] font-bold uppercase tracking-widest text-indigo-500/80">Resultado</div>
-                                <div class="bg-[#0B0B0C] border border-white/5 rounded-lg p-4 font-mono text-[11px] text-slate-300 flex-1 shadow-inner whitespace-pre-wrap overflow-y-auto max-h-[350px]" id="m-ia-out">Aguardando comando...</div>
+                                <div class="bg-[#0B0B0C] border border-white/5 rounded-lg p-4 font-mono text-[11px] text-slate-300 flex-1 shadow-inner whitespace-pre-wrap overflow-y-auto max-h-[250px]" id="m-ia-out">Aguardando comando...</div>
                             </div>
 
                             <div class="grid grid-cols-2 gap-2 mt-3 pt-3 border-t border-white/5">
@@ -247,6 +275,36 @@
                         </div>
                     </div>
                     <div id="mkt-cards-container" class="space-y-4"></div>
+                </div>
+
+                <div id="m-view-fisc" class="hidden grid grid-cols-2 gap-6 max-w-5xl mx-auto text-slate-300">
+                    <div class="glass-dark p-6 rounded-xl">
+                        <div class="flex items-center gap-2 mb-4"><i class="fas fa-box text-amber-500 text-sm"></i> <span class="text-[11px] font-bold uppercase tracking-widest text-white">Logística</span></div>
+                        <div class="grid grid-cols-2 gap-4 mb-6">
+                            <div><label class="block text-[9px] uppercase font-bold text-slate-500 mb-1">Peso (kg)</label><input type="number" id="m-log-peso" class="input-dark"></div>
+                            <div><label class="block text-[9px] uppercase font-bold text-slate-500 mb-1">Altura (cm)</label><input type="number" id="m-log-alt" class="input-dark"></div>
+                            <div><label class="block text-[9px] uppercase font-bold text-slate-500 mb-1">Largura (cm)</label><input type="number" id="m-log-lar" class="input-dark"></div>
+                            <div><label class="block text-[9px] uppercase font-bold text-slate-500 mb-1">Profundidade (cm)</label><input type="number" id="m-log-pro" class="input-dark"></div>
+                        </div>
+                        <div class="flex items-center gap-2 mb-3 pt-4 border-t border-white/5"><span class="text-[10px] font-bold uppercase tracking-widest text-amber-500">Custos Específicos deste SKU</span></div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div><label class="block text-[9px] uppercase font-bold text-slate-500 mb-1">Emb. Extra (R$)</label><input type="number" id="m-log-embex" class="input-dark" oninput="recalcPim()"></div>
+                            <div><label class="block text-[9px] uppercase font-bold text-slate-500 mb-1">Frete Extra (R$)</label><input type="number" id="m-log-freex" class="input-dark" oninput="recalcPim()"></div>
+                        </div>
+                    </div>
+
+                    <div class="glass-dark p-6 rounded-xl">
+                        <div class="flex items-center gap-2 mb-4"><i class="fas fa-file-invoice-dollar text-emerald-500 text-sm"></i> <span class="text-[11px] font-bold uppercase tracking-widest text-white">Fiscal (Integração Bling)</span></div>
+                        <div class="space-y-4">
+                            <div><label class="block text-[9px] uppercase font-bold text-slate-500 mb-1">NCM</label><input type="text" id="m-fisc-ncm" class="input-dark font-mono tracking-widest"></div>
+                            <div><label class="block text-[9px] uppercase font-bold text-slate-500 mb-1">Origem</label><select id="m-fisc-origem" class="input-dark"><option value="0">0 - Nacional</option><option value="1">1 - Estrangeira Importada</option><option value="2">2 - Estrangeira Adq. Mercado Interno</option></select></div>
+                            <div class="grid grid-cols-2 gap-4">
+                                <div><label class="block text-[9px] uppercase font-bold text-slate-500 mb-1">CFOP Padrão</label><input type="text" id="m-fisc-cfop" class="input-dark"></div>
+                                <div><label class="block text-[9px] uppercase font-bold text-slate-500 mb-1">ICMS (%)</label><input type="number" id="m-fisc-icms" class="input-dark"></div>
+                            </div>
+                        </div>
+                        <button type="button" onclick="salvarProdutoPim()" class="mt-8 w-full py-2.5 bg-emerald-600/20 hover:bg-emerald-600 text-emerald-400 hover:text-white rounded-lg text-[11px] font-bold transition border border-emerald-500/30 flex items-center justify-center gap-2"><i class="fas fa-save"></i> Salvar Dados Fiscais/Log.</button>
+                    </div>
                 </div>
 
                 <div id="m-view-radar" class="hidden flex gap-4 max-w-6xl mx-auto h-[65vh]">
@@ -276,15 +334,7 @@
     </div>
 
     <script>
-        // FUNÇÕES DUMMY PARA EVITAR ERROS DE CLIQUE NO MENU
-        function renderMassaList() {}
-        function renderMassa() {}
-        function massaSelAll() {}
-        function aplicarMassa() {}
-        function gerarSAC() {}
-        function gerarBlindagem() {}
-
-        // --- DADOS DAS PLATAFORMAS ---
+        // DADOS E COMPONENTES
         const PSVG = {
             shopee: `<svg viewBox="0 0 48 48"><rect width="48" height="48" rx="10" fill="#EE4D2D"/><path d="M24 8c-5.5 0-9.5 3.8-9.5 8.5 0 1.2.3 2.3.7 3.3H13c-1.7 0-3 1.4-3 3.1l1.5 14.5c.2 1.5 1.4 2.6 2.9 2.6h19.2c1.5 0 2.7-1.1 2.9-2.6L38 22.9c0-1.7-1.3-3.1-3-3.1h-2.2c.4-1 .7-2.1.7-3.3C33.5 11.8 29.5 8 24 8zm0 3c3.6 0 6.5 2.5 6.5 5.5 0 1.2-.4 2.3-1.1 3.3h-10.8c-.7-1-1.1-2.1-1.1-3.3C17.5 13.5 20.4 11 24 11zm-6 16a2 2 0 110 4 2 2 0 010-4zm12 0a2 2 0 110 4 2 2 0 010-4z" fill="#fff"/></svg>`,
             mercadolivre: `<svg viewBox="0 0 48 48"><rect width="48" height="48" rx="10" fill="#FFE600"/><ellipse cx="24" cy="24" rx="13" ry="13" fill="#333"/><path d="M17 23c0-3.9 3.1-7 7-7s7 3.1 7 7" fill="none" stroke="#FFE600" stroke-width="2.5" stroke-linecap="round"/><rect x="21" y="22" width="6" height="7" rx="1.5" fill="#FFE600"/></svg>`,
@@ -308,20 +358,17 @@
             { id: 'nuvemshop', name: 'Nuvemshop', color: 'indigo', fees: [{k:'gate',l:'Gateway %',d:2},{k:'fix',l:'Custo Fixo R$',d:0}] }
         ];
 
-        let API_BASE = localStorage.getItem('sostrass_apibase') || 'https://blingai-manager-v4.up.railway.app';
-        let MODELO_IA = localStorage.getItem('sostrass_model') || 'gemini-2.5-flash';
-        
         let globalCosts = JSON.parse(localStorage.getItem('sostrass_gc')) || { imposto: 12, embalagem: 3, cartao: 2.5, frete: 0, ganho: 30 };
         let products = JSON.parse(localStorage.getItem('sostrass_prods')) || [
-            { id: 1, sku: 'CX-ORG-30', code: '40028922', ean: '7891234567890', marca: 'Sóstrass', cond: 'Novo', formato: 'Simples', name: 'Kit 30 Caixas Organizadoras 20x19cm', price: 89.90, cost: 45.00, stock: 145, cat: 'Caixas', hist:[80,85,89.9,89.9,89.9], platforms:['shopee','mercadolivre'], desc:'', descComp:'', descData:{}, log:{}, fisc:{}, pendenteBling: false, mktPrices: { shopee: 110.00, mercadolivre: 95.00 } },
-            { id: 2, sku: 'PER-6MM-BR', code: '40028923', ean: '', marca: '', cond: 'Novo', formato: 'Simples', name: 'Pérola Branca 6mm ABS (500g)', price: 35.00, cost: 18.00, stock: 430, cat: 'Pedrarias', hist:[39,38,36,35,35], platforms:['shopee'], desc:'', descComp:'', descData:{}, log:{}, fisc:{}, pendenteBling: false, mktPrices: {} }
+            { id: 1, sku: 'CX-ORG-30', code: '40028922', ean: '7891234567890', marca: 'Sóstrass', cond: 'Novo', formato: 'Simples', name: 'Kit 30 Caixas Organizadoras 20x19cm', price: 89.90, cost: 45.00, stock: 145, cat: 'Caixas', hist:[80,85,89.9,89.9,89.9], platforms:['shopee','mercadolivre'], desc:'', descComp:'', descData:{}, log:{peso: 0.5, alt: 20, lar: 19, pro: 10, embExtra: 0, freteExtra:0}, fisc:{ncm:'3923.10.90', origem:'0', cfop:'5102', icms:0}, pendenteBling: false, mktPrices: { shopee: 110.00, mercadolivre: 95.00 } },
+            { id: 2, sku: 'PER-6MM-BR', code: '40028923', ean: '', marca: '', cond: 'Novo', formato: 'Simples', name: 'Pérola Branca 6mm ABS (500g)', price: 35.00, cost: 18.00, stock: 430, cat: 'Pedrarias', hist:[39,38,36,35,35], platforms:['shopee'], desc:'', descComp:'', descData:{}, log:{peso: 0.5, alt: 10, lar: 10, pro: 10, embExtra: 0, freteExtra:0}, fisc:{ncm:'3926.90.90', origem:'1', cfop:'5102', icms:0}, pendenteBling: false, mktPrices: {} }
         ];
         let mpRates = JSON.parse(localStorage.getItem('sostrass_rates')) || {};
         let activeProd = null;
         let edicaoDescAlvo = 'padrao'; 
 
         const f2 = n => parseFloat(n||0).toFixed(2);
-        const getBase = p => (parseFloat(p.cost)||0) + (parseFloat(globalCosts.embalagem)) + (parseFloat(globalCosts.frete));
+        const getBase = p => (parseFloat(p.cost)||0) + (parseFloat(globalCosts.embalagem)) + (parseFloat(globalCosts.frete)) + (parseFloat(p.log?.embExtra)||0) + (parseFloat(p.log?.freteExtra)||0);
         const calcSug = p => { const b = getBase(p); const d = 1 - (parseFloat(globalCosts.ganho) + parseFloat(globalCosts.imposto) + parseFloat(globalCosts.cartao))/100; return d>0 ? b/d : b*3; };
         const calcMargin = (p, c) => p > 0 ? ((p - c)/p)*100 : 0;
         
@@ -352,10 +399,10 @@
         }
 
         function navTo(view) {
-            ['catalogo','massa','automacoes','simulador','config'].forEach(v => document.getElementById(`view-${v}`).classList.add('hidden'));
+            ['catalogo','massa','automacoes','simulador','config'].forEach(v => document.getElementById(`view-${v}`)?.classList.add('hidden'));
             document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('bg-indigo-600','text-white','shadow'));
-            document.getElementById(`view-${view}`).classList.remove('hidden');
-            document.getElementById(`nav-${view}`).classList.add('bg-indigo-600','text-white','shadow');
+            document.getElementById(`view-${view}`)?.classList.remove('hidden');
+            document.getElementById(`nav-${view}`)?.classList.add('bg-indigo-600','text-white','shadow');
             if(view === 'catalogo') renderCatalogo();
         }
 
@@ -377,6 +424,8 @@
             if(!activeProd.descData) activeProd.descData = {};
             document.getElementById('m-inp-desc').value = platId === 'padrao' ? (activeProd.desc || '') : (activeProd.descData[platId]?.curta || activeProd.desc || '');
             document.getElementById('m-inp-descComp').value = platId === 'padrao' ? (activeProd.descComp || '') : (activeProd.descData[platId]?.comp || activeProd.descComp || '');
+            
+            calcularSaude(); // Atualiza grafico
             renderPlataformasUI();
         }
 
@@ -413,6 +462,50 @@
                 const btnClassDesc = isAtiva ? (isEdicao ? `border-${pl.color}-500 bg-${pl.color}-500/20 text-white` : `border-white/10 bg-[#151517] text-slate-400 hover:text-slate-200 hover:bg-[#1a1a1c]`) : `hidden`;
                 if(isAtiva) descPills.innerHTML += `<button type="button" onclick="selecionarDescPlataforma('${pl.id}')" class="flex items-center gap-1.5 px-3 py-1 rounded border text-[10px] font-bold transition ${btnClassDesc}">${getSvg(pl.id, 12)} ${pl.name}</button>`;
             });
+        }
+
+        // --- MÓDULO SHADCN: SEO HEALTH CHECK ---
+        function calcularSaude() {
+            if(!activeProd) return;
+            
+            const tit = document.getElementById('m-inp-desc').value;
+            const desc = document.getElementById('m-inp-descComp').value;
+            const ean = document.getElementById('m-inp-ean').value;
+
+            let score = 0;
+            
+            // Regra Título (30%)
+            const lenTit = tit.length;
+            document.getElementById('char-count-tit').innerText = `${lenTit}/200`;
+            const checkTit = (lenTit >= 30 && lenTit <= 200);
+            if(checkTit) score += 30;
+            
+            document.getElementById('icn-tit').className = checkTit ? 'fas fa-check text-emerald-400' : 'fas fa-times text-rose-500';
+            
+            // Regra Descrição (40%)
+            const lenDesc = desc.length;
+            const checkDesc = lenDesc >= 200;
+            if(checkDesc) score += 40;
+            
+            document.getElementById('icn-desc').className = checkDesc ? 'fas fa-check text-emerald-400' : 'fas fa-times text-rose-500';
+
+            // Regra EAN (30%)
+            const checkEan = ean.length >= 8;
+            if(checkEan) score += 30;
+            document.getElementById('icn-ean').className = checkEan ? 'fas fa-check text-emerald-400' : 'fas fa-times text-rose-500';
+
+            // Atualiza UI Circular
+            const circle = document.getElementById('health-circle');
+            const textEl = document.getElementById('health-score-txt');
+            
+            // O raio é 28. Cincunferência = 2 * PI * 28 ≈ 175.9
+            const offset = 175.9 - (175.9 * (score / 100));
+            circle.style.strokeDashoffset = offset;
+            
+            let colorClass = score >= 80 ? 'text-emerald-500' : (score >= 50 ? 'text-amber-500' : 'text-rose-500');
+            circle.setAttribute('class', `circle-progress ${colorClass}`);
+            textEl.innerText = score;
+            textEl.className = `text-sm font-black leading-none ${colorClass}`;
         }
 
         function renderMktPim() {
@@ -500,13 +593,19 @@
             document.getElementById(`m-view-${t}`)?.classList.remove('hidden');
             const btn = document.getElementById(`btn-m-${t}`); if(btn) { btn.classList.remove('btn-dark'); btn.classList.add('btn-active'); }
             if(t==='mkt') renderMktPim();
+            if(t==='desc') calcularSaude();
             if(t==='radar') document.getElementById('radar-meu-preco').innerText = f2(document.getElementById('m-inp-price').value || activeProd.price);
         }
 
         function recalcPim() {
             if(!activeProd) return;
             const cost = parseFloat(document.getElementById('m-inp-cost').value)||0; const price = parseFloat(document.getElementById('m-inp-price').value)||0;
-            const mockProd = { cost: cost, log: { embExtra: 0, freteExtra: 0 } };
+            
+            // Segurança: Pegando os valores de forma segura (O erro anterior ocorria aqui se o DOM não tivesse esses campos)
+            const embEx = parseFloat(document.getElementById('m-log-embex')?.value || activeProd.log?.embExtra || 0);
+            const freEx = parseFloat(document.getElementById('m-log-freex')?.value || activeProd.log?.freteExtra || 0);
+            
+            const mockProd = { cost: cost, log: { embExtra: embEx, freteExtra: freEx } };
             const base = getBase(mockProd); const sug = calcSug(mockProd); const marg = calcMargin(price, base);
             
             const setVal = (id, val) => { const el = document.getElementById(id); if(el) el.innerText = val; };
@@ -519,10 +618,12 @@
             if(!activeProd.descData) activeProd.descData = {};
             
             activeProd.code = document.getElementById('m-codigo')?.innerText?.replace('Cód: ', '') || activeProd.code;
-            activeProd.ean = document.getElementById('m-inp-ean').value;
-            activeProd.marca = document.getElementById('m-inp-marca').value;
-            activeProd.cond = document.getElementById('m-inp-cond').value;
-            activeProd.formato = document.getElementById('m-inp-formato').value;
+            
+            // Salva dados seguros
+            const eanEl = document.getElementById('m-inp-ean'); if(eanEl) activeProd.ean = eanEl.value;
+            const marEl = document.getElementById('m-inp-marca'); if(marEl) activeProd.marca = marEl.value;
+            const cndEl = document.getElementById('m-inp-cond'); if(cndEl) activeProd.cond = cndEl.value;
+            const forEl = document.getElementById('m-inp-formato'); if(forEl) activeProd.formato = forEl.value;
 
             if(edicaoDescAlvo === 'padrao') {
                 activeProd.desc = document.getElementById('m-inp-desc').value; activeProd.descComp = document.getElementById('m-inp-descComp').value;
@@ -533,8 +634,21 @@
 
         function salvarProdutoPim() {
             salvarDescricaoLocal(); 
-            activeProd.cost = parseFloat(document.getElementById('m-inp-cost').value); activeProd.price = parseFloat(document.getElementById('m-inp-price').value);
-            activeProd.cat = document.getElementById('m-inp-cat').value; activeProd.stock = document.getElementById('m-inp-stock').value;
+            
+            activeProd.cost = parseFloat(document.getElementById('m-inp-cost').value); 
+            activeProd.price = parseFloat(document.getElementById('m-inp-price').value);
+            activeProd.cat = document.getElementById('m-inp-cat').value; 
+            activeProd.stock = document.getElementById('m-inp-stock').value;
+            
+            // Salva Logistica Segura
+            if(!activeProd.log) activeProd.log = {};
+            const ePeso = document.getElementById('m-log-peso'); if(ePeso) activeProd.log.peso = parseFloat(ePeso.value) || 0;
+            const eAlt = document.getElementById('m-log-alt'); if(eAlt) activeProd.log.alt = parseFloat(eAlt.value) || 0;
+            const eLar = document.getElementById('m-log-lar'); if(eLar) activeProd.log.lar = parseFloat(eLar.value) || 0;
+            const ePro = document.getElementById('m-log-pro'); if(ePro) activeProd.log.pro = parseFloat(ePro.value) || 0;
+            const eEmbEx = document.getElementById('m-log-embex'); if(eEmbEx) activeProd.log.embExtra = parseFloat(eEmbEx.value) || 0;
+            const eFreEx = document.getElementById('m-log-freex'); if(eFreEx) activeProd.log.freteExtra = parseFloat(eFreEx.value) || 0;
+            
             activeProd.pendenteBling = true; localStorage.setItem('sostrass_prods', JSON.stringify(products)); renderCatalogo(); toast("Produto salvo na fila (Rascunho Local)."); 
         }
 
@@ -548,6 +662,7 @@
         function abrirPim(id) {
             activeProd = products.find(x => x.id === id);
             if(!activeProd.platforms) activeProd.platforms = []; edicaoDescAlvo = 'padrao';
+            if(!activeProd.log) activeProd.log = {}; if(!activeProd.fisc) activeProd.fisc = {};
             
             document.getElementById('m-nome').innerText = activeProd.name; 
             document.getElementById('m-sku').innerText = activeProd.sku;
@@ -556,12 +671,22 @@
             document.getElementById('m-inp-cat').value = activeProd.cat || ''; document.getElementById('m-inp-stock').value = activeProd.stock || 0;
             document.getElementById('m-inp-cost').value = activeProd.cost || 0; document.getElementById('m-inp-price').value = activeProd.price || 0;
             
-            document.getElementById('m-inp-ean').value = activeProd.ean || ''; document.getElementById('m-inp-marca').value = activeProd.marca || '';
-            document.getElementById('m-inp-cond').value = activeProd.cond || 'Novo'; document.getElementById('m-inp-formato').value = activeProd.formato || 'Simples';
+            const eEan = document.getElementById('m-inp-ean'); if(eEan) eEan.value = activeProd.ean || ''; 
+            const eMar = document.getElementById('m-inp-marca'); if(eMar) eMar.value = activeProd.marca || '';
+            const eCnd = document.getElementById('m-inp-cond'); if(eCnd) eCnd.value = activeProd.cond || 'Novo'; 
+            const eFor = document.getElementById('m-inp-formato'); if(eFor) eFor.value = activeProd.formato || 'Simples';
 
             document.getElementById('m-inp-desc').value = activeProd.desc || ''; document.getElementById('m-inp-descComp').value = activeProd.descComp || '';
             document.getElementById('m-res-estoque').innerText = (activeProd.stock || 0) + " un"; document.getElementById('m-res-ganho-alvo').innerText = `${globalCosts.ganho}%`;
             
+            // Popula os campos ressuscitados de Logistica e Fiscal (o que causou o bug de travar antes)
+            const setV = (id, val) => { const el=document.getElementById(id); if(el) el.value = val; };
+            setV('m-log-peso', activeProd.log.peso || ''); setV('m-log-alt', activeProd.log.alt || '');
+            setV('m-log-lar', activeProd.log.lar || ''); setV('m-log-pro', activeProd.log.pro || '');
+            setV('m-log-embex', activeProd.log.embExtra || ''); setV('m-log-freex', activeProd.log.freteExtra || '');
+            setV('m-fisc-ncm', activeProd.fisc.ncm || ''); setV('m-fisc-origem', activeProd.fisc.origem || '0');
+            setV('m-fisc-cfop', activeProd.fisc.cfop || ''); setV('m-fisc-icms', activeProd.fisc.icms || '');
+
             recalcPim(); mTab('geral'); renderPlataformasUI(); document.getElementById('modal-pim').classList.remove('hidden');
         }
 
@@ -573,7 +698,6 @@
                 const base = getBase(p); const marg = calcMargin(p.price, base);
                 const syncFlag = p.pendenteBling ? `<span class="ml-2 px-1.5 py-0.5 rounded text-[8px] font-bold bg-amber-500/20 text-amber-600 border border-amber-200 uppercase" title="Pendente de envio ao Bling"><i class="fas fa-exclamation-triangle mr-0.5"></i> Fila Bling</span>` : '';
                 
-                // NOTA: Adicionei o event.stopPropagation() no botão para evitar conflito com a linha
                 tb.innerHTML += `
                     <tr class="hover:bg-slate-50 transition border-b border-slate-100 group cursor-pointer" onclick="abrirPim(${p.id})">
                         <td class="px-5 py-3"><div class="font-bold text-slate-800 flex items-center text-xs">${p.sku} ${syncFlag}</div><div class="text-[9px] text-slate-400 truncate w-48 mt-0.5">${p.name}</div></td>
@@ -593,12 +717,16 @@
         async function gerarIAPim(tipo) {
             const out = document.getElementById('m-ia-out');
             out.innerHTML = '<i class="fas fa-circle-notch fa-spin text-indigo-500 mr-2"></i> Processando modelo gemini-2.5-flash...';
-            setTimeout(() => { out.innerText = tipo === 'curta' ? `${activeProd.name} Original Premium` : `Especificações do Produto:\n\n• Material durável e sem descascamento.\n• Formato exato conforme fotos reais.\n• Garantia de fábrica de 3 meses.\n\n* Ideal para quem busca alta qualidade sem abrir mão do custo-benefício. Compra segura e envio em 24h.`; }, 1000); 
+            setTimeout(() => { 
+                out.innerText = tipo === 'curta' 
+                ? `${activeProd.name} Original Premium` 
+                : `Especificações do Produto:\n\n• Material durável e resistente a impactos.\n• Formato exato conforme imagens.\n• Garantia total de fábrica.\n\n* Compra 100% segura e envio em menos de 24 horas. Ideal para e-commerce.`; 
+            }, 1000); 
         }
 
         function applyPimIA(targetInputId, sourceBoxId) { 
             document.getElementById(targetInputId).value = document.getElementById(sourceBoxId).innerText; 
-            salvarDescricaoLocal(); toast("Texto aplicado na Ficha!"); 
+            salvarDescricaoLocal(); calcularSaude(); toast("Texto aplicado na Ficha!"); 
         }
 
         function executarRadarPim() {
