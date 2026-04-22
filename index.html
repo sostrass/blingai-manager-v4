@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sóstrass PIM Enterprise v8.7</title>
+    <title>Sóstrass PIM Enterprise v8.8</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -29,6 +29,10 @@
         .btn-active { background: #4f46e5; border-color: #6366f1; color: #fff; box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3); }
 
         .circle-progress { transition: stroke-dashoffset 0.8s ease-out; stroke-linecap: round; }
+        
+        /* Timeline Feed Custom Styles */
+        .feed-line { position: absolute; left: 15px; top: 20px; bottom: -20px; width: 2px; background: #e2e8f0; z-index: 0; }
+        .feed-item:last-child .feed-line { display: none; }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-800 h-screen flex overflow-hidden bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]">
@@ -41,7 +45,7 @@
         </div>
         <div class="flex-1 py-6 px-3 space-y-1 overflow-y-auto">
             <p class="px-3 text-[9px] font-bold text-slate-500 uppercase tracking-wider mb-2">Operacional</p>
-            <button type="button" onclick="navTo('catalogo')" id="nav-catalogo" class="nav-btn w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-medium transition bg-indigo-600 text-white shadow"><i class="fas fa-chart-line w-5 text-center"></i> Monitoramento</button>
+            <button type="button" onclick="navTo('catalogo')" id="nav-catalogo" class="nav-btn w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-medium transition bg-indigo-600 text-white shadow"><i class="fas fa-chart-pie w-5 text-center"></i> Dashboard PIM</button>
             <button type="button" onclick="navTo('radar')" id="nav-radar" class="nav-btn w-full flex items-center gap-3 px-3 py-2 hover:text-white hover:bg-slate-800 rounded-lg text-xs transition"><i class="fas fa-satellite-dish w-5 text-indigo-400 text-center"></i> Inteligência/Radar</button>
             <button type="button" onclick="navTo('massa')" id="nav-massa" class="nav-btn w-full flex items-center gap-3 px-3 py-2 hover:text-white hover:bg-slate-800 rounded-lg text-xs transition"><i class="fas fa-bolt w-5 text-amber-400 text-center"></i> Op. em Massa</button>
             <button type="button" onclick="navTo('automacoes')" id="nav-automacoes" class="nav-btn w-full flex items-center gap-3 px-3 py-2 hover:text-white hover:bg-slate-800 rounded-lg text-xs transition"><i class="fas fa-robot w-5 text-emerald-400 text-center"></i> Central I.A.</button>
@@ -58,9 +62,11 @@
         <header class="h-14 glass-panel flex items-center justify-between px-8 z-10 sticky top-0 border-b border-slate-200">
             <div class="flex-1 max-w-xl relative">
                 <i class="fas fa-search absolute left-4 top-3 text-slate-400 text-xs"></i>
-                <input type="text" id="buscaGeral" placeholder="Buscar SKU ou Produto..." class="w-full ios-input pl-9 py-2" oninput="renderCatalogo(this.value)">
+                <input type="text" id="buscaGeral" placeholder="Buscar SKU ou Produto..." class="w-full ios-input pl-9 py-2 bg-slate-50 border-transparent focus:border-indigo-500 focus:bg-white" oninput="renderCatalogo(this.value)">
             </div>
             <div class="flex items-center gap-3 ml-6">
+                <button onclick="prepararEnvioBlingGeral()" class="px-4 py-1.5 bg-emerald-50 text-emerald-600 hover:bg-emerald-100 border border-emerald-200 rounded-lg text-[10px] font-bold uppercase tracking-wider transition flex items-center gap-2"><i class="fas fa-sync-alt"></i> Sincronizar Tudo</button>
+                <div class="w-px h-5 bg-slate-200 mx-1"></div>
                 <div id="status-pill" class="px-2 py-1 bg-rose-50 text-rose-600 border border-rose-200 rounded text-[9px] font-bold uppercase tracking-wider">OFFLINE</div>
                 <div id="serverBar" class="px-3 py-1 bg-slate-100 rounded text-[9px] font-bold border border-slate-200 text-slate-500"><i class="fas fa-circle-notch fa-spin mr-1"></i> PROXY...</div>
             </div>
@@ -68,25 +74,54 @@
 
         <main class="flex-1 overflow-auto p-8 bg-[#f8fafc]" id="view-container">
             
-            <div id="view-catalogo" class="space-y-6">
-                <div class="flex justify-between items-end mb-4">
-                    <div><h2 class="text-2xl font-bold tracking-tight text-slate-800">Monitoramento Financeiro</h2><p class="text-xs text-slate-500 mt-1">Visão global de margens e controle de preços.</p></div>
+            <div id="view-catalogo" class="flex flex-col lg:flex-row items-start gap-6">
+                
+                <div class="flex-1 flex flex-col min-w-0 space-y-6">
+                    
+                    <div class="flex justify-between items-end">
+                        <div>
+                            <h2 class="text-2xl font-bold tracking-tight text-slate-800">Dashboard Operacional</h2>
+                            <p class="text-xs text-slate-500 mt-1">Gestão de catálogo, margens e sincronização com marketplaces.</p>
+                        </div>
+                        <button onclick="abrirPim('novo')" class="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold shadow-lg transition flex items-center gap-2 transform hover:scale-105"><i class="fas fa-plus"></i> Novo Produto</button>
+                    </div>
+
+                    <div class="grid grid-cols-3 gap-4" id="dash-metrics">
+                        </div>
+
+                    <div class="glass-panel rounded-xl overflow-hidden shadow-sm flex flex-col">
+                        <div class="p-4 border-b border-slate-100 bg-slate-50/50 flex justify-between items-center">
+                            <span class="text-[10px] font-bold uppercase tracking-widest text-slate-500"><i class="fas fa-boxes mr-2"></i> Seu Catálogo de Produtos</span>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-xs whitespace-nowrap">
+                                <thead class="bg-white border-b border-slate-100 text-slate-400 uppercase text-[9px] font-bold tracking-wider">
+                                    <tr>
+                                        <th class="px-5 py-3">SKU / Detalhes</th>
+                                        <th class="px-5 py-3">Plataformas</th>
+                                        <th class="px-5 py-3 text-right">Preço Global</th>
+                                        <th class="px-5 py-3 text-center">Margem</th>
+                                        <th class="px-5 py-3 w-24 text-center">Trend (7d)</th>
+                                        <th class="px-5 py-3 text-right">Ação</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tabela-produtos" class="divide-y divide-slate-50 bg-white"></tbody>
+                            </table>
+                        </div>
+                    </div>
                 </div>
-                <div class="glass-panel rounded-xl overflow-hidden shadow-sm">
-                    <table class="w-full text-left text-xs whitespace-nowrap">
-                        <thead class="bg-slate-100/50 border-b border-slate-200 text-slate-500 uppercase text-[9px] font-bold tracking-wider">
-                            <tr>
-                                <th class="px-5 py-3">SKU / Produto</th>
-                                <th class="px-5 py-3 text-right">Custo Base</th>
-                                <th class="px-5 py-3 text-right">Preço (Global)</th>
-                                <th class="px-5 py-3 text-center">Margem</th>
-                                <th class="px-5 py-3 w-24 text-center">Gráfico (7d)</th>
-                                <th class="px-5 py-3 text-right">Ação</th>
-                            </tr>
-                        </thead>
-                        <tbody id="tabela-produtos" class="divide-y divide-slate-100 bg-white"></tbody>
-                    </table>
+
+                <div class="w-80 shrink-0 flex flex-col gap-6 sticky top-0">
+                    <div class="glass-panel rounded-xl flex flex-col overflow-hidden shadow-sm h-[calc(100vh-140px)]">
+                        <div class="p-4 border-b border-slate-100 bg-slate-50/50 flex justify-between items-center shrink-0">
+                            <span class="text-[10px] font-bold uppercase tracking-widest text-slate-500"><i class="fas fa-stream mr-2"></i> Activity Feed</span>
+                            <span class="text-[9px] bg-slate-200 text-slate-600 px-2 py-0.5 rounded font-bold">Hoje</span>
+                        </div>
+                        <div class="flex-1 overflow-y-auto p-5 relative" id="activity-feed-list">
+                            </div>
+                    </div>
                 </div>
+
             </div>
 
             <div id="view-radar" class="hidden h-full flex flex-col">
@@ -225,6 +260,10 @@
                         <div class="flex items-center gap-2 mb-4"><i class="fas fa-pen text-rose-500 text-sm"></i> <span class="text-[11px] font-bold uppercase tracking-widest text-slate-200">Valores Globais da Ficha</span></div>
                         <div class="grid grid-cols-2 gap-8">
                             <div class="space-y-1 text-xs">
+                                <div class="flex justify-between items-center py-2.5 border-b border-white/5">
+                                    <span class="text-slate-400">Novo SKU Principal</span>
+                                    <input type="text" id="m-inp-newsku" class="input-ghost text-indigo-300" placeholder="Apenas se for novo...">
+                                </div>
                                 <div class="flex justify-between items-center py-2.5 border-b border-white/5">
                                     <span class="text-slate-400">Categoria do Produto</span>
                                     <input type="text" id="m-inp-cat" class="input-ghost text-slate-300" placeholder="Ex: Acessórios">
@@ -424,13 +463,17 @@
 
         let globalCosts = JSON.parse(localStorage.getItem('sostrass_gc')) || { imposto: 12, embalagem: 3, cartao: 2.5, frete: 0, ganho: 30 };
         let products = JSON.parse(localStorage.getItem('sostrass_prods')) || [
-            { id: 1, sku: 'CX-ORG-30', code: '40028922', ean: '7891234567890', marca: 'Sóstrass', cond: 'Novo', formato: 'Simples', name: 'Kit 30 Caixas Organizadoras 20x19cm', price: 89.90, cost: 45.00, stock: 145, cat: 'Caixas', hist:[80,85,89.9,89.9,89.9], platforms:['shopee','mercadolivre'], desc:'', descComp:'', descData:{}, log:{peso: 0.5, alt: 20, lar: 19, pro: 10, embExtra: 0, freteExtra:0}, fisc:{ncm:'3923.10.90', origem:'0', cfop:'5102', icms:0}, pendenteBling: false, mktPrices: { shopee: 110.00, mercadolivre: 95.00 } },
-            { id: 2, sku: 'PER-6MM-BR', code: '40028923', ean: '', marca: '', cond: 'Novo', formato: 'Simples', name: 'Pérola Branca 6mm ABS (500g)', price: 35.00, cost: 18.00, stock: 430, cat: 'Pedrarias', hist:[39,38,36,35,35], platforms:['shopee'], desc:'', descComp:'', descData:{}, log:{peso: 0.5, alt: 10, lar: 10, pro: 10, embExtra: 0, freteExtra:0}, fisc:{ncm:'3926.90.90', origem:'1', cfop:'5102', icms:0}, pendenteBling: false, mktPrices: {} }
+            { id: 1, sku: 'CX-ORG-30', code: '40028922', ean: '7891234567890', marca: 'Sóstrass', cond: 'Novo', formato: 'Simples', name: 'Kit 30 Caixas Organizadoras 20x19cm', price: 89.90, cost: 45.00, stock: 145, cat: 'Caixas', hist:[80,85,89.9,89.9,89.9], platforms:['shopee','mercadolivre'], desc:'', descComp:'', descData:{}, log:{peso: 0.5, alt: 20, lar: 19, pro: 10, embExtra: 0, freteExtra:0}, fisc:{ncm:'3923.10.90', origem:'0', cfop:'5102', icms:0}, pendenteBling: true, mktPrices: { shopee: 110.00, mercadolivre: 95.00 } },
+            { id: 2, sku: 'PER-6MM-BR', code: '40028923', ean: '', marca: '', cond: 'Novo', formato: 'Simples', name: 'Pérola Branca 6mm ABS (500g)', price: 35.00, cost: 18.00, stock: 12, cat: 'Pedrarias', hist:[39,38,36,35,35], platforms:['shopee'], desc:'', descComp:'', descData:{}, log:{peso: 0.5, alt: 10, lar: 10, pro: 10, embExtra: 0, freteExtra:0}, fisc:{ncm:'3926.90.90', origem:'1', cfop:'5102', icms:0}, pendenteBling: false, mktPrices: {} }
         ];
         let mpRates = JSON.parse(localStorage.getItem('sostrass_rates')) || {};
+        let systemEvents = JSON.parse(localStorage.getItem('sostrass_events')) || [
+            { time: 'Agora', msg: 'Sistema inicializado com sucesso.', type: 'sys' }
+        ];
         let activeProd = null;
         let edicaoDescAlvo = 'padrao'; 
 
+        // --- FUNÇÕES MATEMÁTICAS E AUXILIARES ---
         const f2 = n => parseFloat(n||0).toFixed(2);
         const getBase = p => (parseFloat(p.cost)||0) + (parseFloat(globalCosts.embalagem)) + (parseFloat(globalCosts.frete)) + (parseFloat(p.log?.embExtra)||0) + (parseFloat(p.log?.freteExtra)||0);
         const calcSug = p => { const b = getBase(p); const d = 1 - (parseFloat(globalCosts.ganho) + parseFloat(globalCosts.imposto) + parseFloat(globalCosts.cartao))/100; return d>0 ? b/d : b*3; };
@@ -454,6 +497,15 @@
             let res = bp + fix; return pct < 100 ? res / (1 - pct/100) : res;
         };
 
+        function addEvent(msg, type='edit') {
+            const now = new Date();
+            const timeStr = `${now.getHours().toString().padStart(2,'0')}:${now.getMinutes().toString().padStart(2,'0')}`;
+            systemEvents.unshift({ time: timeStr, msg, type });
+            if(systemEvents.length > 20) systemEvents.pop();
+            localStorage.setItem('sostrass_events', JSON.stringify(systemEvents));
+            renderActivityFeed();
+        }
+
         // --- SISTEMA UI E NAVEGAÇÃO ---
         function toast(msg) {
             const c = document.getElementById('toast-container'); const t = document.createElement('div');
@@ -472,6 +524,112 @@
             if(view === 'catalogo') renderCatalogo();
             if(view === 'radar') populateRadarSelect();
         }
+
+        // --- DASHBOARD (CATÁLOGO + TIMELINE) ---
+        function renderCatalogo(filtro = '') {
+            const tb = document.getElementById('tabela-produtos'); 
+            if(!tb) return;
+            tb.innerHTML = '';
+            
+            let totalProds = 0;
+            let estqBaixo = 0;
+            let filaBling = 0;
+
+            products.filter(p => p.sku.toLowerCase().includes(filtro.toLowerCase()) || p.name.toLowerCase().includes(filtro.toLowerCase())).forEach((p, i) => {
+                totalProds++;
+                if((p.stock || 0) < 50) estqBaixo++;
+                if(p.pendenteBling) filaBling++;
+
+                const base = getBase(p); const marg = calcMargin(p.price, base);
+                const syncFlag = p.pendenteBling ? `<span class="ml-2 px-1.5 py-0.5 rounded text-[8px] font-bold bg-amber-50 text-amber-600 border border-amber-200 uppercase" title="Pendente de envio"><i class="fas fa-exclamation-triangle mr-0.5"></i> Fila</span>` : '';
+                
+                // Extrai ícones das plataformas
+                let platsHtml = '';
+                if(p.platforms && p.platforms.length > 0) {
+                    platsHtml = p.platforms.map(plId => `<div class="w-5 h-5 rounded-full border border-slate-200 bg-white flex items-center justify-center -ml-1 first:ml-0 shadow-sm" title="${plId}">${getSvg(plId, 10)}</div>`).join('');
+                } else {
+                    platsHtml = `<span class="text-[9px] text-slate-400">Nenhuma</span>`;
+                }
+
+                tb.innerHTML += `
+                    <tr class="hover:bg-slate-50 transition border-b border-slate-50 group cursor-pointer" onclick="abrirPim(${p.id})">
+                        <td class="px-5 py-3"><div class="font-bold text-slate-800 flex items-center text-xs">${p.sku} ${syncFlag}</div><div class="text-[9px] text-slate-400 truncate w-48 mt-0.5" title="${p.name}">${p.name}</div></td>
+                        <td class="px-5 py-3"><div class="flex items-center">${platsHtml}</div></td>
+                        <td class="px-5 py-3 text-right font-bold text-slate-700">R$ ${f2(p.price)}</td>
+                        <td class="px-5 py-3 text-center"><span class="px-2 py-0.5 rounded text-[9px] font-bold ${marg>=30?'bg-emerald-50 text-emerald-600 border border-emerald-100':'bg-rose-50 text-rose-600 border border-rose-100'}">${marg.toFixed(1)}%</span></td>
+                        <td class="px-5 py-3"><canvas id="spark-${i}" width="80" height="20"></canvas></td>
+                        <td class="px-5 py-3 text-right"><button type="button" onclick="abrirPim(${p.id}); event.stopPropagation();" class="opacity-0 group-hover:opacity-100 bg-white border border-slate-200 px-3 py-1.5 rounded-lg text-[9px] font-bold text-slate-600 hover:bg-indigo-600 hover:text-white transition shadow-sm">EDITAR</button></td>
+                    </tr>`;
+            });
+
+            // Atualiza Gráficos 
+            products.forEach((p, i) => {
+                const ctx = document.getElementById(`spark-${i}`); if(!ctx) return;
+                new Chart(ctx, { type:'line', data:{ labels:p.hist, datasets:[{ data:p.hist, borderColor:'#6366f1', borderWidth:2, pointRadius:0, tension:0.4 }] }, options:{ events:[], plugins:{legend:{display:false}}, scales:{x:{display:false},y:{display:false}} }});
+            });
+
+            // Atualiza Dashboard Metrics
+            const dash = document.getElementById('dash-metrics');
+            if(dash) {
+                dash.innerHTML = `
+                    <div class="glass-panel p-4 rounded-xl flex flex-col shadow-sm border border-slate-100">
+                        <div class="flex items-center gap-2 text-slate-500 mb-1"><i class="fas fa-boxes text-indigo-500"></i> <span class="text-[9px] font-bold uppercase tracking-widest">Total Produtos</span></div>
+                        <div class="text-2xl font-black text-slate-800">${totalProds}</div>
+                    </div>
+                    <div class="glass-panel p-4 rounded-xl flex flex-col shadow-sm border border-slate-100">
+                        <div class="flex items-center gap-2 text-slate-500 mb-1"><i class="fas fa-battery-quarter ${estqBaixo > 0 ? 'text-rose-500' : 'text-emerald-500'}"></i> <span class="text-[9px] font-bold uppercase tracking-widest">Estoque Crítico (< 50)</span></div>
+                        <div class="text-2xl font-black ${estqBaixo > 0 ? 'text-rose-600' : 'text-emerald-600'}">${estqBaixo}</div>
+                    </div>
+                    <div class="glass-panel p-4 rounded-xl flex flex-col shadow-sm border border-slate-100">
+                        <div class="flex items-center gap-2 text-slate-500 mb-1"><i class="fas fa-cloud-upload-alt ${filaBling > 0 ? 'text-amber-500' : 'text-slate-400'}"></i> <span class="text-[9px] font-bold uppercase tracking-widest">Fila Bling</span></div>
+                        <div class="text-2xl font-black ${filaBling > 0 ? 'text-amber-600' : 'text-slate-700'}">${filaBling}</div>
+                    </div>
+                `;
+            }
+
+            renderActivityFeed();
+        }
+
+        function renderActivityFeed() {
+            const feed = document.getElementById('activity-feed-list');
+            if(!feed) return;
+            
+            let html = '';
+            systemEvents.forEach((ev, i) => {
+                let icon = 'fa-info-circle text-slate-400';
+                let dotBg = 'bg-slate-100';
+                if(ev.type === 'edit') { icon = 'fa-pen text-indigo-500'; dotBg = 'bg-indigo-50 border-indigo-200'; }
+                if(ev.type === 'sync') { icon = 'fa-cloud-upload-alt text-emerald-500'; dotBg = 'bg-emerald-50 border-emerald-200'; }
+                if(ev.type === 'radar') { icon = 'fa-satellite-dish text-amber-500'; dotBg = 'bg-amber-50 border-amber-200'; }
+                if(ev.type === 'new') { icon = 'fa-plus text-rose-500'; dotBg = 'bg-rose-50 border-rose-200'; }
+
+                html += `
+                    <div class="relative pl-6 pb-5 feed-item">
+                        <div class="feed-line"></div>
+                        <div class="absolute left-[9px] top-1 w-3.5 h-3.5 rounded-full border border-slate-200 flex items-center justify-center bg-white z-10 shadow-sm ${dotBg}">
+                            <div class="w-1.5 h-1.5 rounded-full bg-current opacity-50"></div>
+                        </div>
+                        <div class="text-[9px] font-bold text-slate-400 mb-0.5">${ev.time}</div>
+                        <div class="text-[11px] font-medium text-slate-700 leading-tight"><i class="fas ${icon} mr-1 opacity-50"></i> ${ev.msg}</div>
+                    </div>
+                `;
+            });
+            feed.innerHTML = html;
+        }
+
+        function prepararEnvioBlingGeral() {
+            const pendentes = products.filter(p => p.pendenteBling);
+            if(pendentes.length === 0) return toast("Tudo atualizado! Nenhuma pendência para o Bling.");
+            
+            if(confirm(`Você tem ${pendentes.length} produtos na fila. Deseja enviar todas as atualizações para o Bling agora?`)) {
+                products.forEach(p => p.pendenteBling = false);
+                localStorage.setItem('sostrass_prods', JSON.stringify(products));
+                addEvent(`Sincronização em lote concluída (${pendentes.length} SKUs).`, 'sync');
+                toast(`${pendentes.length} SKUs atualizados no Bling com sucesso!`);
+                renderCatalogo();
+            }
+        }
+
 
         // --- ABA RADAR (FULL PAGE) ---
         let radarTargetProd = null;
@@ -543,6 +701,7 @@
                         </div>`;
                 });
                 list.innerHTML = html;
+                addEvent(`Varrida de mercado para SKU ${radarTargetProd.sku}.`, 'radar');
             }, 1500);
         }
 
@@ -553,10 +712,11 @@
             localStorage.setItem('sostrass_prods', JSON.stringify(products));
             document.getElementById('radar-current-price').innerText = `R$ ${f2(novoPreco)}`;
             toast(`Preço Global atualizado para R$ ${f2(novoPreco)}!`);
-            executarRadarPage(); // Recalcula a lista
+            addEvent(`Preço do SKU ${radarTargetProd.sku} alterado via Radar.`, 'edit');
+            executarRadarPage(); 
         }
 
-        // --- FUNÇÕES DO MODAL PIM (AGORA BLINDADAS) ---
+        // --- FUNÇÕES DO MODAL PIM (BLINDADAS) ---
         function togglePlataforma(platId) {
             if(!activeProd.platforms) activeProd.platforms = [];
             const index = activeProd.platforms.indexOf(platId);
@@ -818,6 +978,19 @@
         function salvarProdutoPim() {
             salvarDescricaoLocal(); 
             
+            // Se for produto novo, captura o novo SKU digitado
+            const isNew = activeProd.isNew;
+            if(isNew) {
+                const newSkuInput = document.getElementById('m-inp-newsku');
+                if(newSkuInput && newSkuInput.value.trim() !== '') {
+                    activeProd.sku = newSkuInput.value.trim().toUpperCase();
+                } else {
+                    activeProd.sku = "SKU-" + Math.floor(Math.random() * 10000);
+                }
+                activeProd.name = document.getElementById('m-inp-desc')?.value || "Novo Produto Sem Nome";
+                delete activeProd.isNew;
+            }
+
             const eCost = document.getElementById('m-inp-cost'); if(eCost) activeProd.cost = parseFloat(eCost.value) || 0;
             const ePrice = document.getElementById('m-inp-price'); if(ePrice) activeProd.price = parseFloat(ePrice.value) || 0;
             const eCat = document.getElementById('m-inp-cat'); if(eCat) activeProd.cat = eCat.value;
@@ -837,20 +1010,45 @@
             const eCfo = document.getElementById('m-fisc-cfop'); if(eCfo) activeProd.fisc.cfop = eCfo.value;
             const eIcm = document.getElementById('m-fisc-icms'); if(eIcm) activeProd.fisc.icms = parseFloat(eIcm.value) || 0;
 
-            activeProd.pendenteBling = true; localStorage.setItem('sostrass_prods', JSON.stringify(products)); renderCatalogo(); toast("Produto salvo na fila (Rascunho Local)."); 
+            activeProd.pendenteBling = true; 
+            
+            if(isNew) {
+                products.unshift(activeProd); // Joga no topo da lista
+                addEvent(`Novo produto criado: ${activeProd.sku}`, 'new');
+            } else {
+                addEvent(`Ficha editada e salva: ${activeProd.sku}`, 'edit');
+            }
+
+            localStorage.setItem('sostrass_prods', JSON.stringify(products)); 
+            renderCatalogo(); 
+            toast("Produto salvo na fila (Rascunho Local)."); 
+            fecharModal();
         }
 
         function prepararEnvioBling() {
             if(!activeProd.pendenteBling) { alert("Nenhuma alteração pendente para enviar."); return; }
             if(confirm(`Confirmar envio das atualizações do SKU ${activeProd.sku} para o Bling?`)) {
-                activeProd.pendenteBling = false; localStorage.setItem('sostrass_prods', JSON.stringify(products)); toast("Sincronizado com o Bling!"); renderCatalogo();
+                activeProd.pendenteBling = false; 
+                localStorage.setItem('sostrass_prods', JSON.stringify(products)); 
+                addEvent(`SKU ${activeProd.sku} sincronizado com Bling.`, 'sync');
+                toast("Sincronizado com o Bling!"); 
+                renderCatalogo();
+                fecharModal();
             }
         }
 
         function abrirPim(id) {
-            activeProd = products.find(x => x.id === id);
+            if(id === 'novo') {
+                activeProd = {
+                    id: Date.now(), isNew: true, sku: 'NOVO-SKU', code: '', ean: '', marca: 'Sóstrass', cond: 'Novo', formato: 'Simples',
+                    name: 'Novo Produto...', price: 0, cost: 0, stock: 0, cat: '', hist: [0,0,0,0,0], platforms: [],
+                    desc: '', descComp: '', descData: {}, log: {peso:0, alt:0, lar:0, pro:0, embExtra:0, freteExtra:0}, fisc: {ncm:'', origem:'0', cfop:'', icms:0}, pendenteBling: false, mktPrices: {}
+                };
+            } else {
+                activeProd = products.find(x => x.id === id);
+            }
+            
             if(!activeProd) return;
-
             if(!activeProd.platforms) activeProd.platforms = []; edicaoDescAlvo = 'padrao';
             if(!activeProd.log) activeProd.log = {}; if(!activeProd.fisc) activeProd.fisc = {};
             
@@ -858,6 +1056,13 @@
             setVSafe('m-sku', activeProd.sku);
             setVSafe('m-codigo', `Cód: ${activeProd.code || '---'}`); 
             
+            // Container para novo SKU só aparece se for produto novo
+            const newSkuInput = document.getElementById('m-inp-newsku');
+            if(newSkuInput) {
+                newSkuInput.parentElement.style.display = activeProd.isNew ? 'flex' : 'none';
+                newSkuInput.value = '';
+            }
+
             setVSafe('m-inp-cat', activeProd.cat || ''); 
             setVSafe('m-inp-stock', activeProd.stock || 0);
             setVSafe('m-inp-cost', activeProd.cost || 0); 
@@ -890,37 +1095,12 @@
 
         function fecharModal() { document.getElementById('modal-pim')?.classList.add('hidden'); }
 
-        function renderCatalogo(filtro = '') {
-            const tb = document.getElementById('tabela-produtos'); 
-            if(!tb) return;
-            tb.innerHTML = '';
-            
-            products.filter(p => p.sku.toLowerCase().includes(filtro.toLowerCase()) || p.name.toLowerCase().includes(filtro.toLowerCase())).forEach((p, i) => {
-                const base = getBase(p); const marg = calcMargin(p.price, base);
-                const syncFlag = p.pendenteBling ? `<span class="ml-2 px-1.5 py-0.5 rounded text-[8px] font-bold bg-amber-500/20 text-amber-600 border border-amber-200 uppercase" title="Pendente de envio ao Bling"><i class="fas fa-exclamation-triangle mr-0.5"></i> Fila Bling</span>` : '';
-                
-                tb.innerHTML += `
-                    <tr class="hover:bg-slate-50 transition border-b border-slate-100 group cursor-pointer" onclick="abrirPim(${p.id})">
-                        <td class="px-5 py-3"><div class="font-bold text-slate-800 flex items-center text-xs">${p.sku} ${syncFlag}</div><div class="text-[9px] text-slate-400 truncate w-48 mt-0.5">${p.name}</div></td>
-                        <td class="px-5 py-3 text-right font-medium text-rose-400">R$ ${f2(base)}</td>
-                        <td class="px-5 py-3 text-right font-bold text-indigo-600">R$ ${f2(p.price)}</td>
-                        <td class="px-5 py-3 text-center"><span class="px-2 py-0.5 rounded text-[9px] font-bold ${marg>=30?'bg-emerald-100 text-emerald-700':'bg-rose-100 text-rose-700'}">${marg.toFixed(1)}%</span></td>
-                        <td class="px-5 py-3"><canvas id="spark-${i}" width="80" height="20"></canvas></td>
-                        <td class="px-5 py-3 text-right"><button type="button" onclick="abrirPim(${p.id}); event.stopPropagation();" class="opacity-0 group-hover:opacity-100 bg-white border border-slate-200 px-3 py-1.5 rounded-lg text-[9px] font-bold text-slate-600 hover:bg-indigo-600 hover:text-white transition shadow-sm">EDITAR</button></td>
-                    </tr>`;
-            });
-            products.forEach((p, i) => {
-                const ctx = document.getElementById(`spark-${i}`); if(!ctx) return;
-                new Chart(ctx, { type:'line', data:{ labels:p.hist, datasets:[{ data:p.hist, borderColor:'#6366f1', borderWidth:2, pointRadius:0, tension:0.4 }] }, options:{ events:[], plugins:{legend:{display:false}}, scales:{x:{display:false},y:{display:false}} }});
-            });
-        }
-
         async function gerarIAPim(tipo) {
             const out = document.getElementById('m-ia-out');
             if(!out) return;
             out.innerHTML = '<i class="fas fa-circle-notch fa-spin text-indigo-500 mr-2"></i> Processando modelo gemini-2.5-flash...';
             setTimeout(() => { 
-                out.innerText = tipo === 'curta' ? `${activeProd.name} Original Premium` : `Especificações do Produto:\n\n• Material durável e sem descascamento.\n• Formato exato conforme fotos reais.\n• Garantia de fábrica de 3 meses.\n\n* Ideal para quem busca alta qualidade sem abrir mão do custo-benefício. Compra segura e envio em 24h.`; 
+                out.innerText = tipo === 'curta' ? `${document.getElementById('m-inp-desc')?.value || activeProd.name} Original Premium` : `Especificações do Produto:\n\n• Material durável e sem descascamento.\n• Formato exato conforme fotos reais.\n• Garantia de fábrica de 3 meses.\n\n* Ideal para quem busca alta qualidade sem abrir mão do custo-benefício. Compra segura e envio em 24h.`; 
             }, 1000); 
         }
 
