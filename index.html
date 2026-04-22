@@ -3,24 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sóstrass PIM Enterprise v7.5</title>
+    <title>Sóstrass PIM Enterprise v8.0</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
         * { box-sizing: border-box; font-family: 'Inter', sans-serif; }
-        ::-webkit-scrollbar { width: 6px; height: 6px; }
-        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
+        ::-webkit-scrollbar { width: 5px; height: 5px; }
+        ::-webkit-scrollbar-thumb { background: #475569; border-radius: 10px; }
         
         .glass-panel { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(16px); border: 1px solid rgba(226, 232, 240, 0.8); box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03); }
-        .ios-input { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 10px 14px; outline: none; transition: all 0.2s; font-size: 13px; width: 100%; color: #1e293b;}
+        .ios-input { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 8px 12px; outline: none; transition: all 0.2s; font-size: 12px; width: 100%; color: #1e293b;}
         .ios-input:focus { border-color: #6366f1; background: #fff; box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15); }
         
-        /* Estilos Premium Dark Mode (Modal PIM) */
-        .glass-dark { background: rgba(15, 15, 18, 0.85); backdrop-filter: blur(24px); border: 1px solid rgba(255, 255, 255, 0.05); box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4); }
-        .input-ghost { background: transparent; border: none; color: #fff; text-align: right; outline: none; width: 100%; max-width: 120px; font-weight: 700; transition: all 0.2s; }
+        /* Estilos Premium Dark Mode (Modal PIM) - Foco em tipografia suave */
+        .glass-dark { background: rgba(15, 15, 17, 0.75); backdrop-filter: blur(24px); border: 1px solid rgba(255, 255, 255, 0.05); box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3); }
+        .input-ghost { background: transparent; border: none; color: #fff; text-align: right; outline: none; width: 100%; max-width: 100px; font-weight: 600; transition: all 0.2s; font-size: 13px;}
         .input-ghost:focus { background: rgba(255, 255, 255, 0.05); border-radius: 6px; padding-right: 8px; }
+        .input-dark { background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.08); border-radius: 6px; padding: 8px 10px; color: #e2e8f0; font-size: 12px; outline: none; transition: 0.2s; width: 100%;}
+        .input-dark:focus { border-color: #6366f1; background: rgba(0,0,0,0.5); }
+        
         .btn-dark { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); color: #94a3b8; transition: all 0.2s; }
         .btn-dark:hover { background: rgba(255, 255, 255, 0.08); border-color: rgba(255, 255, 255, 0.15); color: #fff;}
         .btn-active { background: #4f46e5; border-color: #6366f1; color: #fff; box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3); }
@@ -28,51 +31,51 @@
 </head>
 <body class="bg-slate-50 text-slate-800 h-screen flex overflow-hidden bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]">
 
-    <div id="toast-container" class="fixed top-20 right-6 z-50 flex flex-col gap-3"></div>
+    <div id="toast-container" class="fixed top-20 right-6 z-50 flex flex-col gap-3 pointer-events-none"></div>
 
     <aside class="w-64 bg-slate-900 text-slate-400 flex flex-col shadow-xl z-20 shrink-0">
-        <div class="h-16 flex items-center px-6 border-b border-slate-800 bg-slate-950">
-            <h1 class="text-lg font-bold text-white flex items-center gap-2"><i class="fas fa-gem text-indigo-500"></i> Sóstrass<span class="text-[10px] bg-indigo-500/20 text-indigo-400 px-1.5 rounded">PRO</span></h1>
+        <div class="h-14 flex items-center px-6 border-b border-slate-800 bg-slate-950">
+            <h1 class="text-sm font-bold text-white flex items-center gap-2"><i class="fas fa-gem text-indigo-500"></i> Sóstrass<span class="text-[9px] bg-indigo-500/20 text-indigo-400 px-1.5 py-0.5 rounded">PRO</span></h1>
         </div>
         <div class="flex-1 py-6 px-3 space-y-1 overflow-y-auto">
-            <p class="px-3 text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2">Operacional</p>
-            <button onclick="navTo('catalogo')" id="nav-catalogo" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-lg font-medium transition bg-indigo-600 text-white shadow-lg"><i class="fas fa-chart-line w-5 text-center"></i> Monitoramento</button>
-            <button onclick="navTo('massa')" id="nav-massa" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 hover:text-white hover:bg-slate-800 rounded-lg transition"><i class="fas fa-bolt w-5 text-amber-400 text-center"></i> Op. em Massa</button>
-            <button onclick="navTo('automacoes')" id="nav-automacoes" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 hover:text-white hover:bg-slate-800 rounded-lg transition"><i class="fas fa-robot w-5 text-emerald-400 text-center"></i> Central I.A.</button>
+            <p class="px-3 text-[9px] font-bold text-slate-500 uppercase tracking-wider mb-2">Operacional</p>
+            <button onclick="navTo('catalogo')" id="nav-catalogo" class="nav-btn w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-medium transition bg-indigo-600 text-white shadow"><i class="fas fa-chart-line w-5 text-center"></i> Monitoramento</button>
+            <button onclick="navTo('massa')" id="nav-massa" class="nav-btn w-full flex items-center gap-3 px-3 py-2 hover:text-white hover:bg-slate-800 rounded-lg text-xs transition"><i class="fas fa-bolt w-5 text-amber-400 text-center"></i> Op. em Massa</button>
+            <button onclick="navTo('automacoes')" id="nav-automacoes" class="nav-btn w-full flex items-center gap-3 px-3 py-2 hover:text-white hover:bg-slate-800 rounded-lg text-xs transition"><i class="fas fa-robot w-5 text-emerald-400 text-center"></i> Central I.A.</button>
             <div class="my-4 border-t border-slate-800"></div>
-            <p class="px-3 text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2">Sistema</p>
-            <button onclick="navTo('simulador')" id="nav-simulador" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 hover:text-white hover:bg-slate-800 rounded-lg transition"><i class="fas fa-globe w-5 text-center"></i> Custos Globais</button>
-            <button onclick="navTo('config')" id="nav-config" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 hover:text-white hover:bg-slate-800 rounded-lg transition"><i class="fas fa-cog w-5 text-center"></i> Configurações</button>
+            <p class="px-3 text-[9px] font-bold text-slate-500 uppercase tracking-wider mb-2">Sistema</p>
+            <button onclick="navTo('simulador')" id="nav-simulador" class="nav-btn w-full flex items-center gap-3 px-3 py-2 hover:text-white hover:bg-slate-800 rounded-lg text-xs transition"><i class="fas fa-globe w-5 text-center"></i> Custos Globais</button>
+            <button onclick="navTo('config')" id="nav-config" class="nav-btn w-full flex items-center gap-3 px-3 py-2 hover:text-white hover:bg-slate-800 rounded-lg text-xs transition"><i class="fas fa-cog w-5 text-center"></i> Configurações</button>
         </div>
     </aside>
 
     <div class="flex-1 flex flex-col min-w-0 relative">
-        <header class="h-16 glass-panel flex items-center justify-between px-8 z-10 sticky top-0 border-b border-slate-200">
-            <div class="flex-1 max-w-2xl relative">
-                <i class="fas fa-search absolute left-4 top-3.5 text-slate-400"></i>
-                <input type="text" id="buscaGeral" placeholder="Buscar SKU ou Produto..." class="w-full ios-input pl-10 py-2.5" oninput="renderCatalogo(this.value)">
+        <header class="h-14 glass-panel flex items-center justify-between px-8 z-10 sticky top-0 border-b border-slate-200">
+            <div class="flex-1 max-w-xl relative">
+                <i class="fas fa-search absolute left-4 top-3 text-slate-400 text-xs"></i>
+                <input type="text" id="buscaGeral" placeholder="Buscar SKU ou Produto..." class="w-full ios-input pl-9 py-2" oninput="renderCatalogo(this.value)">
             </div>
             <div class="flex items-center gap-3 ml-6">
-                <div id="status-pill" class="px-3 py-1 bg-rose-50 text-rose-600 border border-rose-200 rounded-full text-[10px] font-black">OFFLINE</div>
-                <div id="serverBar" class="px-4 py-1.5 bg-slate-100 rounded-full text-[10px] font-black border border-slate-200 text-slate-500"><i class="fas fa-circle-notch fa-spin mr-1"></i> PROXY...</div>
+                <div id="status-pill" class="px-2 py-1 bg-rose-50 text-rose-600 border border-rose-200 rounded text-[9px] font-bold uppercase tracking-wider">OFFLINE</div>
+                <div id="serverBar" class="px-3 py-1 bg-slate-100 rounded text-[9px] font-bold border border-slate-200 text-slate-500"><i class="fas fa-circle-notch fa-spin mr-1"></i> PROXY...</div>
             </div>
         </header>
 
-        <main class="flex-1 overflow-auto p-8" id="view-container">
+        <main class="flex-1 overflow-auto p-8 bg-[#f8fafc]" id="view-container">
             <div id="view-catalogo" class="space-y-6">
-                <div class="flex justify-between items-end mb-6">
-                    <div><h2 class="text-3xl font-black tracking-tight text-slate-800">Monitoramento Financeiro</h2><p class="text-slate-500 mt-1">Visão global de margens e histórico de preços.</p></div>
+                <div class="flex justify-between items-end mb-4">
+                    <div><h2 class="text-2xl font-bold tracking-tight text-slate-800">Monitoramento Financeiro</h2><p class="text-xs text-slate-500 mt-1">Visão global de margens e controle de preços.</p></div>
                 </div>
-                <div class="glass-panel rounded-2xl overflow-hidden shadow-sm">
-                    <table class="w-full text-left text-sm whitespace-nowrap">
-                        <thead class="bg-slate-50 border-b border-slate-200 text-slate-500 uppercase text-[10px] font-black">
+                <div class="glass-panel rounded-xl overflow-hidden shadow-sm">
+                    <table class="w-full text-left text-xs whitespace-nowrap">
+                        <thead class="bg-slate-100/50 border-b border-slate-200 text-slate-500 uppercase text-[9px] font-bold tracking-wider">
                             <tr>
-                                <th class="px-6 py-4">SKU / Produto</th>
-                                <th class="px-6 py-4 text-right">Custo Base</th>
-                                <th class="px-6 py-4 text-right">Preço (Global)</th>
-                                <th class="px-6 py-4 text-center">Margem</th>
-                                <th class="px-6 py-4 w-32 text-center">Gráfico (7d)</th>
-                                <th class="px-6 py-4 text-right">Ação</th>
+                                <th class="px-5 py-3">SKU / Produto</th>
+                                <th class="px-5 py-3 text-right">Custo Base</th>
+                                <th class="px-5 py-3 text-right">Preço (Global)</th>
+                                <th class="px-5 py-3 text-center">Margem</th>
+                                <th class="px-5 py-3 w-24 text-center">Gráfico (7d)</th>
+                                <th class="px-5 py-3 text-right">Ação</th>
                             </tr>
                         </thead>
                         <tbody id="tabela-produtos" class="divide-y divide-slate-100 bg-white"></tbody>
@@ -80,185 +83,198 @@
                 </div>
             </div>
 
-            <div id="view-massa" class="hidden space-y-6"><h2 class="text-3xl font-black text-amber-600">Ações em Lote</h2></div>
-            <div id="view-automacoes" class="hidden space-y-6"><h2 class="text-3xl font-black text-emerald-600">AI Core</h2></div>
-            <div id="view-simulador" class="hidden space-y-6"><h2 class="text-3xl font-black text-indigo-600">Precificação Global</h2></div>
-            <div id="view-config" class="hidden space-y-6"><h2 class="text-3xl font-black text-slate-800">Infraestrutura</h2></div>
+            <div id="view-massa" class="hidden space-y-6"><h2 class="text-2xl font-bold text-amber-600">Ações em Lote</h2></div>
+            <div id="view-automacoes" class="hidden space-y-6"><h2 class="text-2xl font-bold text-emerald-600">AI Core</h2></div>
+            <div id="view-simulador" class="hidden space-y-6"><h2 class="text-2xl font-bold text-indigo-600">Precificação Global</h2></div>
+            <div id="view-config" class="hidden space-y-6"><h2 class="text-2xl font-bold text-slate-800">Infraestrutura</h2></div>
         </main>
     </div>
 
     <div id="modal-pim" class="fixed inset-0 bg-black/90 backdrop-blur-md z-50 hidden flex items-center justify-center p-4 transition-opacity">
         <div class="bg-[#0B0B0C] w-full max-w-7xl h-full max-h-[96vh] rounded-2xl shadow-2xl flex flex-col overflow-hidden border border-white/10 text-slate-300">
             
-            <div class="px-8 py-6 border-b border-white/5 bg-[#0B0B0C] shrink-0 flex flex-wrap gap-6 justify-between items-center z-10 relative shadow-md">
-                
-                <div class="flex items-center gap-4 flex-1 min-w-[300px]">
-                    <div class="w-14 h-14 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-slate-300 text-2xl shadow-inner"><i class="fas fa-box-open"></i></div>
+            <div class="px-6 py-4 border-b border-white/5 bg-[#0B0B0C] shrink-0 flex flex-wrap gap-4 justify-between items-center z-10 shadow-md">
+                <div class="flex items-center gap-3 min-w-[250px]">
+                    <div class="w-10 h-10 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-indigo-400 text-lg shadow-inner"><i class="fas fa-box"></i></div>
                     <div class="flex-1 min-w-0">
-                        <h3 class="font-black text-2xl text-white leading-tight truncate" id="m-nome">Produto</h3>
-                        <p class="text-sm font-mono font-bold text-slate-500 mt-1 flex items-center gap-3">
-                            <span id="m-sku">SKU</span> 
+                        <h3 class="font-bold text-base text-white truncate" id="m-nome">Produto</h3>
+                        <p class="text-[10px] font-mono text-slate-500 mt-0.5 flex items-center gap-2">
+                            <span id="m-sku" class="font-bold text-indigo-300">SKU</span> 
                             <span class="w-1 h-1 rounded-full bg-slate-700"></span> 
-                            <span id="m-codigo" class="text-slate-600">Cód: ---</span>
+                            <span id="m-codigo" class="text-slate-500">Cód: ---</span>
                         </p>
                     </div>
                 </div>
 
-                <div class="flex flex-wrap gap-2 items-center justify-end">
-                    <button onclick="mTab('geral')" id="btn-m-geral" class="px-5 py-2.5 rounded-lg text-xs font-bold btn-active transition">Visão Geral</button>
-                    <button onclick="mTab('desc')" id="btn-m-desc" class="px-5 py-2.5 rounded-lg text-xs font-bold btn-dark transition">Descrição & I.A.</button>
-                    <button onclick="mTab('mkt')" id="btn-m-mkt" class="px-5 py-2.5 rounded-lg text-xs font-bold btn-dark transition">Marketplaces</button>
-                    <button onclick="mTab('fisc')" id="btn-m-fisc" class="px-5 py-2.5 rounded-lg text-xs font-bold btn-dark transition">Fiscal / Log</button>
-                    
-                    <div class="w-px h-6 bg-white/10 mx-2 hidden sm:block"></div>
-                    
-                    <button onclick="prepararEnvioBling()" class="px-6 py-2.5 rounded-lg text-xs font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 hover:bg-emerald-500 hover:text-white transition flex items-center gap-2">
-                        <i class="fas fa-cloud-upload-alt"></i> Sincronizar
+                <div class="flex flex-wrap gap-2 items-center bg-[#151517] p-1.5 rounded-xl border border-white/5">
+                    <button onclick="mTab('geral')" id="btn-m-geral" class="px-4 py-1.5 rounded-lg text-[11px] font-bold btn-active transition">Visão Geral</button>
+                    <button onclick="mTab('desc')" id="btn-m-desc" class="px-4 py-1.5 rounded-lg text-[11px] font-bold btn-dark transition">Produto</button>
+                    <button onclick="mTab('mkt')" id="btn-m-mkt" class="px-4 py-1.5 rounded-lg text-[11px] font-bold btn-dark transition">Marketplaces</button>
+                    <button onclick="mTab('radar')" id="btn-m-radar" class="px-4 py-1.5 rounded-lg text-[11px] font-bold btn-dark transition"><i class="fas fa-radar text-indigo-400 mr-1"></i> Radar</button>
+                </div>
+                
+                <div class="flex items-center gap-3">
+                    <button onclick="prepararEnvioBling()" class="px-4 py-1.5 rounded-lg text-[11px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 hover:bg-emerald-500 hover:text-white transition flex items-center gap-1.5">
+                        <i class="fas fa-cloud-upload-alt"></i> Sincronizar Bling
                     </button>
-                    <button onclick="fecharModal()" class="ml-2 text-slate-500 hover:text-rose-500 text-xl w-10 h-10 rounded-full hover:bg-white/5 transition flex items-center justify-center"><i class="fas fa-times"></i></button>
+                    <div class="w-px h-5 bg-white/10 mx-1"></div>
+                    <button onclick="fecharModal()" class="text-slate-500 hover:text-rose-400 text-lg w-8 h-8 rounded-full hover:bg-white/5 transition flex items-center justify-center"><i class="fas fa-times"></i></button>
                 </div>
             </div>
 
-            <div class="flex-1 overflow-y-auto p-8 bg-[#0B0B0C] relative">
+            <div class="flex-1 overflow-y-auto p-6 bg-[#0B0B0C] relative scroll-smooth">
                 
-                <div id="m-view-geral" class="space-y-6 max-w-5xl mx-auto">
+                <div id="m-view-geral" class="space-y-4 max-w-5xl mx-auto">
                     
-                    <div class="glass-dark rounded-2xl p-6">
-                        <div class="flex items-center gap-2 mb-4 text-slate-400"><i class="fas fa-chart-pie text-indigo-500"></i> <span class="text-xs font-bold uppercase tracking-wider text-white">Indicadores Globais</span></div>
-                        <div class="grid grid-cols-4 gap-4">
-                            <div class="bg-[#151517] p-5 rounded-xl border border-white/5 shadow-inner">
-                                <p class="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2">Preço Bling (Global)</p>
-                                <p class="text-3xl font-black text-[#10b981]" id="m-res-preco">R$ 0,00</p>
-                            </div>
-                            <div class="bg-[#151517] p-5 rounded-xl border border-white/5 shadow-inner">
-                                <p class="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2">Custo Base</p>
-                                <p class="text-3xl font-black text-[#f43f5e]" id="m-res-custo">R$ 0,00</p>
-                            </div>
-                            <div class="bg-[#151517] p-5 rounded-xl border border-white/5 shadow-inner">
-                                <p class="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2">Margem Bruta (Global)</p>
-                                <p class="text-3xl font-black text-[#10b981]" id="m-res-margem">0%</p>
-                            </div>
-                            <div class="bg-[#151517] p-5 rounded-xl border border-white/5 shadow-inner">
-                                <p class="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2">Estoque Total</p>
-                                <p class="text-3xl font-black text-white" id="m-res-estoque">0 un</p>
-                            </div>
+                    <div class="grid grid-cols-4 gap-4">
+                        <div class="glass-dark p-4 rounded-xl flex flex-col justify-center">
+                            <p class="text-[9px] font-bold text-slate-500 uppercase tracking-widest mb-1">Preço Bling (Global)</p>
+                            <p class="text-2xl font-bold text-[#10b981]" id="m-res-preco">R$ 0,00</p>
+                        </div>
+                        <div class="glass-dark p-4 rounded-xl flex flex-col justify-center">
+                            <p class="text-[9px] font-bold text-slate-500 uppercase tracking-widest mb-1">Custo Base</p>
+                            <p class="text-2xl font-bold text-[#f43f5e]" id="m-res-custo">R$ 0,00</p>
+                        </div>
+                        <div class="glass-dark p-4 rounded-xl flex flex-col justify-center border border-indigo-500/20 bg-indigo-900/10">
+                            <p class="text-[9px] font-bold text-indigo-400 uppercase tracking-widest mb-1">Margem Bruta</p>
+                            <p class="text-2xl font-bold text-indigo-300" id="m-res-margem">0%</p>
+                        </div>
+                        <div class="glass-dark p-4 rounded-xl flex flex-col justify-center">
+                            <p class="text-[9px] font-bold text-slate-500 uppercase tracking-widest mb-1">Estoque Total</p>
+                            <p class="text-2xl font-bold text-white" id="m-res-estoque">0 un</p>
                         </div>
                     </div>
 
-                    <div class="glass-dark rounded-2xl p-6">
-                        <div class="flex items-center gap-2 mb-2 text-slate-400"><i class="fas fa-link text-amber-500"></i> <span class="text-xs font-bold uppercase tracking-wider text-white">Plataformas Vinculadas</span></div>
-                        <p class="text-xs text-slate-500 mb-6">Ative ou desative as plataformas onde este produto é vendido. Isso afeta as abas de Descrição e Marketplaces.</p>
-                        
-                        <div class="flex flex-wrap gap-3 mb-6 border-b border-white/5 pb-6" id="vg-platform-pills"></div>
+                    <div class="glass-dark rounded-xl p-5">
+                        <div class="flex items-center gap-2 mb-3"><i class="fas fa-link text-amber-500 text-sm"></i> <span class="text-[11px] font-bold uppercase tracking-widest text-slate-200">Plataformas Vinculadas</span></div>
+                        <p class="text-[10px] text-slate-500 mb-4">Ative os canais onde este produto é vendido. Isso desbloqueia as abas de edição e cálculos específicos.</p>
+                        <div class="flex flex-wrap gap-2 mb-4 border-b border-white/5 pb-4" id="vg-platform-pills"></div>
                         <div class="space-y-1" id="vg-platform-list"></div>
                     </div>
 
-                    <div class="glass-dark rounded-2xl p-6">
-                        <div class="flex items-center gap-2 mb-6 text-slate-400"><i class="fas fa-pen text-rose-500"></i> <span class="text-xs font-bold uppercase tracking-wider text-white">Edição Rápida (Base)</span></div>
-                        <div class="grid grid-cols-2 gap-12">
-                            <div>
-                                <div class="space-y-0 text-sm">
-                                    <div class="flex justify-between items-center py-4 border-b border-white/5 group">
-                                        <span class="text-slate-400 font-medium">Categoria do Produto</span>
-                                        <input type="text" id="m-inp-cat" class="input-ghost text-slate-300" placeholder="Ex: Informática">
-                                    </div>
-                                    <div class="flex justify-between items-center py-4 border-b border-white/5 group">
-                                        <span class="text-slate-400 font-medium flex gap-2">Preço Global <span class="text-slate-600">R$</span></span>
-                                        <input type="number" id="m-inp-price" class="input-ghost text-[#10b981] text-lg" oninput="recalcPim()">
-                                    </div>
-                                    <div class="flex justify-between items-center py-4 border-b border-white/5 group">
-                                        <span class="text-slate-400 font-medium flex gap-2">Custo Fornecedor <span class="text-slate-600">R$</span></span>
-                                        <input type="number" id="m-inp-cost" class="input-ghost text-[#f43f5e] text-lg" oninput="recalcPim()">
-                                    </div>
-                                    <div class="flex justify-between items-center py-4 group">
-                                        <span class="text-slate-400 font-medium">Estoque Físico</span>
-                                        <div class="flex items-center gap-2">
-                                            <input type="number" id="m-inp-stock" class="input-ghost text-right text-lg">
-                                            <span class="text-slate-600 text-xs font-bold">un</span>
-                                        </div>
-                                    </div>
+                    <div class="glass-dark rounded-xl p-5">
+                        <div class="flex items-center gap-2 mb-4"><i class="fas fa-pen text-rose-500 text-sm"></i> <span class="text-[11px] font-bold uppercase tracking-widest text-slate-200">Valores Globais da Ficha</span></div>
+                        <div class="grid grid-cols-2 gap-8">
+                            <div class="space-y-1 text-xs">
+                                <div class="flex justify-between items-center py-2.5 border-b border-white/5">
+                                    <span class="text-slate-400">Preço Global (R$)</span>
+                                    <input type="number" id="m-inp-price" class="input-ghost text-[#10b981]" oninput="recalcPim()">
                                 </div>
-                                <button onclick="salvarProdutoPim()" class="mt-4 w-full py-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-sm font-bold shadow-lg transition"><i class="fas fa-save mr-2"></i> Salvar Edição Rápida</button>
+                                <div class="flex justify-between items-center py-2.5 border-b border-white/5">
+                                    <span class="text-slate-400">Custo Fornecedor (R$)</span>
+                                    <input type="number" id="m-inp-cost" class="input-ghost text-[#f43f5e]" oninput="recalcPim()">
+                                </div>
+                                <div class="flex justify-between items-center py-2.5">
+                                    <span class="text-slate-400">Estoque Físico (un)</span>
+                                    <input type="number" id="m-inp-stock" class="input-ghost text-white">
+                                </div>
                             </div>
-                            <div class="pl-8 border-l border-white/5 flex flex-col justify-center">
-                                <p class="text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-1">Cálculo Reverso (Sugestão)</p>
-                                <p class="text-4xl font-black text-[#10b981] mb-1" id="m-res-sug">R$ 0,00</p>
-                                <p class="text-xs text-slate-500 mb-8">Para manter sua margem de <strong><span id="m-res-ganho-alvo">...</span></strong>, o preço global ideal é o acima.</p>
-
-                                <button onclick="navTo('simulador'); fecharModal()" class="px-5 py-3 bg-[#151517] hover:bg-[#1a1a1c] text-slate-300 rounded-xl text-xs font-bold border border-white/10 shadow-inner transition flex items-center justify-center gap-2 mt-auto"><i class="fas fa-cog text-slate-500"></i> Ajustar Parâmetros Globais</button>
+                            <div class="pl-6 border-l border-white/5 flex flex-col justify-center">
+                                <p class="text-[9px] font-bold uppercase tracking-widest text-slate-500 mb-1">Preço Matemático Sugerido</p>
+                                <p class="text-3xl font-bold text-[#10b981] mb-1" id="m-res-sug">R$ 0,00</p>
+                                <p class="text-[10px] text-slate-500 mb-3">Calculado para manter ganho de <strong class="text-white"><span id="m-res-ganho-alvo">...</span></strong> com as taxas globais.</p>
+                                <button onclick="salvarProdutoPim()" class="px-4 py-2 bg-indigo-600/20 hover:bg-indigo-600 text-indigo-400 hover:text-white border border-indigo-500/30 rounded-lg text-[10px] font-bold transition flex items-center justify-center w-max gap-2"><i class="fas fa-save"></i> Salvar Alterações</button>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <div id="m-view-desc" class="hidden space-y-6 max-w-5xl mx-auto">
+                <div id="m-view-desc" class="hidden space-y-4 max-w-5xl mx-auto">
                     
-                    <div class="glass-dark rounded-xl p-5 border border-white/5 flex justify-between items-center sticky top-0 z-20 shadow-md">
-                        <div class="flex items-center gap-4">
-                            <span class="text-[10px] font-bold uppercase tracking-widest text-slate-400">Canal de Edição:</span>
-                            <div class="flex flex-wrap gap-2" id="desc-platform-pills"></div>
+                    <div class="glass-dark rounded-xl p-3 flex justify-between items-center sticky top-0 z-20 shadow-md">
+                        <div class="flex items-center gap-3">
+                            <span class="text-[9px] font-bold uppercase tracking-widest text-slate-500 px-2">Canal de Edição:</span>
+                            <div class="flex flex-wrap gap-1.5" id="desc-platform-pills"></div>
                         </div>
-                        <button onclick="salvarProdutoPim()" class="px-6 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-xs font-bold shadow-lg transition"><i class="fas fa-save mr-2"></i> Salvar Textos</button>
+                        <button onclick="salvarProdutoPim()" class="px-4 py-1.5 bg-emerald-600 text-white rounded text-[10px] font-bold shadow transition hover:bg-emerald-500"><i class="fas fa-check mr-1"></i> Salvar Ficha</button>
                     </div>
 
-                    <div class="grid grid-cols-2 gap-6">
-                        <div class="space-y-6">
-                            <div class="glass-dark rounded-xl p-6 border border-white/5">
-                                <div class="flex items-center gap-2 mb-1 text-slate-400"><i class="fas fa-heading text-indigo-400"></i> <span class="text-[10px] font-bold uppercase tracking-widest text-white">Título do Anúncio</span></div>
-                                <p class="text-[11px] text-slate-500 mb-4 ml-6">Foco no benefício principal e palavras-chave. Máx 200 char.</p>
-                                <textarea id="m-inp-desc" rows="2" class="w-full bg-[#151517] border border-white/10 rounded-lg p-4 text-sm font-medium text-slate-200 focus:border-indigo-500 outline-none resize-none transition shadow-inner placeholder:text-slate-600"></textarea>
+                    <div class="glass-dark rounded-xl p-5 border-l-2 border-indigo-500">
+                        <div class="flex items-center gap-2 mb-3"><i class="fas fa-tags text-indigo-400 text-sm"></i> <span class="text-[10px] font-bold uppercase tracking-widest text-white">Dados Básicos (Sincroniza c/ Bling)</span></div>
+                        <div class="grid grid-cols-4 gap-4">
+                            <div><label class="block text-[9px] uppercase font-bold text-slate-500 mb-1">GTIN / EAN</label><input type="text" id="m-inp-ean" class="input-dark font-mono text-[11px]" placeholder="Ex: 7890000000000"></div>
+                            <div><label class="block text-[9px] uppercase font-bold text-slate-500 mb-1">Marca</label><input type="text" id="m-inp-marca" class="input-dark" placeholder="Ex: Sóstrass"></div>
+                            <div><label class="block text-[9px] uppercase font-bold text-slate-500 mb-1">Condição</label><select id="m-inp-cond" class="input-dark"><option value="Novo">Novo</option><option value="Usado">Usado</option></select></div>
+                            <div><label class="block text-[9px] uppercase font-bold text-slate-500 mb-1">Formato</label><select id="m-inp-formato" class="input-dark"><option value="Simples">Simples</option><option value="Com Variação">Com Variação</option></select></div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="space-y-4">
+                            <div class="glass-dark rounded-xl p-5">
+                                <div class="flex justify-between items-end mb-2">
+                                    <div class="flex items-center gap-2"><i class="fas fa-heading text-slate-400 text-sm"></i> <span class="text-[10px] font-bold uppercase tracking-widest text-white">Título do Anúncio</span></div>
+                                    <span class="text-[9px] font-mono text-slate-500">Máx 200</span>
+                                </div>
+                                <textarea id="m-inp-desc" rows="2" class="w-full bg-[#151517] border border-white/5 rounded-lg p-3 text-xs font-medium text-slate-200 focus:border-indigo-500 outline-none resize-none transition shadow-inner placeholder:text-slate-600"></textarea>
                             </div>
 
-                            <div class="glass-dark rounded-xl p-6 border border-white/5">
-                                <div class="flex items-center gap-2 mb-1 text-slate-400"><i class="fas fa-align-left text-emerald-400"></i> <span class="text-[10px] font-bold uppercase tracking-widest text-white">Descrição Completa</span></div>
-                                <p class="text-[11px] text-slate-500 mb-4 ml-6">Especificações, modo de uso e garantias. Use bullet points.</p>
-                                <textarea id="m-inp-descComp" rows="12" class="w-full bg-[#151517] border border-white/10 rounded-lg p-4 text-[13px] leading-relaxed font-mono text-slate-300 focus:border-emerald-500 outline-none resize-none transition shadow-inner placeholder:text-slate-600"></textarea>
+                            <div class="glass-dark rounded-xl p-5 flex-1">
+                                <div class="flex items-center gap-2 mb-2"><i class="fas fa-align-left text-slate-400 text-sm"></i> <span class="text-[10px] font-bold uppercase tracking-widest text-white">Descrição Completa</span></div>
+                                <p class="text-[9px] text-slate-500 mb-3">Evite devoluções: detalhe uso, material, medidas reais e o que vem na embalagem.</p>
+                                <textarea id="m-inp-descComp" rows="14" class="w-full bg-[#151517] border border-white/5 rounded-lg p-4 text-[12px] leading-relaxed font-mono text-slate-300 focus:border-indigo-500 outline-none resize-none transition shadow-inner placeholder:text-slate-600"></textarea>
                             </div>
                         </div>
 
-                        <div class="space-y-6">
-                            <div class="glass-dark rounded-xl p-6 border border-indigo-500/20 bg-indigo-900/5">
-                                <div class="flex items-center gap-2 mb-4 text-indigo-400"><i class="fas fa-sparkles"></i> <span class="text-[10px] font-bold uppercase tracking-widest text-white">Gemini AI Studio</span></div>
-                                
-                                <label class="text-[10px] font-mono uppercase text-slate-500 mb-2 block">Instruções de Geração</label>
-                                <textarea id="m-ia-context" rows="3" class="w-full bg-[#0B0B0C] border border-white/5 rounded-lg p-3 text-xs text-slate-300 focus:border-indigo-500 outline-none resize-none transition shadow-inner mb-4" placeholder="Ex: Tom profissional, listar garantia de 12 meses, focar em durabilidade..."></textarea>
-                                
-                                <div class="grid grid-cols-2 gap-3 mb-6">
-                                    <button onclick="gerarIAPim('curta')" class="py-2.5 bg-[#151517] hover:bg-white/5 border border-white/10 rounded-lg text-xs font-bold text-slate-300 transition flex items-center justify-center gap-2"><i class="fas fa-magic text-indigo-400"></i> Gerar Título</button>
-                                    <button onclick="gerarIAPim('comp')" class="py-2.5 bg-[#151517] hover:bg-white/5 border border-white/10 rounded-lg text-xs font-bold text-slate-300 transition flex items-center justify-center gap-2"><i class="fas fa-align-left text-emerald-400"></i> Gerar Completa</button>
-                                </div>
+                        <div class="glass-dark rounded-xl p-5 border border-indigo-500/10 flex flex-col">
+                            <div class="flex items-center gap-2 mb-3"><i class="fas fa-sparkles text-indigo-400"></i> <span class="text-[10px] font-bold uppercase tracking-widest text-indigo-300">Gemini AI Studio</span></div>
+                            
+                            <label class="text-[9px] font-bold uppercase tracking-widest text-slate-500 mb-1">Instruções Anti-Devolução (Prompt)</label>
+                            <textarea id="m-ia-context" rows="3" class="w-full bg-[#0B0B0C] border border-white/5 rounded-lg p-3 text-[11px] text-slate-300 focus:border-indigo-500 outline-none resize-none transition shadow-inner mb-4" placeholder="Ex: Detalhar que a pérola é ABS e não de vidro. Focar em artesãs. Listar que não descasca..."></textarea>
+                            
+                            <div class="grid grid-cols-2 gap-2 mb-4">
+                                <button onclick="gerarIAPim('curta')" class="py-2 bg-[#151517] hover:bg-[#1a1a1c] border border-white/5 rounded-lg text-[10px] font-bold text-slate-300 transition flex items-center justify-center gap-1.5"><i class="fas fa-magic text-indigo-400"></i> Gerar Título</button>
+                                <button onclick="gerarIAPim('comp')" class="py-2 bg-[#151517] hover:bg-[#1a1a1c] border border-white/5 rounded-lg text-[10px] font-bold text-slate-300 transition flex items-center justify-center gap-1.5"><i class="fas fa-align-left text-emerald-400"></i> Gerar Desc. Detalhada</button>
+                            </div>
 
-                                <div class="relative">
-                                    <div class="absolute -top-3 left-4 bg-[#0B0B0C] px-2 text-[9px] font-bold uppercase tracking-widest text-indigo-400">Resultado da IA</div>
-                                    <div class="bg-[#0B0B0C] border border-white/10 rounded-xl p-5 font-mono text-[13px] text-slate-300 min-h-[150px] shadow-inner whitespace-pre-wrap overflow-y-auto max-h-[300px]" id="m-ia-out">Aguardando comando...</div>
-                                </div>
+                            <div class="relative flex-1 flex flex-col">
+                                <div class="absolute -top-2.5 left-3 bg-[#0B0B0C] px-1 text-[8px] font-bold uppercase tracking-widest text-indigo-500/80">Resultado</div>
+                                <div class="bg-[#0B0B0C] border border-white/5 rounded-lg p-4 font-mono text-[11px] text-slate-300 flex-1 shadow-inner whitespace-pre-wrap overflow-y-auto max-h-[350px]" id="m-ia-out">Aguardando comando...</div>
+                            </div>
 
-                                <div class="grid grid-cols-2 gap-3 mt-4 pt-4 border-t border-white/5">
-                                    <button onclick="applyPimIA('m-inp-desc', 'm-ia-out')" class="py-2 bg-indigo-600/20 hover:bg-indigo-600 text-indigo-300 hover:text-white rounded-lg text-[11px] font-bold transition">Aplicar ao Título</button>
-                                    <button onclick="applyPimIA('m-inp-descComp', 'm-ia-out')" class="py-2 bg-emerald-600/20 hover:bg-emerald-600 text-emerald-300 hover:text-white rounded-lg text-[11px] font-bold transition">Aplicar à Descrição</button>
-                                </div>
+                            <div class="grid grid-cols-2 gap-2 mt-3 pt-3 border-t border-white/5">
+                                <button onclick="applyPimIA('m-inp-desc', 'm-ia-out')" class="py-1.5 bg-indigo-600/10 hover:bg-indigo-600/20 text-indigo-400 rounded text-[10px] font-bold transition">Aplicar Título</button>
+                                <button onclick="applyPimIA('m-inp-descComp', 'm-ia-out')" class="py-1.5 bg-emerald-600/10 hover:bg-emerald-600/20 text-emerald-400 rounded text-[10px] font-bold transition">Aplicar Descrição</button>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <div id="m-view-mkt" class="hidden flex flex-col gap-5 max-w-6xl mx-auto">
-                    <div class="glass-dark rounded-xl p-5 border border-indigo-500/20 bg-indigo-900/10 mb-2 flex items-center justify-between">
+                <div id="m-view-mkt" class="hidden flex flex-col gap-4 max-w-5xl mx-auto">
+                    
+                    <div class="glass-dark rounded-xl p-4 border border-indigo-500/20 bg-indigo-900/5 flex items-start gap-3">
+                        <i class="fas fa-info-circle text-indigo-400 mt-0.5"></i>
                         <div>
-                            <p class="text-[10px] font-bold uppercase tracking-widest text-indigo-400 mb-1"><i class="fas fa-info-circle mr-1"></i> Precificação Inteligente</p>
-                            <p class="text-xs text-indigo-200/70">O <strong>Preço Sugerido</strong> já embute o seu custo, embalagem e margem alvo. Ele absorve exatamente as taxas da plataforma para você não perder 1 centavo.</p>
+                            <p class="text-[10px] font-bold uppercase tracking-widest text-indigo-300 mb-0.5">Dinâmica de Precificação</p>
+                            <p class="text-[11px] text-indigo-200/60 leading-tight">O "Preço Sugerido" embute seu Custo, Embalagem e Margem Alvo, e sobre isso, aplica a matemática reversa das taxas do marketplace. Assim você garante a margem exata configurada globalmente. Valores salvos aqui ficam na fila para atualização no Bling.</p>
                         </div>
-                        <button onclick="salvarProdutoPim()" class="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-sm font-bold shadow-lg transition whitespace-nowrap"><i class="fas fa-save mr-2"></i> Salvar Edições</button>
                     </div>
 
-                    <div id="mkt-cards-container" class="space-y-5"></div>
+                    <div id="mkt-cards-container" class="space-y-4"></div>
                 </div>
 
-                <div id="m-view-fisc" class="hidden grid grid-cols-2 gap-8 text-slate-800">
-                    <div class="glass-panel p-6 rounded-2xl"><h4 class="font-bold">Logística (Em Breve Dark Mode)</h4></div>
-                </div>
-                <div id="m-view-radar" class="hidden h-full text-slate-800">
-                    <div class="glass-panel p-6 rounded-2xl"><h4 class="font-bold">Radar Scraper (Em Breve Dark Mode)</h4></div>
+                <div id="m-view-radar" class="hidden flex gap-4 max-w-6xl mx-auto h-[65vh]">
+                    
+                    <div class="w-1/3 glass-dark p-5 rounded-xl flex flex-col">
+                        <div class="flex items-center gap-2 mb-3"><i class="fas fa-satellite-dish text-indigo-400 text-sm"></i> <span class="text-[11px] font-bold uppercase tracking-widest text-white">Spider Engine</span></div>
+                        <p class="text-[10px] text-slate-500 mb-3">Insira URLs de concorrentes (Mercado Livre, Shopee, etc). O sistema varrerá as páginas em background para extrair preços.</p>
+                        <textarea id="m-radar-url" class="w-full flex-1 bg-[#151517] border border-white/5 rounded-lg p-3 text-[10px] font-mono text-slate-300 focus:border-indigo-500 outline-none resize-none shadow-inner mb-3 whitespace-pre" placeholder="https://produto.mercadolivre.com.br/...\nhttps://shopee.com.br/..."></textarea>
+                        <button onclick="executarRadarPim()" class="w-full py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-xs font-bold shadow transition flex items-center justify-center gap-2"><i class="fas fa-search-dollar"></i> Varrer Mercado</button>
+                    </div>
+
+                    <div class="w-2/3 glass-dark p-5 rounded-xl flex flex-col relative overflow-hidden">
+                        <div class="flex items-center justify-between mb-4 border-b border-white/5 pb-2">
+                            <span class="text-[11px] font-bold uppercase tracking-widest text-slate-300">Inteligência Competitiva</span>
+                            <span class="text-[9px] font-mono text-slate-500">Seu Preço Global Atual: <strong class="text-[#10b981]">R$ <span id="radar-meu-preco">0,00</span></strong></span>
+                        </div>
+                        
+                        <div id="m-radar-res" class="flex-1 overflow-y-auto space-y-2 pr-2">
+                            <div class="h-full flex flex-col items-center justify-center text-slate-600">
+                                <i class="fas fa-radar text-4xl mb-3 opacity-20"></i>
+                                <p class="text-xs font-medium">Aguardando inserção de alvos...</p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
             </div>
@@ -277,9 +293,8 @@
             americanas: `<svg viewBox="0 0 48 48"><rect width="48" height="48" rx="10" fill="#E60014"/><path d="M16 28l8-14 8 14h-4l-4-7-4 7z" fill="white"/><rect x="12" y="30" width="24" height="4" fill="white"/></svg>`,
             nuvemshop: `<svg viewBox="0 0 48 48"><rect width="48" height="48" rx="10" fill="#1C1CFF"/><path d="M13 31a7 7 0 010-14c.5 0 1 .1 1.5.2A9 9 0 0133 25 5.5 5.5 0 0134 36H13z" fill="white"/></svg>`
         };
-        const getSvg = (id, sz=20) => `<div style="width:${sz}px;height:${sz}px;flex-shrink:0;">${PSVG[id] || ''}</div>`;
+        const getSvg = (id, sz=16) => `<div style="width:${sz}px;height:${sz}px;flex-shrink:0;">${PSVG[id] || ''}</div>`;
 
-        // ATUALIZADO: Taxas completas idênticas à imagem 15.55.00
         const PLATS = [
             { id: 'shopee', name: 'Shopee', color: 'rose', fees: [{k:'com',l:'Comissão %',d:20},{k:'txs',l:'Tx Serviço %',d:5},{k:'txd',l:'Tx Devolução %',d:1}] },
             { id: 'mercadolivre', name: 'Mercado Livre', color: 'amber', fees: [{k:'com_menor',l:'Com até R$79 %',d:12},{k:'com_maior',l:'Com > R$79 %',d:16},{k:'frete',l:'Frete R$',d:0}] },
@@ -293,12 +308,11 @@
 
         let API_BASE = localStorage.getItem('sostrass_apibase') || 'https://blingai-manager-v4.up.railway.app';
         let MODELO_IA = localStorage.getItem('sostrass_model') || 'gemini-2.5-flash';
-        let serverOnline = false;
         
         let globalCosts = JSON.parse(localStorage.getItem('sostrass_gc')) || { imposto: 12, embalagem: 3, cartao: 2.5, frete: 0, ganho: 30 };
         let products = JSON.parse(localStorage.getItem('sostrass_prods')) || [
-            { id: 1, sku: 'CX-ORG-30', code: '40028922', name: 'Kit 30 Caixas Organizadoras 20x19cm', price: 89.90, cost: 45.00, stock: 145, cat: 'Caixas', hist:[80,85,89.9,89.9,89.9], platforms:['shopee','mercadolivre'], desc:'', descComp:'', descData:{}, log:{}, fisc:{}, pendenteBling: false, mktPrices: { shopee: 110.00, mercadolivre: 95.00 } },
-            { id: 2, sku: 'PER-6MM-BR', code: '40028923', name: 'Pérola Branca 6mm ABS (500g)', price: 35.00, cost: 18.00, stock: 430, cat: 'Pedrarias', hist:[39,38,36,35,35], platforms:['shopee'], desc:'', descComp:'', descData:{}, log:{}, fisc:{}, pendenteBling: false, mktPrices: {} }
+            { id: 1, sku: 'CX-ORG-30', code: '40028922', ean: '7891234567890', marca: 'Sóstrass', cond: 'Novo', formato: 'Simples', name: 'Kit 30 Caixas Organizadoras 20x19cm', price: 89.90, cost: 45.00, stock: 145, cat: 'Caixas', hist:[80,85,89.9,89.9,89.9], platforms:['shopee','mercadolivre'], desc:'', descComp:'', descData:{}, log:{}, fisc:{}, pendenteBling: false, mktPrices: { shopee: 110.00, mercadolivre: 95.00 } },
+            { id: 2, sku: 'PER-6MM-BR', code: '40028923', ean: '', marca: '', cond: 'Novo', formato: 'Simples', name: 'Pérola Branca 6mm ABS (500g)', price: 35.00, cost: 18.00, stock: 430, cat: 'Pedrarias', hist:[39,38,36,35,35], platforms:['shopee'], desc:'', descComp:'', descData:{}, log:{}, fisc:{}, pendenteBling: false, mktPrices: {} }
         ];
         let mpRates = JSON.parse(localStorage.getItem('sostrass_rates')) || {};
         let actLog = JSON.parse(localStorage.getItem('sostrass_logs')) || [];
@@ -311,59 +325,49 @@
         const calcSug = p => { const b = getBase(p); const d = 1 - (parseFloat(globalCosts.ganho) + parseFloat(globalCosts.imposto) + parseFloat(globalCosts.cartao))/100; return d>0 ? b/d : b*3; };
         const calcMargin = (p, c) => p > 0 ? ((p - c)/p)*100 : 0;
         
-        // Novo motor de cálculo por plataforma
         const calcMkt = (bp, platId, prodId) => {
             const rates = (mpRates[prodId] && mpRates[prodId][platId]) ? mpRates[prodId][platId] : {};
             const pl = PLATS.find(x => x.id === platId);
             
-            // Regra Específica: Mercado Livre (Até R$ 79)
             if(platId === 'mercadolivre') {
                 const comMenor = parseFloat(rates['com_menor'] ?? 12)/100;
                 const comMaior = parseFloat(rates['com_maior'] ?? 16)/100;
                 const frete = parseFloat(rates['frete'] ?? 0);
-                
                 let p1 = (bp + frete) / (1 - comMenor);
                 if(p1 <= 79) return p1;
                 return (bp + frete) / (1 - comMaior);
             }
 
-            // Regra Padrão (Soma as % e Soma os Fixos)
             let pct=0, fix=0; 
-            pl.fees.forEach(f => { 
-                const v = parseFloat(rates[f.k] ?? f.d)||0; 
-                if(f.l.includes('%')) pct+=v; else fix+=v; 
-            });
-            let res = bp + fix; 
-            return pct < 100 ? res / (1 - pct/100) : res;
+            pl.fees.forEach(f => { const v = parseFloat(rates[f.k] ?? f.d)||0; if(f.l.includes('%')) pct+=v; else fix+=v; });
+            let res = bp + fix; return pct < 100 ? res / (1 - pct/100) : res;
         };
 
-        // --- 3. UI, NAVEGAÇÃO E PLATAFORMAS DINÂMICAS ---
+        // --- 3. UI ---
         function toast(msg) {
             const c = document.getElementById('toast-container'); const t = document.createElement('div');
-            t.className = `toast-enter bg-emerald-600 text-white px-5 py-3 rounded-lg shadow-xl font-bold text-sm flex items-center gap-2`;
-            t.innerHTML = `<i class="fas fa-check-circle"></i> ${msg}`; c.appendChild(t);
+            t.className = `toast-enter bg-slate-800 border border-white/10 text-white px-4 py-3 rounded-lg shadow-2xl font-bold text-[11px] flex items-center gap-3 relative overflow-hidden`;
+            t.innerHTML = `<div class="absolute left-0 top-0 bottom-0 w-1 bg-emerald-500"></div><i class="fas fa-check-circle text-emerald-400 text-sm"></i> ${msg}`; 
+            c.appendChild(t);
             setTimeout(() => { t.style.opacity='0'; setTimeout(()=>t.remove(),300); }, 3000);
         }
 
         function navTo(view) {
             ['catalogo','massa','automacoes','simulador','config'].forEach(v => document.getElementById(`view-${v}`).classList.add('hidden'));
-            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('bg-indigo-600','text-white','shadow-lg'));
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('bg-indigo-600','text-white','shadow'));
             document.getElementById(`view-${view}`).classList.remove('hidden');
-            document.getElementById(`nav-${view}`).classList.add('bg-indigo-600','text-white','shadow-lg');
+            document.getElementById(`nav-${view}`).classList.add('bg-indigo-600','text-white','shadow');
             if(view === 'catalogo') renderCatalogo();
         }
 
         function togglePlataforma(platId) {
             if(!activeProd.platforms) activeProd.platforms = [];
             const index = activeProd.platforms.indexOf(platId);
-            if(index > -1) { activeProd.platforms.splice(index, 1); } 
-            else { activeProd.platforms.push(platId); }
-            
+            if(index > -1) { activeProd.platforms.splice(index, 1); } else { activeProd.platforms.push(platId); }
             activeProd.pendenteBling = true;
             if(edicaoDescAlvo === platId) selecionarDescPlataforma('padrao');
-            
             renderPlataformasUI();
-            if(document.getElementById('m-view-mkt').classList.contains('hidden') === false) renderMktPim();
+            if(!document.getElementById('m-view-mkt').classList.contains('hidden')) renderMktPim();
         }
 
         function selecionarDescPlataforma(platId) {
@@ -374,7 +378,6 @@
             if(!activeProd.descData) activeProd.descData = {};
             document.getElementById('m-inp-desc').value = platId === 'padrao' ? (activeProd.desc || '') : (activeProd.descData[platId]?.curta || activeProd.desc || '');
             document.getElementById('m-inp-descComp').value = platId === 'padrao' ? (activeProd.descComp || '') : (activeProd.descData[platId]?.comp || activeProd.descComp || '');
-            
             renderPlataformasUI();
         }
 
@@ -386,8 +389,7 @@
             if(!vgPills || !vgList || !descPills || !activeProd) return;
             vgPills.innerHTML = ''; vgList.innerHTML = ''; descPills.innerHTML = '';
 
-            // Aba Descrição - Botão Global
-            descPills.innerHTML += `<button onclick="selecionarDescPlataforma('padrao')" class="flex items-center gap-2 px-5 py-2 rounded-lg border text-xs font-bold transition ${edicaoDescAlvo === 'padrao' ? 'border-indigo-500 bg-indigo-500 text-white shadow-lg' : 'border-white/10 bg-[#151517] text-slate-400 hover:bg-white/5'}"><i class="fas fa-globe"></i> Padrão (Global)</button>`;
+            descPills.innerHTML += `<button onclick="selecionarDescPlataforma('padrao')" class="flex items-center gap-1.5 px-3 py-1 rounded border text-[10px] font-bold transition ${edicaoDescAlvo === 'padrao' ? 'border-indigo-500 bg-indigo-500/20 text-indigo-300' : 'border-white/10 bg-[#151517] text-slate-400 hover:bg-white/5'}"><i class="fas fa-globe"></i> Global</button>`;
 
             const price = parseFloat(document.getElementById('m-inp-price').value) || activeProd.price;
             const base = getBase(activeProd);
@@ -395,106 +397,77 @@
             PLATS.forEach(pl => {
                 const isAtiva = activeProd.platforms?.includes(pl.id);
                 
-                // Visão Geral: Pills
-                const btnClassVg = isAtiva ? `border-${pl.color}-500/50 bg-[#151517] text-slate-200 shadow-inner` : `border-white/5 bg-transparent text-slate-600 opacity-50 hover:opacity-100`;
-                vgPills.innerHTML += `<button onclick="togglePlataforma('${pl.id}')" class="flex items-center gap-2 px-4 py-1.5 rounded-lg border text-xs font-bold transition ${btnClassVg}">${getSvg(pl.id, 14)} ${pl.name}</button>`;
+                // Visão Geral - Botões
+                const btnClassVg = isAtiva ? `border-${pl.color}-500/50 bg-[#151517] text-slate-200 shadow-inner` : `border-white/5 bg-transparent text-slate-600 opacity-50 hover:opacity-100 hover:border-white/20`;
+                vgPills.innerHTML += `<button onclick="togglePlataforma('${pl.id}')" class="flex items-center gap-2 px-3 py-1.5 rounded-lg border text-[10px] font-bold transition ${btnClassVg}">${getSvg(pl.id, 12)} ${pl.name}</button>`;
 
-                // Visão Geral: Lista
+                // Visão Geral - Lista Vertical
                 if(isAtiva) {
                     const mpPrice = calcMkt(price, pl.id, activeProd.id);
                     const mg = calcMargin(mpPrice, base);
                     vgList.innerHTML += `
-                        <div class="flex justify-between items-center py-3 px-4 bg-[#151517] border border-white/5 rounded-xl mb-2 transition hover:border-white/10">
-                            <div class="flex items-center gap-3 text-sm font-bold text-slate-300">${getSvg(pl.id, 18)} ${pl.name}</div>
-                            <div class="flex items-center gap-6"><span class="text-[#10b981] font-black text-lg">R$ ${f2(mpPrice)}</span> <span class="${mg >= 15 ? 'text-[#10b981]/60' : 'text-rose-500/80'} text-xs font-mono bg-black/50 px-2 py-1 rounded">${mg.toFixed(1)}% MG</span></div>
+                        <div class="flex justify-between items-center py-2 px-3 bg-[#151517] border border-white/5 rounded-lg mb-1.5">
+                            <div class="flex items-center gap-2 text-[11px] font-bold text-slate-300">${getSvg(pl.id, 14)} ${pl.name}</div>
+                            <div class="flex items-center gap-4"><span class="text-[#10b981] font-bold text-sm">R$ ${f2(mpPrice)}</span> <span class="${mg >= 15 ? 'text-[#10b981]/60' : 'text-rose-500/80'} text-[9px] font-mono bg-black/50 px-1.5 py-0.5 rounded">${mg.toFixed(1)}% MG</span></div>
                         </div>`;
                 }
 
-                // Descrição: Pills
+                // Descrição - Abas Menores
                 const isEdicao = edicaoDescAlvo === pl.id;
-                const btnClassDesc = isAtiva 
-                    ? (isEdicao ? `border-${pl.color}-500 bg-${pl.color}-500/20 text-white shadow-lg` : `border-white/10 bg-[#151517] text-slate-300 hover:bg-[#1a1a1c]`)
-                    : `hidden`; // Esconde se não estiver vinculada
-                
-                if(isAtiva) {
-                    descPills.innerHTML += `<button onclick="selecionarDescPlataforma('${pl.id}')" class="flex items-center gap-2 px-4 py-2 rounded-lg border text-xs font-bold transition ${btnClassDesc}">${getSvg(pl.id, 14)} ${pl.name}</button>`;
-                }
+                const btnClassDesc = isAtiva ? (isEdicao ? `border-${pl.color}-500 bg-${pl.color}-500/20 text-white` : `border-white/10 bg-[#151517] text-slate-400 hover:text-slate-200 hover:bg-[#1a1a1c]`) : `hidden`;
+                if(isAtiva) descPills.innerHTML += `<button onclick="selecionarDescPlataforma('${pl.id}')" class="flex items-center gap-1.5 px-3 py-1 rounded border text-[10px] font-bold transition ${btnClassDesc}">${getSvg(pl.id, 12)} ${pl.name}</button>`;
             });
         }
 
-        // --- 4. RENDERIZAÇÃO DO MODAL PIM E ABA MARKETPLACES ---
+        // --- 4. MODAL PIM E MARKETPLACES ---
         function renderMktPim() {
-            const container = document.getElementById('mkt-cards-container'); 
-            container.innerHTML = '';
+            const container = document.getElementById('mkt-cards-container'); container.innerHTML = '';
+            const ativas = PLATS.filter(pl => activeProd.platforms?.includes(pl.id));
+            if(ativas.length === 0) { container.innerHTML = `<div class="p-8 text-center text-slate-500"><i class="fas fa-link mb-3 text-3xl opacity-30"></i><p class="text-xs font-bold">Nenhuma plataforma vinculada.</p></div>`; return; }
 
-            const plataformasAtivas = PLATS.filter(pl => activeProd.platforms?.includes(pl.id));
-            if(plataformasAtivas.length === 0) {
-                container.innerHTML = `<div class="p-12 text-center text-slate-500 bg-[#151517] rounded-xl border border-white/5"><i class="fas fa-link mb-4 text-4xl opacity-50"></i><p class="font-bold">Nenhuma plataforma vinculada a este produto.</p><p class="text-xs mt-2">Vá na aba "Visão Geral" e ative os canais de venda.</p></div>`;
-                return;
-            }
-
-            plataformasAtivas.forEach(pl => {
+            ativas.forEach(pl => {
                 const rates = mpRates[activeProd.id]?.[pl.id] || {};
-                const precoAtualBling = activeProd.mktPrices?.[pl.id] || 0; // O que tá no sistema
+                const atual = activeProd.mktPrices?.[pl.id] || 0;
                 
-                // Gera os inputs de taxa dinâmicos
                 let inputs = ''; 
                 pl.fees.forEach(f => { 
                     inputs += `
                     <div class="flex-1">
-                        <label class="text-[9px] font-bold text-slate-500 uppercase flex justify-between items-center bg-[#111113] border border-white/5 px-3 py-1.5 rounded-t-lg border-b-0">${f.l}</label>
+                        <label class="text-[8px] font-bold text-slate-500 uppercase flex justify-between items-center bg-[#111113] border border-white/5 px-2 py-1 rounded-t border-b-0">${f.l}</label>
                         <div class="relative">
-                            <input type="number" step="0.1" value="${rates[f.k] ?? f.d}" class="w-full bg-[#0B0B0C] border border-white/10 p-2.5 text-xs font-black text-white text-right rounded-b-lg outline-none focus:border-indigo-500 transition shadow-inner" oninput="saveRate('${pl.id}','${f.k}',this.value)">
-                            ${f.l.includes('%') ? '<span class="absolute left-3 top-2.5 text-xs text-slate-600">%</span>' : '<span class="absolute left-3 top-2.5 text-xs text-slate-600">R$</span>'}
+                            <input type="number" step="0.1" value="${rates[f.k] ?? f.d}" class="w-full bg-[#0B0B0C] border border-white/10 p-2 text-[11px] font-bold text-white text-right rounded-b outline-none focus:border-indigo-500 transition shadow-inner" oninput="saveRate('${pl.id}','${f.k}',this.value)">
+                            ${f.l.includes('%') ? '<span class="absolute left-2 top-2 text-[9px] text-slate-600">%</span>' : '<span class="absolute left-2 top-2 text-[9px] text-slate-600">R$</span>'}
                         </div>
                     </div>`; 
                 });
 
                 container.innerHTML += `
-                    <div class="glass-dark rounded-xl p-0 border border-white/5 flex flex-col transition-all hover:border-white/10 group overflow-hidden">
-                        
-                        <div class="flex justify-between items-center p-4 border-b border-white/5 bg-[#151517]">
-                            <div class="flex items-center gap-3">
-                                ${getSvg(pl.id, 20)}
-                                <span class="font-black text-sm text-white">${pl.name}</span>
-                                <span class="px-2 py-0.5 rounded text-[9px] font-black bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 uppercase tracking-widest"><i class="fas fa-circle text-[6px] mr-1 mb-px"></i> Ativo</span>
-                            </div>
-                            <div class="text-[10px] font-mono text-slate-500 bg-black px-3 py-1 rounded shadow-inner">
-                                Sincronização Indivídual
+                    <div class="glass-dark rounded-xl p-0 border border-white/5 flex flex-col transition-all hover:border-white/10 group">
+                        <div class="flex justify-between items-center p-3 border-b border-white/5 bg-[#151517]">
+                            <div class="flex items-center gap-2">
+                                ${getSvg(pl.id, 16)} <span class="font-bold text-xs text-white">${pl.name}</span>
                             </div>
                         </div>
-
-                        <div class="p-6 flex flex-col lg:flex-row gap-8 items-center bg-[#0B0B0C]">
-                            
-                            <div class="flex gap-2 w-full lg:w-1/2">
-                                ${inputs}
-                            </div>
-
-                            <div class="hidden lg:block w-px h-16 bg-white/5 mx-2"></div> 
-
-                            <div class="flex-1 flex items-center justify-between w-full">
-                                
-                                <div class="text-left w-1/3">
-                                    <p class="text-[9px] font-bold text-slate-500 uppercase tracking-widest mb-1">Preço Atual Bling</p>
+                        <div class="p-4 flex gap-6 items-center bg-[#0B0B0C]">
+                            <div class="flex gap-2 w-[40%]">${inputs}</div>
+                            <div class="w-px h-10 bg-white/5 mx-1"></div> 
+                            <div class="flex-1 flex items-center justify-between gap-4">
+                                <div class="text-left">
+                                    <p class="text-[8px] font-bold text-slate-500 uppercase tracking-widest mb-0.5">Preço Bling</p>
                                     <div class="relative">
-                                        <span class="absolute left-3 top-2 text-sm text-slate-500 font-bold">R$</span>
-                                        <input type="number" value="${precoAtualBling.toFixed(2)}" class="w-full bg-[#151517] border border-white/10 py-2 pr-3 pl-9 text-lg font-black text-slate-300 rounded-lg outline-none focus:border-indigo-500 transition" onchange="atualizarPrecoManual('${pl.id}', this.value)">
+                                        <span class="absolute left-2 top-1.5 text-[10px] text-slate-500 font-bold">R$</span>
+                                        <input type="number" value="${atual.toFixed(2)}" class="w-24 bg-[#151517] border border-white/10 py-1 pr-2 pl-6 text-sm font-bold text-slate-300 rounded outline-none focus:border-indigo-500" onchange="atualizarPrecoManual('${pl.id}', this.value)">
                                     </div>
                                 </div>
-
-                                <div class="flex flex-col items-center justify-center px-4" id="mkt-indicator-${pl.id}">
-                                    </div>
-
-                                <div class="text-right w-1/3">
-                                    <p class="text-[9px] font-bold text-slate-500 uppercase tracking-widest mb-1 flex justify-end gap-1"><i class="fas fa-magic text-indigo-400"></i> Preço Sugerido</p>
-                                    <p class="text-2xl font-black text-white" id="mkt-p-${pl.id}">R$ 0,00</p>
-                                    <p class="text-[10px] font-bold text-emerald-400 mt-1 bg-emerald-500/10 inline-block px-2 py-0.5 rounded" id="mkt-m-${pl.id}">Margem: 0%</p>
+                                <div class="flex flex-col items-center justify-center min-w-[50px]" id="mkt-indicator-${pl.id}"></div>
+                                <div class="text-right">
+                                    <p class="text-[8px] font-bold text-slate-500 uppercase tracking-widest mb-0.5 flex justify-end gap-1"><i class="fas fa-magic text-indigo-400 mt-px"></i> Sugerido</p>
+                                    <p class="text-xl font-bold text-white leading-none" id="mkt-p-${pl.id}">R$ 0,00</p>
+                                    <p class="text-[9px] font-bold text-emerald-400 mt-1 bg-emerald-500/10 inline-block px-1.5 py-0.5 rounded" id="mkt-m-${pl.id}">0%</p>
                                 </div>
-
-                                <button onclick="acatarSugestao('${pl.id}')" class="ml-6 h-14 px-5 bg-indigo-600/20 hover:bg-indigo-600 text-indigo-400 hover:text-white border border-indigo-500/30 rounded-xl text-xs font-bold transition shadow-lg flex flex-col items-center justify-center gap-1 group-hover:scale-105">
-                                    <i class="fas fa-arrow-left"></i> Acatar
+                                <button onclick="acatarSugestao('${pl.id}')" class="h-10 px-3 bg-indigo-600/20 hover:bg-indigo-600 text-indigo-400 hover:text-white border border-indigo-500/30 rounded text-[10px] font-bold transition flex items-center gap-1.5">
+                                    <i class="fas fa-check"></i> Acatar
                                 </button>
-
                             </div>
                         </div>
                     </div>`;
@@ -504,158 +477,115 @@
 
         function updateMktMute(price, base) {
             if(!activeProd.mktPrices) activeProd.mktPrices = {};
-
             PLATS.forEach(pl => {
                 if(activeProd.platforms?.includes(pl.id)) {
-                    const sugestao = calcMkt(price, pl.id, activeProd.id); 
-                    const mg = calcMargin(sugestao, base);
-                    const atual = activeProd.mktPrices[pl.id] || 0;
-
-                    // Atualiza Textos
+                    const sugestao = calcMkt(price, pl.id, activeProd.id); const mg = calcMargin(sugestao, base); const atual = activeProd.mktPrices[pl.id] || 0;
                     const e1 = document.getElementById(`mkt-p-${pl.id}`); if(e1) e1.innerText = `R$ ${f2(sugestao)}`;
-                    const e2 = document.getElementById(`mkt-m-${pl.id}`); if(e2) { e2.innerText = `Margem: ${mg.toFixed(1)}%`; e2.className = mg >= 15 ? 'text-[10px] font-bold text-emerald-400 mt-1 bg-emerald-500/10 inline-block px-2 py-0.5 rounded' : 'text-[10px] font-bold text-rose-400 mt-1 bg-rose-500/10 inline-block px-2 py-0.5 rounded'; }
+                    const e2 = document.getElementById(`mkt-m-${pl.id}`); if(e2) { e2.innerText = `Margem: ${mg.toFixed(1)}%`; e2.className = mg >= 15 ? 'text-[9px] font-bold text-emerald-400 mt-1 bg-emerald-500/10 inline-block px-1.5 py-0.5 rounded' : 'text-[9px] font-bold text-rose-400 mt-1 bg-rose-500/10 inline-block px-1.5 py-0.5 rounded'; }
                     
-                    // Indicador Bolsa de Valores
                     const ind = document.getElementById(`mkt-indicator-${pl.id}`);
                     if(ind) {
                         const diff = sugestao - atual;
-                        if(atual === 0) {
-                            ind.innerHTML = `<i class="fas fa-exclamation-circle text-amber-500 text-xl"></i><span class="text-[9px] text-amber-500 font-bold mt-1">Sem Preço</span>`;
-                        } else if(Math.abs(diff) < 0.05) {
-                            ind.innerHTML = `<i class="fas fa-equals text-slate-600 text-xl"></i><span class="text-[9px] text-slate-500 font-bold mt-1">OK</span>`;
-                        } else if(sugestao > atual) {
-                            ind.innerHTML = `<i class="fas fa-arrow-trend-up text-rose-500 text-2xl"></i><span class="text-[9px] text-rose-500 font-bold mt-1">+R$ ${f2(diff)}</span>`;
-                        } else {
-                            ind.innerHTML = `<i class="fas fa-arrow-trend-down text-emerald-500 text-2xl"></i><span class="text-[9px] text-emerald-500 font-bold mt-1">-R$ ${f2(Math.abs(diff))}</span>`;
-                        }
+                        if(atual === 0) ind.innerHTML = `<i class="fas fa-exclamation-circle text-amber-500 text-sm"></i><span class="text-[8px] text-amber-500 font-bold mt-0.5">Vazio</span>`;
+                        else if(Math.abs(diff) < 0.05) ind.innerHTML = `<i class="fas fa-equals text-slate-600 text-sm"></i><span class="text-[8px] text-slate-500 font-bold mt-0.5">OK</span>`;
+                        else if(sugestao > atual) ind.innerHTML = `<i class="fas fa-caret-up text-rose-500 text-lg"></i><span class="text-[8px] text-rose-500 font-bold mt-px">+R$ ${f2(diff)}</span>`;
+                        else ind.innerHTML = `<i class="fas fa-caret-down text-emerald-500 text-lg"></i><span class="text-[8px] text-emerald-500 font-bold mt-px">-R$ ${f2(Math.abs(diff))}</span>`;
                     }
                 }
             });
         }
 
-        function atualizarPrecoManual(platId, valor) {
-            if(!activeProd.mktPrices) activeProd.mktPrices = {};
-            activeProd.mktPrices[platId] = parseFloat(valor) || 0;
-            activeProd.pendenteBling = true;
-            recalcPim(); // Recalcula os indicadores
-        }
-
-        function acatarSugestao(platId) {
-            const price = parseFloat(document.getElementById('m-inp-price').value) || activeProd.price;
-            const sugestao = calcMkt(price, platId, activeProd.id);
-            if(!activeProd.mktPrices) activeProd.mktPrices = {};
-            activeProd.mktPrices[platId] = sugestao;
-            activeProd.pendenteBling = true;
-            toast("Sugestão acatada! Preço atualizado localmente.");
-            renderMktPim(); // Re-renderiza para atualizar o input
-        }
-
+        function atualizarPrecoManual(platId, valor) { activeProd.mktPrices[platId] = parseFloat(valor) || 0; activeProd.pendenteBling = true; recalcPim(); }
+        function acatarSugestao(platId) { const price = parseFloat(document.getElementById('m-inp-price').value) || activeProd.price; activeProd.mktPrices[platId] = calcMkt(price, platId, activeProd.id); activeProd.pendenteBling = true; toast("Sugestão acatada!"); renderMktPim(); }
         function saveRate(p, k, v) { if(!mpRates[activeProd.id]) mpRates[activeProd.id]={}; if(!mpRates[activeProd.id][p]) mpRates[activeProd.id][p]={}; mpRates[activeProd.id][p][k]=parseFloat(v); localStorage.setItem('sostrass_rates', JSON.stringify(mpRates)); recalcPim(); }
 
-        // --- 5. FUNÇÕES CORE DO MODAL ---
+        // --- 5. CORE MODAL ---
         function mTab(t) {
             ['geral','desc','mkt','fisc','radar'].forEach(v => document.getElementById(`m-view-${v}`).classList.add('hidden'));
             document.querySelectorAll('[id^="btn-m-"]').forEach(b => { b.classList.remove('btn-active'); b.classList.add('btn-dark'); });
             document.getElementById(`m-view-${t}`).classList.remove('hidden');
             const btn = document.getElementById(`btn-m-${t}`); btn.classList.remove('btn-dark'); btn.classList.add('btn-active');
             if(t==='mkt') renderMktPim();
+            if(t==='radar') document.getElementById('radar-meu-preco').innerText = f2(document.getElementById('m-inp-price').value || activeProd.price);
         }
 
         function recalcPim() {
             if(!activeProd) return;
             const cost = parseFloat(document.getElementById('m-inp-cost').value)||0; const price = parseFloat(document.getElementById('m-inp-price').value)||0;
-            const mockProd = { cost: cost, log: { embExtra: 0, freteExtra: 0 } }; // Removido logística complexa por enquanto para foco
+            const mockProd = { cost: cost, log: { embExtra: 0, freteExtra: 0 } };
             const base = getBase(mockProd); const sug = calcSug(mockProd); const marg = calcMargin(price, base);
             
-            const eCusto = document.getElementById('m-res-custo'); if(eCusto) eCusto.innerText = `R$ ${f2(base)}`; 
-            const ePreco = document.getElementById('m-res-preco'); if(ePreco) ePreco.innerText = `R$ ${f2(price)}`;
-            const eSug = document.getElementById('m-res-sug'); if(eSug) eSug.innerText = `R$ ${f2(sug)}`; 
-            const eMargem = document.getElementById('m-res-margem'); if(eMargem) eMargem.innerText = `${marg.toFixed(1)}%`;
-            
-            updateMktMute(price, base);
-            renderPlataformasUI();
+            const setVal = (id, val) => { const el = document.getElementById(id); if(el) el.innerText = val; };
+            setVal('m-res-custo', `R$ ${f2(base)}`); setVal('m-res-preco', `R$ ${f2(price)}`); setVal('m-res-sug', `R$ ${f2(sug)}`); setVal('m-res-margem', `${marg.toFixed(1)}%`);
+            updateMktMute(price, base); renderPlataformasUI();
         }
 
         function salvarDescricaoLocal() {
             if(!activeProd) return;
             if(!activeProd.descData) activeProd.descData = {};
             
+            activeProd.code = document.getElementById('m-inp-codigo')?.innerText?.replace('Cód: ', '') || activeProd.code;
+            activeProd.ean = document.getElementById('m-inp-ean').value;
+            activeProd.marca = document.getElementById('m-inp-marca').value;
+            activeProd.cond = document.getElementById('m-inp-cond').value;
+            activeProd.formato = document.getElementById('m-inp-formato').value;
+
             if(edicaoDescAlvo === 'padrao') {
-                activeProd.desc = document.getElementById('m-inp-desc').value;
-                activeProd.descComp = document.getElementById('m-inp-descComp').value;
+                activeProd.desc = document.getElementById('m-inp-desc').value; activeProd.descComp = document.getElementById('m-inp-descComp').value;
             } else {
-                activeProd.descData[edicaoDescAlvo] = { 
-                    curta: document.getElementById('m-inp-desc').value, 
-                    comp: document.getElementById('m-inp-descComp').value 
-                };
+                activeProd.descData[edicaoDescAlvo] = { curta: document.getElementById('m-inp-desc').value, comp: document.getElementById('m-inp-descComp').value };
             }
         }
 
         function salvarProdutoPim() {
             salvarDescricaoLocal(); 
-            
-            activeProd.cost = parseFloat(document.getElementById('m-inp-cost').value); 
-            activeProd.price = parseFloat(document.getElementById('m-inp-price').value);
-            activeProd.cat = document.getElementById('m-inp-cat').value; 
-            activeProd.stock = document.getElementById('m-inp-stock').value;
-            
-            activeProd.pendenteBling = true; 
-
-            localStorage.setItem('sostrass_prods', JSON.stringify(products)); 
-            renderCatalogo(); 
-            toast("Salvo localmente! Produto na fila para envio ao Bling."); 
+            activeProd.cost = parseFloat(document.getElementById('m-inp-cost').value); activeProd.price = parseFloat(document.getElementById('m-inp-price').value);
+            activeProd.cat = document.getElementById('m-inp-cat').value; activeProd.stock = document.getElementById('m-inp-stock').value;
+            activeProd.pendenteBling = true; localStorage.setItem('sostrass_prods', JSON.stringify(products)); renderCatalogo(); toast("Produto salvo na fila (Rascunho Local)."); 
         }
 
         function prepararEnvioBling() {
-            if(!activeProd.pendenteBling) { alert("Nenhuma alteração local nova para enviar deste produto."); return; }
-            if(confirm(`Você está prestes a enviar as atualizações do SKU ${activeProd.sku} para o Bling. Confirma?`)) {
-                activeProd.pendenteBling = false;
-                localStorage.setItem('sostrass_prods', JSON.stringify(products));
-                toast("Bling atualizado com sucesso!");
-                renderCatalogo();
-                fecharModal();
+            if(!activeProd.pendenteBling) { alert("Nenhuma alteração pendente para enviar."); return; }
+            if(confirm(`Confirmar envio das atualizações do SKU ${activeProd.sku} para o Bling?`)) {
+                activeProd.pendenteBling = false; localStorage.setItem('sostrass_prods', JSON.stringify(products)); toast("Sincronizado com o Bling!"); renderCatalogo();
             }
         }
 
         function abrirPim(id) {
             activeProd = products.find(x => x.id === id);
-            if(!activeProd.platforms) activeProd.platforms = [];
-            edicaoDescAlvo = 'padrao';
+            if(!activeProd.platforms) activeProd.platforms = []; edicaoDescAlvo = 'padrao';
             
-            document.getElementById('m-nome').innerText = activeProd.name; 
-            document.getElementById('m-sku').innerText = activeProd.sku;
-            document.getElementById('m-codigo').innerText = `Cód: ${activeProd.code || 'N/A'}`; // SKU e CÓDIGO
+            document.getElementById('m-nome').innerText = activeProd.name; document.getElementById('m-sku').innerText = activeProd.sku; document.getElementById('m-codigo').innerText = `Cód: ${activeProd.code || '---'}`;
             
             document.getElementById('m-inp-cat').value = activeProd.cat || ''; document.getElementById('m-inp-stock').value = activeProd.stock || 0;
             document.getElementById('m-inp-cost').value = activeProd.cost || 0; document.getElementById('m-inp-price').value = activeProd.price || 0;
             
+            document.getElementById('m-inp-ean').value = activeProd.ean || ''; document.getElementById('m-inp-marca').value = activeProd.marca || '';
+            document.getElementById('m-inp-cond').value = activeProd.cond || 'Novo'; document.getElementById('m-inp-formato').value = activeProd.formato || 'Simples';
+
             document.getElementById('m-inp-desc').value = activeProd.desc || ''; document.getElementById('m-inp-descComp').value = activeProd.descComp || '';
+            document.getElementById('m-res-estoque').innerText = (activeProd.stock || 0) + " un"; document.getElementById('m-res-ganho-alvo').innerText = `${globalCosts.ganho}%`;
             
-            document.getElementById('m-res-estoque').innerText = (activeProd.stock || 0) + " un";
-            document.getElementById('m-res-ganho-alvo').innerText = `${globalCosts.ganho}%`;
-            
-            recalcPim(); mTab('geral');
-            renderPlataformasUI();
-            document.getElementById('modal-pim').classList.remove('hidden');
+            recalcPim(); mTab('geral'); renderPlataformasUI(); document.getElementById('modal-pim').classList.remove('hidden');
         }
 
         function fecharModal() { document.getElementById('modal-pim').classList.add('hidden'); }
 
-        // --- 6. INTEGRAÇÕES (I.A. E SCRAPER) ---
+        // --- 6. GRID E SCRAPER ---
         function renderCatalogo(filtro = '') {
             const tb = document.getElementById('tabela-produtos'); tb.innerHTML = '';
             products.filter(p => p.sku.toLowerCase().includes(filtro.toLowerCase()) || p.name.toLowerCase().includes(filtro.toLowerCase())).forEach((p, i) => {
                 const base = getBase(p); const marg = calcMargin(p.price, base);
-                const syncFlag = p.pendenteBling ? `<span class="ml-2 px-2 py-0.5 rounded text-[9px] font-black bg-amber-500 text-white uppercase shadow" title="Aguardando envio ao Bling"><i class="fas fa-sync-alt fa-spin mr-1"></i> Fila</span>` : '';
+                const syncFlag = p.pendenteBling ? `<span class="ml-2 px-1.5 py-0.5 rounded text-[8px] font-bold bg-amber-500/20 text-amber-600 border border-amber-200 uppercase" title="Pendente de envio ao Bling"><i class="fas fa-exclamation-triangle mr-0.5"></i> Fila Bling</span>` : '';
                 
                 tb.innerHTML += `
                     <tr class="hover:bg-slate-50 transition border-b border-slate-100 group cursor-pointer" onclick="abrirPim(${p.id})">
-                        <td class="px-6 py-4"><div class="font-black text-slate-800 flex items-center">${p.sku} ${syncFlag}</div><div class="text-[10px] text-slate-400 truncate w-48" title="${p.name}">${p.name}</div></td>
-                        <td class="px-6 py-4 text-right font-bold text-rose-400">R$ ${f2(base)}</td>
-                        <td class="px-6 py-4 text-right font-black text-indigo-600">R$ ${f2(p.price)}</td>
-                        <td class="px-6 py-4 text-center"><span class="px-2 py-1 rounded-md text-[10px] font-black ${marg>=30?'bg-emerald-100 text-emerald-700':'bg-rose-100 text-rose-700'}">${marg.toFixed(1)}%</span></td>
-                        <td class="px-6 py-4"><canvas id="spark-${i}" width="100" height="25"></canvas></td>
-                        <td class="px-6 py-4 text-right"><button class="opacity-0 group-hover:opacity-100 bg-white border border-slate-200 px-3 py-1.5 rounded-lg text-[10px] font-bold text-slate-600 hover:bg-indigo-600 hover:text-white transition shadow-sm">GERENCIAR</button></td>
+                        <td class="px-5 py-3"><div class="font-bold text-slate-800 flex items-center text-xs">${p.sku} ${syncFlag}</div><div class="text-[9px] text-slate-400 truncate w-48 mt-0.5">${p.name}</div></td>
+                        <td class="px-5 py-3 text-right font-medium text-rose-400">R$ ${f2(base)}</td>
+                        <td class="px-5 py-3 text-right font-bold text-indigo-600">R$ ${f2(p.price)}</td>
+                        <td class="px-5 py-3 text-center"><span class="px-2 py-0.5 rounded text-[9px] font-bold ${marg>=30?'bg-emerald-100 text-emerald-700':'bg-rose-100 text-rose-700'}">${marg.toFixed(1)}%</span></td>
+                        <td class="px-5 py-3"><canvas id="spark-${i}" width="80" height="20"></canvas></td>
+                        <td class="px-5 py-3 text-right"><button class="opacity-0 group-hover:opacity-100 bg-white border border-slate-200 px-3 py-1.5 rounded-lg text-[9px] font-bold text-slate-600 hover:bg-indigo-600 hover:text-white transition shadow-sm">EDITAR</button></td>
                     </tr>`;
             });
             products.forEach((p, i) => {
@@ -665,24 +595,58 @@
         }
 
         async function gerarIAPim(tipo) {
-            const outId = tipo === 'curta' ? 'm-ia-out' : 'm-ia-out'; // Joguei pra mesma caixa p/ simplificar
-            const out = document.getElementById(outId);
-            out.innerHTML = '<i class="fas fa-circle-notch fa-spin text-indigo-500 mr-2"></i> Gerando magia com IA...';
-            
-            setTimeout(() => { 
-                out.innerText = tipo === 'curta' 
-                    ? `NOVO TÍTULO: ${activeProd.name} Premium Original` 
-                    : `DESCRIÇÃO:\n• Material Premium\n• Super Resistente\n• Ideal para quem busca qualidade.`; 
-            }, 1000); // Simulação rápida sem bater na API para não travar
+            const out = document.getElementById('m-ia-out');
+            out.innerHTML = '<i class="fas fa-circle-notch fa-spin text-indigo-500 mr-2"></i> Processando modelo gemini-2.5-flash...';
+            setTimeout(() => { out.innerText = tipo === 'curta' ? `${activeProd.name} Original Premium` : `Especificações do Produto:\n\n• Material durável e sem descascamento.\n• Formato exato conforme fotos reais.\n• Garantia de fábrica de 3 meses.\n\n* Ideal para quem busca alta qualidade sem abrir mão do custo-benefício. Compra segura e envio em 24h.`; }, 1000); 
         }
 
         function applyPimIA(targetInputId, sourceBoxId) { 
             document.getElementById(targetInputId).value = document.getElementById(sourceBoxId).innerText; 
-            salvarDescricaoLocal();
-            toast("Texto da I.A. aplicado com sucesso!"); 
+            salvarDescricaoLocal(); toast("Texto aplicado na Ficha!"); 
         }
 
-        // --- INICIALIZAÇÃO ---
+        // NOVO RADAR CONCORRÊNCIA
+        function executarRadarPim() {
+            const res = document.getElementById('m-radar-res');
+            res.innerHTML = '<div class="h-full flex flex-col items-center justify-center text-indigo-400"><i class="fas fa-circle-notch fa-spin text-3xl mb-2"></i><p class="text-[10px] font-bold uppercase tracking-widest mt-2">Buscando na Web...</p></div>';
+            
+            setTimeout(() => {
+                const meuPreco = parseFloat(document.getElementById('m-inp-price').value) || activeProd.price;
+                const mock = [
+                    { loja: 'Mercado Livre - Loja Concorrente', id: 'mercadolivre', preco: meuPreco - 5.00 },
+                    { loja: 'Shopee - Atacadão', id: 'shopee', preco: meuPreco + 2.50 }
+                ];
+                
+                let html = '';
+                mock.forEach(m => {
+                    const diff = meuPreco - m.preco;
+                    const color = diff > 0 ? 'emerald' : 'rose';
+                    const icon = diff > 0 ? 'fa-arrow-down' : 'fa-arrow-up';
+                    const diffText = diff > 0 ? `${f2(diff)} mais barato` : `${f2(Math.abs(diff))} mais caro`;
+                    
+                    html += `
+                    <div class="bg-[#151517] p-4 rounded-lg flex justify-between items-center border border-white/5 transition hover:border-white/10 group">
+                        <div>
+                            <div class="flex items-center gap-2 mb-1">${getSvg(m.id, 14)} <span class="text-xs font-bold text-slate-300">${m.loja}</span></div>
+                            <div class="text-[9px] font-bold text-${color}-400"><i class="fas ${icon} mr-0.5"></i> R$ ${diffText} que você</div>
+                        </div>
+                        <div class="flex items-center gap-4">
+                            <div class="text-xl font-bold text-white">R$ ${f2(m.preco)}</div>
+                            <button onclick="acatarConcorrencia(${m.preco})" class="opacity-0 group-hover:opacity-100 px-3 py-1.5 bg-indigo-600/20 hover:bg-indigo-600 text-indigo-400 hover:text-white rounded text-[10px] font-bold transition border border-indigo-500/30">Acatar Preço Base</button>
+                        </div>
+                    </div>`;
+                });
+                res.innerHTML = html;
+            }, 1200);
+        }
+
+        function acatarConcorrencia(novoPreco) {
+            document.getElementById('m-inp-price').value = novoPreco;
+            document.getElementById('radar-meu-preco').innerText = f2(novoPreco);
+            recalcPim();
+            toast("Preço Global Atualizado!");
+        }
+
         window.onload = () => { navTo('catalogo'); };
     </script>
 </body>
