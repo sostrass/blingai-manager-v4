@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sóstrass PIM - Custos Globais</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+        * { box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        ::-webkit-scrollbar { width: 5px; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        input[type=number]::-webkit-inner-spin-button { -webkit-appearance: none; }
+        
+        .card-finance { background: white; border: 1px solid #e2e8f0; border-radius: 12px; transition: 0.3s; }
+        .card-finance:hover { border-color: #6366f1; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); }
+    </style>
+</head>
+<body class="bg-[#f8fafc] text-slate-800 flex h-screen overflow-hidden">
+
+    <aside class="w-64 bg-slate-900 text-slate-400 flex flex-col shadow-xl shrink-0">
+        <div class="h-16 flex items-center px-6 border-b border-slate-800 bg-slate-950">
+            <h1 class="text-sm font-bold text-white flex items-center gap-2"><i class="fas fa-gem text-indigo-500"></i> Sóstrass<span class="text-[9px] bg-indigo-500/20 text-indigo-400 px-1.5 py-0.5 rounded">PRO</span></h1>
+        </div>
+        <div class="flex-1 py-6 px-3 space-y-1">
+            <a href="dashboard.html" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-medium hover:bg-slate-800 hover:text-white transition"><i class="fas fa-chart-pie w-5"></i> Dashboard</a>
+            <a href="produtos.html" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-medium hover:bg-slate-800 hover:text-white transition"><i class="fas fa-box-open w-5"></i> Produtos</a>
+            <a href="radar.html" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-medium hover:bg-slate-800 hover:text-white transition"><i class="fas fa-satellite-dish w-5"></i> Radar Market</a>
+            <div class="my-4 border-t border-slate-800"></div>
+            <a href="custos.html" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-bold bg-indigo-600 text-white shadow-lg"><i class="fas fa-globe w-5"></i> Custos Globais</a>
+            <a href="config.html" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-medium hover:bg-slate-800 hover:text-white transition"><i class="fas fa-cog w-5"></i> Configurações</a>
+        </div>
+    </aside>
+
+    <main class="flex-1 flex flex-col min-w-0 overflow-y-auto">
+        <header class="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-8 shrink-0">
+            <h2 class="text-lg font-bold text-slate-800">Engenharia de Custos & Taxas</h2>
+            <button onclick="salvarTudo()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2 rounded-lg text-xs font-bold shadow-md transition flex items-center gap-2">
+                <i class="fas fa-save"></i> Gravar Parâmetros Mestres
+            </button>
+        </header>
+
+        <div class="p-8 max-w-6xl mx-auto w-full space-y-8">
+            
+            <section class="space-y-4">
+                <div class="flex items-center gap-2 mb-2">
+                    <div class="w-8 h-8 rounded-lg bg-indigo-100 text-indigo-600 flex items-center justify-center text-sm"><i class="fas fa-university"></i></div>
+                    <h3 class="font-bold text-slate-800">Variáveis de Operação (DAJP)</h3>
+                </div>
+                <div class="grid grid-cols-4 gap-6">
+                    <div class="card-finance p-5">
+                        <label class="block text-[10px] font-bold uppercase text-slate-500 mb-2">Impostos (Simples) %</label>
+                        <div class="flex items-center gap-2">
+                            <input type="number" id="gc-imposto" class="text-xl font-bold w-full outline-none" value="6.00">
+                            <span class="text-slate-400 font-bold">%</span>
+                        </div>
+                        <p class="text-[9px] text-slate-400 mt-2">Incide sobre o faturamento bruto.</p>
+                    </div>
+                    <div class="card-finance p-5">
+                        <label class="block text-[10px] font-bold uppercase text-slate-500 mb-2">Taxa de Cartão %</label>
+                        <div class="flex items-center gap-2">
+                            <input type="number" id="gc-cartao" class="text-xl font-bold w-full outline-none" value="2.50">
+                            <span class="text-slate-400 font-bold">%</span>
+                        </div>
+                        <p class="text-[9px] text-slate-400 mt-2">Média de antecipação e gateway.</p>
+                    </div>
+                    <div class="card-finance p-5">
+                        <label class="block text-[10px] font-bold uppercase text-slate-500 mb-2">Embalagem (Média)</label>
+                        <div class="flex items-center gap-2">
+                            <span class="text-slate-400 font-bold text-xs">R$</span>
+                            <input type="number" id="gc-embalagem" class="text-xl font-bold w-full outline-none" value="3.00">
+                        </div>
+                        <p class="text-[9px] text-slate-400 mt-2">Custo fixo por envio (caixa/fita).</p>
+                    </div>
+                    <div class="card-finance p-5 border-emerald-200 bg-emerald-50/30">
+                        <label class="block text-[10px] font-bold uppercase text-emerald-600 mb-2">Margem Alvo Mínima %</label>
+                        <div class="flex items-center gap-2">
+                            <input type="number" id="gc-ganho" class="text-xl font-black w-full outline-none text-emerald-600 bg-transparent" value="25.00">
+                            <span class="text-emerald-500 font-bold">%</span>
+                        </div>
+                        <p class="text-[9px] text-emerald-600/60 mt-2">O seu lucro líquido desejado.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="space-y-4">
+                <div class="flex items-center gap-2 mb-2">
+                    <div class="w-8 h-8 rounded-lg bg-rose-100 text-rose-600 flex items-center justify-center text-sm"><i class="fas fa-percentage"></i></div>
+                    <h3 class="font-bold text-slate-800">Tabela Mestra de Canais</h3>
+                </div>
+                <div class="glass-panel rounded-xl overflow-hidden">
+                    <table class="w-full text-left text-xs">
+                        <thead class="bg-slate-50 border-b border-slate-200">
+                            <tr class="text-slate-500 font-bold uppercase text-[9px] tracking-wider">
+                                <th class="px-6 py-4">Plataforma</th>
+                                <th class="px-6 py-4 text-center">Comissão (%)</th>
+                                <th class="px-6 py-4 text-center">Taxa Fixa (R$)</th>
+                                <th class="px-6 py-4 text-center">Frete Grátis (R$)</th>
+                                <th class="px-6 py-4 text-right">Ação</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-100 bg-white" id="tabela-taxas-corpo">
+                            </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section class="bg-slate-900 rounded-2xl p-8 text-white shadow-2xl relative overflow-hidden">
+                <div class="absolute right-0 top-0 opacity-10 pointer-events-none"><i class="fas fa-calculator text-[200px]"></i></div>
+                <div class="relative z-10 flex gap-10 items-center">
+                    <div class="w-1/3 space-y-6">
+                        <h3 class="text-xl font-bold text-indigo-400">Simulador de Proteção de Margem</h3>
+                        <div>
+                            <label class="block text-[10px] font-bold uppercase text-slate-400 mb-2">Se o Custo do Fornecedor for:</label>
+                            <div class="flex items-center gap-3 bg-white/5 border border-white/10 rounded-xl p-4 focus-within:border-indigo-500 transition">
+                                <span class="text-slate-500 font-bold">R$</span>
+                                <input type="number" id="sim-custo" class="bg-transparent text-3xl font-black w-full outline-none text-white" value="26.00" oninput="simular()">
+                            </div>
+                        </div>
+                        <div class="p-4 bg-indigo-600/20 rounded-xl border border-indigo-500/30">
+                            <p class="text-xs text-indigo-200 italic">"Esta simulação utiliza a fórmula de divisor para garantir que as taxas não 'comam' o seu lucro."</p>
+                        </div>
+                    </div>
+
+                    <div class="flex-1 grid grid-cols-2 gap-6">
+                        <div class="bg-white/5 rounded-2xl p-6 border border-white/10 flex flex-col items-center justify-center">
+                            <p class="text-[10px] font-bold uppercase text-slate-400 mb-1">Preço Sugerido (Shopee/ML)</p>
+                            <p class="text-5xl font-black text-[#10b981]" id="res-sugerido">R$ 0,00</p>
+                            <p class="text-[10px] text-slate-500 mt-4 uppercase font-bold tracking-widest" id="res-detalhe-divisor">Divisor: 0.00</p>
+                        </div>
+                        <div class="space-y-4">
+                            <div class="flex justify-between items-end border-b border-white/5 pb-2">
+                                <span class="text-xs text-slate-400">Total de Taxas (%)</span>
+                                <span class="text-sm font-bold text-rose-400" id="res-taxa-total">0%</span>
+                            </div>
+                            <div class="flex justify-between items-end border-b border-white/5 pb-2">
+                                <span class="text-xs text-slate-400">Total de Fixos (R$)</span>
+                                <span class="text-sm font-bold text-rose-400" id="res-fixo-total">R$ 0,00</span>
+                            </div>
+                            <div class="flex justify-between items-end">
+                                <span class="text-xs text-slate-300 font-bold">LUCRO LÍQUIDO REAL</span>
+                                <span class="text-lg font-black text-emerald-400" id="res-lucro-real">R$ 0,00</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <script>
+        // Dados de exemplo para inicializar a tabela
+        let mktTaxas = [
+            { id: 'mercadolivre', name: 'Mercado Livre', com: 16.5, fixo: 0, frete: 0 },
+            { id: 'shopee', name: 'Shopee', com: 20.0, fixo: 3.0, frete: 0 },
+            { id: 'nuvemshop', name: 'Nuvemshop', com: 2.0, fixo: 0, frete: 0 }
+        ];
+
+        function renderTabela() {
+            const corpo = document.getElementById('tabela-taxas-corpo');
+            corpo.innerHTML = '';
+            mktTaxas.forEach((m, i) => {
+                corpo.innerHTML += `
+                    <tr class="hover:bg-slate-50 transition">
+                        <td class="px-6 py-4 font-bold text-slate-700">${m.name}</td>
+                        <td class="px-6 py-4 text-center">
+                            <input type="number" step="0.1" value="${m.com}" class="w-16 bg-slate-100 rounded p-1 text-center font-bold" onchange="updateMkt(${i}, 'com', this.value)">
+                        </td>
+                        <td class="px-6 py-4 text-center">
+                            <input type="number" step="0.1" value="${m.fixo}" class="w-16 bg-slate-100 rounded p-1 text-center font-bold" onchange="updateMkt(${i}, 'fixo', this.value)">
+                        </td>
+                        <td class="px-6 py-4 text-center">
+                            <input type="number" step="0.1" value="${m.frete}" class="w-16 bg-slate-100 rounded p-1 text-center font-bold" onchange="updateMkt(${i}, 'frete', this.value)">
+                        </td>
+                        <td class="px-6 py-4 text-right">
+                            <button class="text-slate-400 hover:text-rose-500"><i class="fas fa-trash"></i></button>
+                        </td>
+                    </tr>
+                `;
+            });
+            simular();
+        }
+
+        function updateMkt(index, field, value) {
+            mktTaxas[index][field] = parseFloat(value) || 0;
+            simular();
+        }
+
+        function simular() {
+            // Pega variáveis globais
+            const imposto = parseFloat(document.getElementById('gc-imposto').value) || 0;
+            const cartao = parseFloat(document.getElementById('gc-cartao').value) || 0;
+            const embalagem = parseFloat(document.getElementById('gc-embalagem').value) || 0;
+            const ganhoAlvo = parseFloat(document.getElementById('gc-ganho').value) || 0;
+            const custoProd = parseFloat(document.getElementById('sim-custo').value) || 0;
+
+            // Simula baseado no primeiro marketplace da lista (ex: ML ou Shopee)
+            const mkt = mktTaxas[0];
+            const taxaCanal = mkt.com;
+            const fixoCanal = mkt.fixo + mkt.frete;
+
+            // FÓRMULA SAGRADA: Preço = (Custo + Fixos) / (1 - Taxas%)
+            const totalTaxasPerc = (taxaCanal + imposto + cartao + ganhoAlvo) / 100;
+            const divisor = 1 - totalTaxasPerc;
+            const totalFixos = custoProd + embalagem + fixoCanal;
+
+            let precoFinal = 0;
+            if (divisor > 0) {
+                precoFinal = totalFixos / divisor;
+            }
+
+            document.getElementById('res-sugerido').innerText = `R$ ${f2(precoFinal)}`;
+            document.getElementById('res-detalhe-divisor').innerText = `Divisor aplicado: ${divisor.toFixed(4)}`;
+            document.getElementById('res-taxa-total').innerText = `${(totalTaxasPerc * 100).toFixed(1)}%`;
+            document.getElementById('res-fixo-total').innerText = `R$ ${f2(embalagem + fixoCanal)}`;
+            document.getElementById('res-lucro-real').innerText = `R$ ${f2(precoFinal * (ganhoAlvo / 100))}`;
+        }
+
+        function salvarTudo() {
+            const gc = {
+                imposto: document.getElementById('gc-imposto').value,
+                cartao: document.getElementById('gc-cartao').value,
+                embalagem: document.getElementById('gc-embalagem').value,
+                ganho: document.getElementById('gc-ganho').value
+            };
+            localStorage.setItem('sostrass_gc', JSON.stringify(gc));
+            localStorage.setItem('sostrass_mkt_taxas', JSON.stringify(mktTaxas));
+            toast("Configurações Financeiras salvas globalmente!");
+        }
+
+        window.onload = () => {
+            const savedGc = JSON.parse(localStorage.getItem('sostrass_gc'));
+            if(savedGc) {
+                document.getElementById('gc-imposto').value = savedGc.imposto;
+                document.getElementById('gc-cartao').value = savedGc.cartao;
+                document.getElementById('gc-embalagem').value = savedGc.embalagem;
+                document.getElementById('gc-ganho').value = savedGc.ganho;
+            }
+            renderTabela();
+        };
+    </script>
+</body>
+</html>
