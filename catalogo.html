@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sóstrass PIM - Terminal de Catálogo</title>
+    <title>Sóstrass PIM - Terminal de Anúncios</title>
+    
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = { darkMode: 'class', theme: { extend: { fontFamily: { sans: ['Inter', 'sans-serif'] } } } }
@@ -12,32 +13,31 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
         * { box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        
         ::-webkit-scrollbar { width: 4px; height: 4px; }
         ::-webkit-scrollbar-track { background: #050507; }
         ::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
+        
         body { background-color: #050507; color: #f8fafc; }
         
-        /* Efeitos Hardcore Terminal */
-        .glass-terminal { background: rgba(9, 9, 11, 0.85); backdrop-filter: blur(32px); border: 1px solid rgba(255,255,255,0.05); }
-        .text-glow-green { text-shadow: 0 0 10px rgba(52, 211, 153, 0.6); }
-        .text-glow-red { text-shadow: 0 0 10px rgba(244, 63, 94, 0.6); }
+        .glass-terminal { background: rgba(9, 9, 11, 0.85); backdrop-filter: blur(24px); border: 1px solid rgba(255,255,255,0.05); box-shadow: 0 10px 40px -10px rgba(0,0,0,0.5); }
+        .data-dense { font-feature-settings: "tnum"; font-variant-numeric: tabular-nums; }
         
-        /* Ticker Animado (Letreiro da Bolsa) */
+        /* Ticker Animation */
         @keyframes ticker { 0% { transform: translateX(100%); } 100% { transform: translateX(-100%); } }
-        .animate-ticker { display: inline-block; white-space: nowrap; animation: ticker 25s linear infinite; }
+        .animate-ticker { display: inline-block; white-space: nowrap; animation: ticker 30s linear infinite; }
+        
+        /* Progress Bar Animation */
+        .progress-fill { transition: width 1s cubic-bezier(0.4, 0, 0.2, 1); }
     </style>
-
-    <script src="js/banco.js"></script>
-    <script src="js/funcoes.js"></script>
 </head>
-<body class="flex h-screen overflow-hidden selection:bg-indigo-500/30">
+<body class="flex h-screen overflow-hidden selection:bg-indigo-500/30 selection:text-white relative">
 
-    <div class="absolute top-[-20%] right-[-10%] w-[60%] h-[60%] bg-indigo-900/20 rounded-full blur-[150px] pointer-events-none z-0"></div>
-    <div class="absolute bottom-[-20%] left-[-10%] w-[60%] h-[60%] bg-emerald-900/10 rounded-full blur-[150px] pointer-events-none z-0"></div>
+    <div id="toast-container" class="fixed top-20 right-6 z-50 flex flex-col gap-3 pointer-events-none"></div>
 
     <aside class="w-20 lg:w-64 bg-[#050507]/95 border-r border-white/5 flex flex-col z-20">
         <div class="h-20 flex items-center justify-center lg:justify-start lg:px-8 border-b border-white/5">
-            <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-600 to-blue-800 flex items-center justify-center text-white shadow-[0_0_20px_rgba(79,70,229,0.4)]"><i class="fas fa-gem text-sm"></i></div>
+            <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-600 to-purple-600 flex items-center justify-center text-white shadow-[0_0_20px_rgba(79,70,229,0.4)]"><i class="fas fa-gem text-sm"></i></div>
             <div class="hidden lg:block ml-3">
                 <h1 class="text-sm font-black tracking-tight text-white leading-none">Sóstrass</h1>
                 <p class="text-[9px] font-black text-indigo-500 uppercase tracking-widest mt-0.5">Terminal PIM</p>
@@ -45,179 +45,249 @@
         </div>
         <nav class="flex-1 py-8 px-4 flex flex-col gap-2">
             <a href="cockpit.html" class="flex items-center gap-4 px-4 py-3 text-slate-400 hover:bg-white/5 hover:text-white rounded-xl transition"><i class="fas fa-chart-line text-lg"></i><span class="hidden lg:block text-xs font-bold">Cockpit</span></a>
-            <a href="catalogo.html" class="flex items-center gap-4 px-4 py-3 bg-white/5 text-white rounded-xl border border-white/10 shadow-inner"><i class="fas fa-list-ul text-indigo-400 text-lg"></i><span class="hidden lg:block text-xs font-bold">Ativos (Catálogo)</span></a>
+            <a href="catalogo.html" class="flex items-center gap-4 px-4 py-3 bg-white/5 text-white rounded-xl border border-white/10 shadow-inner"><i class="fas fa-layer-group text-indigo-400 text-lg"></i><span class="hidden lg:block text-xs font-bold">Gestão de Anúncios</span></a>
+            <a href="produto-editor.html?id=novo" class="flex items-center gap-4 px-4 py-3 text-slate-400 hover:bg-white/5 hover:text-white rounded-xl transition"><i class="fas fa-box-open text-lg"></i><span class="hidden lg:block text-xs font-bold">Editor de Produtos</span></a>
         </nav>
     </aside>
 
-    <div class="flex-1 flex flex-col min-w-0 relative z-10">
+    <div class="flex-1 flex flex-col min-w-0 relative z-10 bg-transparent">
         
         <header class="bg-[#09090b]/90 backdrop-blur-xl border-b border-white/5 sticky top-0 z-40 flex flex-col">
-            <div class="h-6 bg-black/60 border-b border-white/5 overflow-hidden flex items-center px-4 relative">
-                <div class="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-[#09090b] to-transparent z-10"></div>
-                <div class="text-[9px] font-mono font-bold text-slate-400 uppercase tracking-widest animate-ticker w-full">
-                    <span class="mr-8"><i class="fas fa-circle text-[6px] text-emerald-500 mr-1 animate-pulse"></i> SHOPEE API: ONLINE (99.8%)</span>
-                    <span class="mr-8"><i class="fas fa-circle text-[6px] text-emerald-500 mr-1 animate-pulse"></i> MERCADO LIVRE: ONLINE (100%)</span>
-                    <span class="mr-8"><i class="fas fa-circle text-[6px] text-amber-500 mr-1 animate-pulse"></i> BLING: SYNC QUEUE (2 ITEMS)</span>
-                    <span class="mr-8 text-emerald-400"><i class="fas fa-arrow-up mr-1"></i> FATURAMENTO HOJE: R$ 14.850,00</span>
+            <div class="h-7 bg-black border-b border-white/5 overflow-hidden flex items-center px-4 relative">
+                <div class="absolute left-0 top-0 bottom-0 w-12 bg-gradient-to-r from-black to-transparent z-10"></div>
+                <div class="text-[10px] font-mono font-bold text-slate-400 uppercase tracking-widest animate-ticker w-full">
+                    <span class="mr-12"><i class="fas fa-circle text-[7px] text-emerald-500 mr-1.5 animate-pulse"></i> ML API: ONLINE (11ms)</span>
+                    <span class="mr-12"><i class="fas fa-circle text-[7px] text-emerald-500 mr-1.5 animate-pulse"></i> SHOPEE API: ONLINE (18ms)</span>
+                    <span class="mr-12 text-emerald-400"><i class="fas fa-arrow-up mr-1.5"></i> GMV HOJE: R$ 14.850,00</span>
+                    <span class="mr-12 text-rose-400"><i class="fas fa-exclamation-triangle mr-1.5"></i> ALERTA BUYBOX: 1 SKU</span>
                 </div>
             </div>
 
-            <div class="px-8 py-4 flex justify-between items-center">
+            <div class="px-8 py-5 flex justify-between items-center">
                 <div class="flex-1 max-w-xl relative">
-                    <i class="fas fa-search absolute left-4 top-3 text-slate-500 text-sm"></i>
-                    <input type="text" placeholder="Buscar Ativos (SKU, NCM, Título)..." class="w-full bg-black/40 border border-white/10 rounded-lg pl-10 py-2.5 text-xs font-bold text-white placeholder:text-slate-600 outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/50 transition-all shadow-inner" oninput="renderTerminal(this.value)">
+                    <i class="fas fa-search absolute left-4 top-3.5 text-slate-500 text-sm"></i>
+                    <input type="text" placeholder="Buscar por SKU, Anúncio ou NCM (Pressione '/')" class="w-full bg-black/50 border border-white/10 rounded-xl pl-10 py-3 text-xs font-bold text-white placeholder:text-slate-600 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all shadow-inner" oninput="renderTable(this.value)">
                 </div>
-                <div class="flex items-center gap-4 ml-4">
-                    <button class="w-9 h-9 rounded-lg border border-white/10 flex items-center justify-center text-slate-400 hover:bg-white/5 transition"><i class="fas fa-filter"></i></button>
-                    <a href="produto-editor.html?id=novo" class="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-xs font-black uppercase tracking-widest shadow-[0_0_15px_rgba(99,102,241,0.3)] transition-all flex items-center gap-2"><i class="fas fa-plus"></i> Novo Ativo</a>
+                <div class="flex items-center gap-4">
+                    <button onclick="toast('Planilha XLSX Gerada com Sucesso!')" class="px-5 py-3 bg-white/5 hover:bg-white/10 text-white rounded-xl text-[10px] font-black uppercase tracking-widest transition-all border border-white/10 flex items-center gap-2"><i class="fas fa-file-excel text-emerald-500"></i> Exportar XLSX</button>
+                    <div class="w-px h-8 bg-white/10 mx-1"></div>
+                    <button class="px-6 py-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-[10px] font-black uppercase tracking-widest shadow-[0_0_15px_rgba(99,102,241,0.3)] transition-all flex items-center gap-2"><i class="fas fa-sync-alt"></i> Sync Canais</button>
                 </div>
             </div>
         </header>
 
-        <main class="flex-1 overflow-y-auto p-8 scroll-smooth" id="terminal-root">
-            </main>
+        <main class="flex-1 overflow-y-auto p-8 scroll-smooth bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] bg-opacity-5">
+            
+            <div class="mb-8">
+                <h2 class="text-2xl font-black text-white tracking-tight uppercase mb-1">Gestor de Anúncios Master</h2>
+                <p class="text-[11px] font-mono text-slate-500 uppercase tracking-widest">Cruzamento de Tráfego, Conversão e BuyBox</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                <div class="glass-terminal rounded-2xl p-6 border-l-4 border-indigo-500 flex flex-col justify-between">
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="p-2 bg-indigo-500/10 text-indigo-400 rounded-lg"><i class="fas fa-eye"></i></div>
+                        <span class="text-[10px] font-bold text-emerald-400 bg-emerald-500/10 px-2 py-1 rounded">+8.4%</span>
+                    </div>
+                    <div><p class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">Visualizações Totais</p><h3 class="text-3xl font-black text-white data-dense">12.450</h3></div>
+                </div>
+                <div class="glass-terminal rounded-2xl p-6 border-l-4 border-emerald-500 flex flex-col justify-between">
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="p-2 bg-emerald-500/10 text-emerald-400 rounded-lg"><i class="fas fa-shopping-cart"></i></div>
+                        <span class="text-[10px] font-bold text-emerald-400 bg-emerald-500/10 px-2 py-1 rounded">+12.0%</span>
+                    </div>
+                    <div><p class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">Vendas Fechadas (Hoje)</p><h3 class="text-3xl font-black text-emerald-400 data-dense">R$ 14.850</h3></div>
+                </div>
+                <div class="glass-terminal rounded-2xl p-6 border-l-4 border-amber-500 flex flex-col justify-between">
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="p-2 bg-amber-500/10 text-amber-400 rounded-lg"><i class="fas fa-filter"></i></div>
+                        <span class="text-[10px] font-bold text-rose-400 bg-rose-500/10 px-2 py-1 rounded">-1.2%</span>
+                    </div>
+                    <div><p class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">Conversão Média (Catálogo)</p><h3 class="text-3xl font-black text-white data-dense">4.2%</h3></div>
+                </div>
+            </div>
+
+            <div class="glass-terminal rounded-3xl overflow-hidden flex flex-col shadow-2xl">
+                <div class="px-6 py-4 border-b border-white/5 bg-black/40 flex gap-2 overflow-x-auto">
+                    <button class="px-4 py-2 bg-indigo-600 text-white rounded-lg text-[10px] font-black uppercase tracking-widest transition">Todos Ativos</button>
+                    <button class="px-4 py-2 bg-white/5 text-slate-400 hover:text-white rounded-lg text-[10px] font-black uppercase tracking-widest transition border border-white/5 flex items-center gap-1.5"><i class="fas fa-exclamation-triangle text-rose-500"></i> Estoque Crítico</button>
+                    <button class="px-4 py-2 bg-white/5 text-slate-400 hover:text-white rounded-lg text-[10px] font-black uppercase tracking-widest transition border border-white/5 flex items-center gap-1.5"><i class="fas fa-crosshairs text-amber-500"></i> Alerta de Preço</button>
+                    <button class="px-4 py-2 bg-white/5 text-slate-400 hover:text-white rounded-lg text-[10px] font-black uppercase tracking-widest transition border border-white/5 flex items-center gap-1.5"><i class="fas fa-heartbeat text-purple-500"></i> SEO Fraco</button>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead class="bg-[#050507] border-b border-white/10 text-[9px] font-black uppercase tracking-widest text-slate-500">
+                            <tr>
+                                <th class="px-6 py-5">Anúncio / Produto</th>
+                                <th class="px-6 py-5 w-48">Gestão de Estoque</th>
+                                <th class="px-6 py-5">Mercado (BuyBox)</th>
+                                <th class="px-6 py-5">Analytics (D-7)</th>
+                                <th class="px-6 py-5 text-center">Saúde / Sync</th>
+                                <th class="px-6 py-5 text-right">Comandos</th>
+                            </tr>
+                        </thead>
+                        <tbody id="terminal-body" class="divide-y divide-white/5 bg-transparent data-dense">
+                            </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </main>
     </div>
 
     <script>
+        // Formatação
         const f2 = n => parseFloat(n||0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
         
-        // Mini Gráfico em SVG (Sparkline simulado de tendência de vendas)
-        const getSparkline = (trend) => {
-            const isUp = trend === 'up';
-            const color = isUp ? '#34d399' : '#f43f5e'; // Emerald ou Rose
-            const path = isUp ? 'M0 20 Q 10 15, 20 18 T 40 10 T 60 5 L 60 25 L 0 25 Z' : 'M0 5 Q 10 10, 20 8 T 40 15 T 60 20 L 60 25 L 0 25 Z';
-            const line = isUp ? 'M0 20 Q 10 15, 20 18 T 40 10 T 60 5' : 'M0 5 Q 10 10, 20 8 T 40 15 T 60 20';
-            
-            return `
-            <svg width="60" height="25" viewBox="0 0 60 25" class="drop-shadow-md">
-                <defs><linearGradient id="grad${trend}" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="${color}" stop-opacity="0.2"/><stop offset="100%" stop-color="${color}" stop-opacity="0"/></linearGradient></defs>
-                <path d="${path}" fill="url(#grad${trend})" />
-                <path d="${line}" fill="none" stroke="${color}" stroke-width="2" stroke-linecap="round" />
-            </svg>`;
-        };
+        function toast(msg) {
+            const c = document.getElementById('toast-container'); const t = document.createElement('div');
+            t.className = `bg-[#0B0B0C] border border-emerald-500/50 text-white px-6 py-4 rounded-xl shadow-2xl font-bold text-xs flex items-center gap-3`;
+            t.innerHTML = `<div class="absolute left-0 top-0 bottom-0 w-1.5 bg-emerald-500"></div><i class="fas fa-check-circle text-emerald-400 text-xl"></i> ${msg}`; 
+            c.appendChild(t); setTimeout(() => { t.style.opacity='0'; setTimeout(()=>t.remove(),300); }, 3000);
+        }
 
-        function renderTerminal(filtro = '') {
-            const root = document.getElementById('terminal-root');
-            const prods = typeof products !== 'undefined' ? products : [];
-            
-            // Header Dinâmico de Resultados
-            let html = `
-                <div class="flex justify-between items-end mb-6">
-                    <div>
-                        <h2 class="text-2xl font-black text-white tracking-tighter uppercase mb-1">Listagem de Ativos</h2>
-                        <p class="text-[10px] font-mono text-slate-500 uppercase tracking-widest">Painel de Cotações e Saúde do Catálogo Bling</p>
-                    </div>
-                </div>
-                
-                <div class="glass-terminal rounded-2xl overflow-hidden shadow-2xl flex flex-col border border-white/10">
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-left whitespace-nowrap border-collapse">
-                            <thead class="bg-black/60 border-b border-white/10 text-[9px] font-black uppercase tracking-widest text-slate-400">
-                                <tr>
-                                    <th class="px-6 py-4">Ativo (SKU / Produto)</th>
-                                    <th class="px-6 py-4">Cotação (R$)</th>
-                                    <th class="px-6 py-4">Performance (Margem)</th>
-                                    <th class="px-6 py-4 text-center">Canais</th>
-                                    <th class="px-6 py-4 text-center">Saúde / Sync</th>
-                                    <th class="px-6 py-4 text-right">Ação</th>
-                                </tr>
-                            </thead>
-                            <tbody class="divide-y divide-white/5 bg-transparent tabular-nums">
-            `;
-
-            if(prods.length === 0) {
-                html += `<tr><td colspan="6" class="p-10 text-center text-slate-500 font-mono text-xs">NENHUM ATIVO ENCONTRADO NO BANCO DE DADOS.</td></tr>`;
+        // DADOS DO TERMINAL (Baseados na sua solicitação exata)
+        const dbAnuncios = [
+            {
+                sku: 'CX-ORG-30', name: 'Kit 30 Caixas Organizadoras', img: 'https://images.unsplash.com/photo-1542272604-787c3835535d?auto=format&fit=crop&q=80&w=150',
+                estoque: 145, estoqueMax: 200,
+                preco: 89.90, precoMercado: 85.00,
+                views: 1240, viewsVar: 12, sales: 145, salesVar: 5, conv: 11.6,
+                seo: 95, sync: true
+            },
+            {
+                sku: 'PER-6MM-BR', name: 'Pérola Branca 6mm ABS (500g)', img: 'https://images.unsplash.com/photo-1596751303254-e69fb2fc7d23?auto=format&fit=crop&q=80&w=150',
+                estoque: 12, estoqueMax: 500, // Crítico
+                preco: 35.00, precoMercado: 38.00,
+                views: 11, viewsVar: -63.6, sales: 1, salesVar: -50, conv: 9.0,
+                seo: 60, sync: false
+            },
+            {
+                sku: 'TES-ROSE', name: 'Tesoura Vintage Rose Gold', img: 'https://images.unsplash.com/photo-1617325247661-675ab03407bd?auto=format&fit=crop&q=80&w=150',
+                estoque: 50, estoqueMax: 100,
+                preco: 45.00, precoMercado: 45.00,
+                views: 890, viewsVar: 5, sales: 45, salesVar: 2, conv: 5.0,
+                seo: 85, sync: true
             }
+        ];
 
-            prods.filter(p => p.sku.toLowerCase().includes(filtro.toLowerCase()) || p.name.toLowerCase().includes(filtro.toLowerCase())).forEach((p) => {
+        // RENDERIZAÇÃO DA TABELA MASTER
+        function renderTable(filtro = '') {
+            const root = document.getElementById('terminal-body');
+            let html = '';
+
+            dbAnuncios.filter(p => p.sku.toLowerCase().includes(filtro.toLowerCase()) || p.name.toLowerCase().includes(filtro.toLowerCase())).forEach((p) => {
                 
-                const base = typeof getBase === 'function' ? getBase(p) : (p.cost || 0);
-                const marg = typeof calcMargin === 'function' ? calcMargin(p.price, base) : 0;
+                // 1. ESTOQUE (Barra de Progresso Visual)
+                const percEstoque = (p.estoque / p.estoqueMax) * 100;
+                const estColor = p.estoque <= 20 ? 'bg-rose-500 shadow-[0_0_10px_rgba(244,63,94,0.6)]' : (percEstoque < 50 ? 'bg-amber-500' : 'bg-indigo-500');
+                const estText = p.estoque <= 20 ? 'text-rose-400 font-black' : 'text-slate-300';
                 
-                // Lógica Hardcore de Cores do Mercado
-                const isLucro = marg >= 30;
-                const margColor = isLucro ? 'text-emerald-400 text-glow-green' : 'text-rose-400 text-glow-red';
-                const margBg = isLucro ? 'bg-emerald-500/10 border-emerald-500/20' : 'bg-rose-500/10 border-rose-500/20';
-                const trend = isLucro ? 'up' : 'down';
+                // 2. MERCADO & BUYBOX
+                let marketBadge = '';
+                if(p.preco > p.precoMercado) {
+                    marketBadge = `<span class="bg-rose-500/10 text-rose-500 border border-rose-500/20 px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-widest"><i class="fas fa-arrow-up"></i> Alto (+${f2(p.preco - p.precoMercado)})</span>`;
+                } else if(p.preco < p.precoMercado) {
+                    marketBadge = `<span class="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-widest"><i class="fas fa-trophy"></i> Competitivo</span>`;
+                } else {
+                    marketBadge = `<span class="bg-slate-500/10 text-slate-400 border border-slate-500/20 px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-widest">Na Média</span>`;
+                }
 
-                // Status Bling
-                const syncBadge = p.pendenteBling 
-                    ? `<div class="flex items-center gap-1.5 text-[9px] font-bold text-amber-500 bg-amber-500/10 px-2 py-1 rounded border border-amber-500/20 animate-pulse"><i class="fas fa-sync-alt fa-spin"></i> SYNC PENDENTE</div>`
-                    : `<div class="flex items-center gap-1.5 text-[9px] font-bold text-slate-400 bg-white/5 px-2 py-1 rounded border border-white/10"><i class="fas fa-check text-emerald-500"></i> BLING OK</div>`;
+                // 3. ANALYTICS (Formatação de Setas e Cores)
+                const formatVar = (v) => {
+                    if(v > 0) return `<span class="text-emerald-400 text-[10px] font-black ml-1"><i class="fas fa-caret-up"></i> ${v}%</span>`;
+                    if(v < 0) return `<span class="text-rose-500 text-[10px] font-black ml-1"><i class="fas fa-caret-down"></i> ${Math.abs(v)}%</span>`;
+                    return `<span class="text-slate-500 text-[10px] font-black ml-1">-</span>`;
+                };
 
-                // Saúde Fake SEO Circle
-                const seoScore = ((p.desc?.length > 30 ? 30:0) + (p.descComp?.length > 200 ? 40:0) + (p.ean?.length >= 8 ? 30:0)) || 85;
-                const seoColor = seoScore > 80 ? 'text-emerald-500' : 'text-amber-500';
-
-                // Canais
-                let platsHtml = p.platforms?.length > 0 
-                    ? p.platforms.map(plId => `<div class="w-6 h-6 rounded bg-white/10 flex items-center justify-center text-xs border border-white/5 shadow-inner" title="${plId}">${typeof PSVG !== 'undefined' ? PSVG[plId] : plId.charAt(0)}</div>`).join('')
-                    : `<span class="text-[9px] text-slate-600 font-bold">N/A</span>`;
+                // 4. SAÚDE E SYNC
+                const seoColor = p.seo >= 80 ? 'text-emerald-400' : (p.seo >= 50 ? 'text-amber-400' : 'text-rose-500');
+                const syncIcon = p.sync ? '<i class="fas fa-cloud text-emerald-500"></i>' : '<i class="fas fa-sync-alt fa-spin text-amber-500"></i>';
 
                 html += `
-                    <tr class="hover:bg-white/[0.02] transition-colors group cursor-pointer" onclick="window.location.href='produto-editor.html?id=${p.id}'">
+                    <tr class="hover:bg-white/[0.02] transition-colors group">
                         
-                        <td class="px-6 py-4">
+                        <td class="px-6 py-5">
                             <div class="flex items-center gap-4">
-                                <div class="w-10 h-10 rounded-lg bg-black/50 border border-white/10 overflow-hidden shrink-0 flex items-center justify-center shadow-inner group-hover:border-indigo-500/50 transition-colors">
-                                    <i class="fas fa-box text-slate-600 text-lg"></i>
+                                <div class="w-12 h-12 rounded-xl bg-black overflow-hidden shrink-0 border border-white/10 group-hover:border-indigo-500/50 transition shadow-inner relative">
+                                    <img src="${p.img}" class="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition duration-500">
                                 </div>
                                 <div class="flex flex-col">
-                                    <span class="text-sm font-black text-white tracking-tight group-hover:text-indigo-400 transition-colors">${p.sku}</span>
-                                    <span class="text-[10px] font-bold text-slate-500 truncate w-64">${p.name}</span>
+                                    <span class="text-sm font-black text-white tracking-tight group-hover:text-indigo-400 transition">${p.sku}</span>
+                                    <span class="text-[10px] font-bold text-slate-500 truncate w-56">${p.name}</span>
                                 </div>
                             </div>
                         </td>
 
-                        <td class="px-6 py-4">
-                            <div class="flex flex-col">
-                                <span class="text-sm font-black text-white">R$ ${f2(p.price)}</span>
-                                <span class="text-[9px] font-mono text-slate-500">Base: R$ ${f2(base)}</span>
+                        <td class="px-6 py-5">
+                            <div class="flex flex-col gap-1.5 w-full pr-8">
+                                <div class="flex justify-between text-[10px] font-mono">
+                                    <span class="${estText}">${p.estoque} un.</span>
+                                    <span class="text-slate-600">/ ${p.estoqueMax}</span>
+                                </div>
+                                <div class="w-full h-1.5 bg-white/5 rounded-full overflow-hidden shadow-inner">
+                                    <div class="h-full ${estColor} progress-fill" style="width: ${percEstoque}%"></div>
+                                </div>
                             </div>
                         </td>
 
-                        <td class="px-6 py-4">
-                            <div class="flex items-center gap-4">
-                                ${getSparkline(trend)}
-                                <span class="px-2 py-1 rounded-md text-[10px] font-black border ${margBg} ${margColor}">
-                                    ${marg.toFixed(1)}%
-                                </span>
+                        <td class="px-6 py-5">
+                            <div class="flex flex-col items-start gap-1">
+                                <span class="text-sm font-black text-white">R$ ${f2(p.preco)}</span>
+                                ${marketBadge}
                             </div>
                         </td>
 
-                        <td class="px-6 py-4">
-                            <div class="flex items-center justify-center gap-1">
-                                ${platsHtml}
+                        <td class="px-6 py-5">
+                            <div class="grid grid-cols-2 gap-x-6 gap-y-1">
+                                <div class="flex flex-col">
+                                    <span class="text-[9px] font-black text-slate-600 uppercase tracking-widest">Visitas</span>
+                                    <div class="flex items-baseline"><span class="text-xs font-black text-slate-200">${p.views}</span> ${formatVar(p.viewsVar)}</div>
+                                </div>
+                                <div class="flex flex-col">
+                                    <span class="text-[9px] font-black text-slate-600 uppercase tracking-widest">Conversão</span>
+                                    <span class="text-xs font-black text-indigo-400">${p.conv}%</span>
+                                </div>
+                                <div class="flex flex-col col-span-2 pt-1 border-t border-white/5 mt-1">
+                                    <span class="text-[9px] font-black text-slate-600 uppercase tracking-widest">Vendas Fechadas</span>
+                                    <div class="flex items-baseline"><span class="text-xs font-black text-slate-200">${p.sales}</span> ${formatVar(p.salesVar)}</div>
+                                </div>
                             </div>
                         </td>
 
-                        <td class="px-6 py-4">
+                        <td class="px-6 py-5 text-center">
                             <div class="flex flex-col items-center justify-center gap-2">
-                                ${syncBadge}
-                                <div class="flex items-center gap-2" title="Health Score SEO">
-                                    <svg width="14" height="14" viewBox="0 0 36 36" class="transform -rotate-90">
-                                        <circle cx="18" cy="18" r="16" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="4"></circle>
-                                        <circle cx="18" cy="18" r="16" fill="none" stroke="currentColor" stroke-width="4" stroke-dasharray="100" stroke-dashoffset="${100 - seoScore}" class="${seoColor}"></circle>
+                                <div class="relative w-10 h-10 flex items-center justify-center" title="Saúde SEO">
+                                    <svg class="absolute inset-0 w-full h-full transform -rotate-90 drop-shadow-md">
+                                        <circle cx="20" cy="20" r="16" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="3"></circle>
+                                        <circle cx="20" cy="20" r="16" fill="none" stroke="currentColor" stroke-width="3" stroke-dasharray="100" stroke-dashoffset="${100 - p.seo}" class="${seoColor}"></circle>
                                     </svg>
-                                    <span class="text-[9px] font-black ${seoColor}">${seoScore}</span>
+                                    <span class="text-[9px] font-black ${seoColor}">${p.seo}</span>
                                 </div>
+                                <div class="bg-black/50 p-1.5 rounded-lg border border-white/5 shadow-inner" title="Sincronização API">${syncIcon}</div>
                             </div>
                         </td>
 
-                        <td class="px-6 py-4 text-right">
-                            <a href="produto-editor.html?id=${p.id}" class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-white/5 border border-white/10 text-slate-400 hover:bg-indigo-600 hover:text-white hover:border-indigo-500 transition-all shadow-sm group-hover:scale-110" title="Abrir Editor Master">
-                                <i class="fas fa-edit"></i>
-                            </a>
+                        <td class="px-6 py-5 text-right">
+                            <div class="flex items-center justify-end gap-2">
+                                <button onclick="window.location.href='produto-editor.html?id=${p.sku}'" class="px-4 py-2 bg-white/5 hover:bg-indigo-600 text-slate-300 hover:text-white rounded-lg text-[10px] font-black uppercase tracking-widest transition-all border border-white/10 hover:border-indigo-500 shadow-sm flex items-center gap-2">
+                                    <i class="fas fa-edit"></i> Editar
+                                </button>
+                                <button class="w-8 h-8 bg-white/5 hover:bg-yellow-500/20 text-slate-400 hover:text-yellow-500 rounded-lg flex items-center justify-center transition border border-white/10 hover:border-yellow-500/30" title="Ver no Mercado Livre">
+                                    <i class="fas fa-external-link-alt"></i>
+                                </button>
+                            </div>
                         </td>
                     </tr>
                 `;
             });
 
-            html += `</tbody></table></div></div>`;
             root.innerHTML = html;
         }
 
-        window.onload = () => { renderTerminal(); };
+        // Boot
+        window.onload = () => { setTimeout(() => renderTable(), 100); };
     </script>
 </body>
 </html>
