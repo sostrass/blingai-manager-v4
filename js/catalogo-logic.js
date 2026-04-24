@@ -1,137 +1,156 @@
 // ARQUIVO: js/catalogo-logic.js
+// Motor 100% amarrado para o Front-End do Terminal
 
-const PLATS_CONFIG = [
-    { id: 'mercadolivre', name: 'ML', color: 'text-yellow-500' },
-    { id: 'shopee', name: 'SH', color: 'text-rose-500' },
-    { id: 'amazon', name: 'AMZ', color: 'text-amber-500' },
-    { id: 'shein', name: 'SHN', color: 'text-slate-400' },
-    { id: 'magalu', name: 'MGL', color: 'text-blue-500' },
-    { id: 'tiktok', name: 'TKT', color: 'text-black dark:text-white' },
-    { id: 'nuvemshop', name: 'NVM', color: 'text-indigo-400' },
-    { id: 'americanas', name: 'AME', color: 'text-red-600' }
+const f2 = n => parseFloat(n||0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+// Banco de Dados de Mock Avançado
+const dbAnuncios = [
+    { sku: 'CX-ORG-30', name: 'Kit 30 Caixas Organizadoras', img: 'https://images.unsplash.com/photo-1542272604-787c3835535d?auto=format&fit=crop&q=80&w=150', estoque: 145, estoqueMax: 200, preco: 89.90, precoMercado: 85.00, views: 1240, viewsVar: 12, sales: 145, salesVar: 5, conv: 11.6, seo: 95, sync: true },
+    { sku: 'PER-6MM-BR', name: 'Pérola Branca 6mm ABS (500g)', img: 'https://images.unsplash.com/photo-1596751303254-e69fb2fc7d23?auto=format&fit=crop&q=80&w=150', estoque: 12, estoqueMax: 500, preco: 35.00, precoMercado: 38.00, views: 11, viewsVar: -63.6, sales: 1, salesVar: -50, conv: 9.0, seo: 60, sync: false },
+    { sku: 'TES-ROSE', name: 'Tesoura Vintage Rose Gold', img: 'https://images.unsplash.com/photo-1617325247661-675ab03407bd?auto=format&fit=crop&q=80&w=150', estoque: 50, estoqueMax: 100, preco: 45.00, precoMercado: 45.00, views: 890, viewsVar: 5, sales: 45, salesVar: 2, conv: 5.0, seo: 85, sync: true },
+    { sku: 'FIO-SIL-10M', name: 'Fio de Silicone 10m Transparente', img: 'https://images.unsplash.com/photo-1584820927498-cafe8c117769?auto=format&fit=crop&q=80&w=150', estoque: 8, estoqueMax: 300, preco: 12.50, precoMercado: 10.00, views: 340, viewsVar: -10, sales: 20, salesVar: -5, conv: 5.8, seo: 45, sync: true }
 ];
 
-function renderTicker() {
-    const el = document.getElementById('ticker-content');
-    let content = PLATS_CONFIG.map(p => `
-        <span class="mr-12"><i class="fas fa-circle text-[6px] text-emerald-500 mr-1.5 animate-pulse"></i> ${p.name} API: ONLINE</span>
-    `).join('');
-    el.innerHTML = content + `<span class="text-emerald-500 font-black">GMV HOJE: R$ 14.850,22</span>`;
+// Estado Global da Tela
+let estadoAtual = { filtroTexto: '', filtroBotao: 'todos' };
+
+function toast(msg) {
+    const c = document.getElementById('toast-container'); const t = document.createElement('div');
+    t.className = `bg-[#0B0B0C] border border-emerald-500/50 text-white px-6 py-4 rounded-xl shadow-2xl font-bold text-xs flex items-center gap-3`;
+    t.innerHTML = `<div class="absolute left-0 top-0 bottom-0 w-1.5 bg-emerald-500"></div><i class="fas fa-check-circle text-emerald-400 text-xl"></i> ${msg}`; 
+    c.appendChild(t); setTimeout(() => { t.style.opacity='0'; setTimeout(()=>t.remove(),300); }, 3000);
 }
 
-function renderKPIs() {
-    const data = [
-        { label: 'Valor em Estoque', val: 'R$ 248.500', sub: 'Líquido Projetado', icon: 'fa-box', color: 'indigo' },
-        { label: 'Vendas Hoje', val: '124', sub: '+18.4% vs ontem', icon: 'fa-shopping-cart', color: 'emerald' },
-        { label: 'Visitas (24h)', val: '14.240', sub: 'Conversão 4.2%', icon: 'fa-eye', color: 'blue' },
-        { label: 'Risco de Ruptura', val: '3 SKUs', sub: 'Ação Necessária', icon: 'fa-exclamation-triangle', color: 'rose' }
-    ];
+// === INTERAÇÕES DE BOTÕES SUPERIORES ===
+function exportarPlanilha(btn) {
+    const originalText = btn.innerHTML;
+    btn.innerHTML = `<i class="fas fa-circle-notch fa-spin text-emerald-500"></i> <span>Processando...</span>`;
+    btn.disabled = true;
+    setTimeout(() => {
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+        toast("Arquivo Sóstrass_Catalogo.xlsx baixado com sucesso!");
+    }, 1500);
+}
+
+function sincronizarCanaisGlobais(btn) {
+    const originalText = btn.innerHTML;
+    btn.innerHTML = `<i class="fas fa-sync-alt fa-spin"></i> <span>Sincronizando...</span>`;
+    btn.classList.replace('bg-indigo-600', 'bg-indigo-800');
+    btn.disabled = true;
+    setTimeout(() => {
+        btn.innerHTML = originalText;
+        btn.classList.replace('bg-indigo-800', 'bg-indigo-600');
+        btn.disabled = false;
+        toast("Sincronização com Bling, ML e Shopee concluída.");
+        // Zera as pendências visualmente
+        dbAnuncios.forEach(p => p.sync = true);
+        renderTable();
+    }, 2000);
+}
+
+// === LÓGICA DE FILTROS ===
+function aplicarFiltro(tipo, btnElement) {
+    // Atualiza estado global
+    estadoAtual.filtroBotao = tipo;
     
-    document.getElementById('kpi-blocks').innerHTML = data.map(k => `
-        <div class="bg-white dark:bg-[#0b0b0d] border border-slate-200 dark:border-white/5 p-6 rounded-3xl shadow-xl flex flex-col justify-between group hover:border-${k.color}-500 transition-all">
-            <div class="flex justify-between items-start mb-4">
-                <div class="w-10 h-10 rounded-xl bg-${k.color}-500/10 text-${k.color}-500 flex items-center justify-center text-xl shadow-inner"><i class="fas ${k.icon}"></i></div>
-                <i class="fas fa-chart-line text-slate-300 dark:text-white/10 text-4xl absolute right-6 opacity-0 group-hover:opacity-100 transition-opacity"></i>
-            </div>
-            <div>
-                <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">${k.label}</p>
-                <h3 class="text-2xl font-black text-slate-800 dark:text-white">${k.val}</h3>
-                <p class="text-[10px] font-bold text-${k.color === 'rose' ? 'rose' : 'emerald'}-500 mt-2">${k.sub}</p>
-            </div>
-        </div>
-    `).join('');
+    // UI: Reseta todos os botões
+    const botoes = document.querySelectorAll('.filter-btn');
+    botoes.forEach(b => {
+        b.classList.remove('bg-indigo-600', 'text-white', 'shadow-md', 'active');
+        b.classList.add('bg-white/5', 'text-slate-400');
+    });
+
+    // UI: Ativa o botão clicado
+    btnElement.classList.remove('bg-white/5', 'text-slate-400');
+    btnElement.classList.add('bg-indigo-600', 'text-white', 'shadow-md', 'active');
+
+    renderTable(); // Chama o render que vai ler o estadoAtual
 }
 
-function renderTerminal(filtro = '') {
+// O Input text chama essa função
+function renderTerminal(texto) {
+    estadoAtual.filtroTexto = texto;
+    renderTable();
+}
+
+// === O MOTOR DE RENDERIZAÇÃO ===
+function renderTable() {
     const root = document.getElementById('terminal-body');
-    const items = [
-        { sku: 'CX-ORG-30', name: 'Kit 30 Caixas Organizadoras', price: 89.90, mkt: 85.00, views: 1240, vVar: 12, sales: 145, sVar: 5, estoque: 145, max: 200, seo: 95, plats: ['mercadolivre', 'shopee', 'amazon', 'nuvemshop'] },
-        { sku: 'PER-6MM-BR', name: 'Pérola Branca 6mm ABS (500g)', price: 35.00, mkt: 38.00, views: 85, vVar: -63, sales: 1, sVar: -50, estoque: 12, max: 500, seo: 45, plats: ['shopee', 'shein', 'tiktok'] },
-        { sku: 'TES-ROSE', name: 'Tesoura Vintage Rose Gold', price: 45.00, mkt: 45.00, views: 890, vVar: 5, sales: 45, sVar: 2, estoque: 50, max: 100, seo: 82, plats: ['mercadolivre', 'magalu', 'americanas'] }
-    ];
+    let html = '';
 
-    root.innerHTML = items.filter(i => i.sku.includes(filtro.toUpperCase()) || i.name.toUpperCase().includes(filtro.toUpperCase())).map(p => {
-        const pVar = p.price > p.mkt ? `<span class="text-rose-500 text-[9px] font-black">ALTO (+R$${(p.price - p.mkt).toFixed(2)})</span>` : `<span class="text-emerald-500 text-[9px] font-black">COMPETITIVO</span>`;
-        const estPerc = (p.estoque / p.max) * 100;
-        
-        return `
-        <tr class="hover:bg-slate-50 dark:hover:bg-white/[0.02] transition-colors group cursor-pointer">
-            <td class="px-6 py-5">
-                <div class="flex items-center gap-4">
-                    <div class="w-12 h-12 rounded-xl bg-slate-100 dark:bg-black border border-slate-200 dark:border-white/10 flex items-center justify-center text-slate-400 group-hover:border-indigo-500 transition-colors"><i class="fas fa-box text-xl"></i></div>
-                    <div>
-                        <p class="text-sm font-black text-slate-800 dark:text-white tracking-tight">${p.sku}</p>
-                        <p class="text-[10px] font-bold text-slate-500 truncate w-48">${p.name}</p>
-                    </div>
-                </div>
-            </td>
-            <td class="px-6 py-5">
-                <div class="flex flex-col gap-2">
-                    <div class="flex gap-1.5">
-                        ${PLATS_CONFIG.map(pl => {
-                            const ativo = p.plats.includes(pl.id);
-                            return `<div class="w-6 h-6 rounded-lg flex items-center justify-center text-[9px] font-black border ${ativo ? 'bg-indigo-500/10 border-indigo-500/30 text-indigo-500' : 'bg-slate-100 dark:bg-white/5 border-transparent text-slate-300 dark:text-slate-700'}" title="${pl.name}">${pl.name}</div>`;
-                        }).join('')}
-                    </div>
-                    <div class="w-full h-1.5 bg-slate-100 dark:bg-white/5 rounded-full overflow-hidden">
-                        <div class="h-full ${p.estoque < 20 ? 'bg-rose-500' : 'bg-indigo-500'} transition-all duration-1000" style="width: ${estPerc}%"></div>
-                    </div>
-                </div>
-            </td>
-            <td class="px-6 py-5">
-                <div class="flex flex-col">
-                    <span class="text-sm font-black text-slate-800 dark:text-white">R$ ${p.price.toFixed(2)}</span>
-                    ${pVar}
-                </div>
-            </td>
-            <td class="px-6 py-5 text-xs font-bold">
-                <div class="grid grid-cols-2 gap-x-4">
-                    <div class="flex flex-col"><span class="text-[8px] text-slate-400 uppercase">Visitas</span><span class="${p.vVar < 0 ? 'text-rose-500' : 'text-emerald-500'}">${p.views} <i class="fas fa-caret-${p.vVar < 0 ? 'down' : 'up'}"></i></span></div>
-                    <div class="flex flex-col"><span class="text-[8px] text-slate-400 uppercase">Vendas</span><span>${p.sales}</span></div>
-                </div>
-            </td>
-            <td class="px-6 py-5 text-center">
-                <div class="inline-flex items-center justify-center w-10 h-10 rounded-full border-2 ${p.seo < 50 ? 'border-rose-500 text-rose-500' : 'border-emerald-500 text-emerald-500'} text-[10px] font-black shadow-lg">
-                    ${p.seo}%
-                </div>
-            </td>
-            <td class="px-6 py-5 text-right">
-                <button onclick="window.location.href='produto-editor.html?id=${p.sku}'" class="w-9 h-9 rounded-xl bg-slate-100 dark:bg-white/5 text-slate-500 dark:text-slate-400 hover:bg-indigo-600 hover:text-white transition flex items-center justify-center"><i class="fas fa-edit text-xs"></i></button>
-            </td>
-        </tr>
-        `;
-    }).join('');
-}
+    // 1. Aplica Filtros Cruzados (Texto + Botão)
+    let filtrados = dbAnuncios.filter(p => p.sku.toLowerCase().includes(estadoAtual.filtroTexto.toLowerCase()) || p.name.toLowerCase().includes(estadoAtual.filtroTexto.toLowerCase()));
 
-function exportData() {
-    toast("Iniciando exportação estruturada para XLSX...");
-    // Lógica real de exportação viria aqui
-}
+    if (estadoAtual.filtroBotao === 'estoque') filtrados = filtrados.filter(p => p.estoque <= 20);
+    if (estadoAtual.filtroBotao === 'buybox') filtrados = filtrados.filter(p => p.preco > p.precoMercado);
+    if (estadoAtual.filtroBotao === 'seo') filtrados = filtrados.filter(p => p.seo < 80);
 
-// Adicione esta função no seu js/catalogo-logic.js para os botões de filtro funcionarem
-
-function aplicarFiltro(tipo) {
-    const root = document.getElementById('terminal-body');
-    const prods = typeof products !== 'undefined' ? products : [];
-    let filtrados = [];
-
-    if (tipo === 'todos') {
-        filtrados = prods;
-    } else if (tipo === 'estoque') {
-        // Filtra produtos com menos de 20 unidades
-        filtrados = prods.filter(p => p.stock <= 20);
-    } else if (tipo === 'seo') {
-        // Filtra produtos com SEO menor que 80
-        filtrados = prods.filter(p => {
-            const seoScore = ((p.desc?.length > 30 ? 30:0) + (p.descComp?.length > 200 ? 40:0) + (p.ean?.length >= 8 ? 30:0)) || 85;
-            return seoScore < 80;
-        });
+    if (filtrados.length === 0) {
+        root.innerHTML = `<tr><td colspan="6" class="px-6 py-12 text-center"><div class="flex flex-col items-center justify-center text-slate-500"><i class="fas fa-ghost text-4xl mb-3 opacity-50"></i><p class="text-xs font-mono uppercase tracking-widest">Nenhum ativo corresponde aos filtros atuais.</p></div></td></tr>`;
+        return;
     }
 
-    // Re-renderiza a tabela apenas com os filtrados (reaproveita a lógica do renderTerminal)
-    // Para simplificar aqui, vamos apenas passar o termo vazio, mas no mundo real
-    // você passaria o array filtrado para a função de renderização.
-    
-    // Feedback visual (Toast)
-    toast(`Filtro aplicado: ${tipo.toUpperCase()}`);
+    // 2. Monta o HTML
+    filtrados.forEach((p) => {
+        const percEstoque = (p.estoque / p.estoqueMax) * 100;
+        const estColor = p.estoque <= 20 ? 'bg-rose-500 shadow-[0_0_10px_rgba(244,63,94,0.6)]' : (percEstoque < 50 ? 'bg-amber-500' : 'bg-indigo-500');
+        const estText = p.estoque <= 20 ? 'text-rose-400 font-black animate-pulse' : 'text-slate-300';
+        
+        let marketBadge = '';
+        if(p.preco > p.precoMercado) marketBadge = `<span class="bg-rose-500/10 text-rose-500 border border-rose-500/20 px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-widest"><i class="fas fa-arrow-up"></i> Alto (+R$${f2(p.preco - p.precoMercado)})</span>`;
+        else if(p.preco < p.precoMercado) marketBadge = `<span class="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-widest"><i class="fas fa-trophy"></i> Competitivo</span>`;
+        else marketBadge = `<span class="bg-slate-500/10 text-slate-400 border border-slate-500/20 px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-widest">Na Média</span>`;
+
+        const formatVar = (v) => {
+            if(v > 0) return `<span class="text-emerald-400 text-[10px] font-black ml-1"><i class="fas fa-caret-up"></i> ${v}%</span>`;
+            if(v < 0) return `<span class="text-rose-500 text-[10px] font-black ml-1"><i class="fas fa-caret-down"></i> ${Math.abs(v)}%</span>`;
+            return `<span class="text-slate-500 text-[10px] font-black ml-1">-</span>`;
+        };
+
+        const seoColor = p.seo >= 80 ? 'text-emerald-400' : (p.seo >= 50 ? 'text-amber-400' : 'text-rose-500');
+        const syncIcon = p.sync ? '<i class="fas fa-check text-emerald-500"></i>' : '<i class="fas fa-sync-alt fa-spin text-amber-500"></i>';
+
+        html += `
+            <tr class="hover:bg-white/[0.02] transition-colors group cursor-pointer" onclick="window.location.href='produto-editor.html?id=${p.sku}'">
+                <td class="px-6 py-5">
+                    <div class="flex items-center gap-4">
+                        <div class="w-12 h-12 rounded-xl bg-black overflow-hidden shrink-0 border border-white/10 group-hover:border-indigo-500/50 transition shadow-inner"><img src="${p.img}" class="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition duration-500"></div>
+                        <div class="flex flex-col"><span class="text-sm font-black text-white tracking-tight group-hover:text-indigo-400 transition">${p.sku}</span><span class="text-[10px] font-bold text-slate-500 truncate w-56">${p.name}</span></div>
+                    </div>
+                </td>
+                <td class="px-6 py-5">
+                    <div class="flex flex-col gap-1.5 w-full pr-8">
+                        <div class="flex justify-between text-[10px] font-mono"><span class="${estText}">${p.estoque} un.</span><span class="text-slate-600">/ ${p.estoqueMax}</span></div>
+                        <div class="w-full h-1.5 bg-white/5 rounded-full overflow-hidden shadow-inner"><div class="h-full ${estColor} progress-fill" style="width: ${percEstoque}%"></div></div>
+                    </div>
+                </td>
+                <td class="px-6 py-5">
+                    <div class="flex flex-col items-start gap-1"><span class="text-sm font-black text-white">R$ ${f2(p.preco)}</span>${marketBadge}</div>
+                </td>
+                <td class="px-6 py-5 text-xs font-bold">
+                    <div class="grid grid-cols-2 gap-x-6 gap-y-1">
+                        <div class="flex flex-col"><span class="text-[9px] font-black text-slate-600 uppercase tracking-widest">Visitas</span><div class="flex items-baseline"><span class="text-xs font-black text-slate-200">${p.views}</span> ${formatVar(p.viewsVar)}</div></div>
+                        <div class="flex flex-col"><span class="text-[9px] font-black text-slate-600 uppercase tracking-widest">Conversão</span><span class="text-xs font-black text-indigo-400">${p.conv}%</span></div>
+                    </div>
+                </td>
+                <td class="px-6 py-5 text-center">
+                    <div class="flex flex-col items-center justify-center gap-2">
+                        <div class="relative w-10 h-10 flex items-center justify-center"><svg class="absolute inset-0 w-full h-full transform -rotate-90 drop-shadow-md"><circle cx="20" cy="20" r="16" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="3"></circle><circle cx="20" cy="20" r="16" fill="none" stroke="currentColor" stroke-width="3" stroke-dasharray="100" stroke-dashoffset="${100 - p.seo}" class="${seoColor}"></circle></svg><span class="text-[9px] font-black ${seoColor}">${p.seo}</span></div>
+                        <div class="bg-black/50 p-1.5 rounded-lg border border-white/5 shadow-inner" title="${p.sync ? 'Sincronizado' : 'Aguardando API'}">${syncIcon}</div>
+                    </div>
+                </td>
+                <td class="px-6 py-5 text-right">
+                    <div class="flex items-center justify-end gap-2">
+                        <button onclick="event.stopPropagation(); window.location.href='produto-editor.html?id=${p.sku}'" class="px-4 py-2 bg-white/5 hover:bg-indigo-600 text-slate-300 hover:text-white rounded-lg text-[10px] font-black uppercase tracking-widest transition-all border border-white/10 hover:border-indigo-500 shadow-sm flex items-center gap-2"><i class="fas fa-edit"></i> Editar</button>
+                    </div>
+                </td>
+            </tr>
+        `;
+    });
+
+    root.innerHTML = html;
 }
+
+// Boot inicial
+window.onload = () => { setTimeout(() => renderTable(), 100); };
