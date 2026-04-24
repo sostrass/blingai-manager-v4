@@ -1,427 +1,127 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
-<head>
+<html lang="pt-BR" class="dark"> <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sóstrass PIM - Editor Master</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <title>PIM - Editor Modular</title>
     
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: { extend: { fontFamily: { sans: ['Inter', 'sans-serif'] } } }
+        }
+    </script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+    <script src="js/banco.js"></script>
+    <script src="js/funcoes.js"></script>
+    <script src="js/aba-estudio.js"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
-        * { box-sizing: border-box; font-family: 'Inter', sans-serif; }
         ::-webkit-scrollbar { width: 6px; height: 6px; }
-        ::-webkit-scrollbar-track { background: #050507; }
-        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
-        input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        .dark ::-webkit-scrollbar-thumb { background: #334155; }
         
-        body { background-color: #050507; color: #f8fafc; }
-        .glass-card { background: rgba(15, 15, 17, 0.7); backdrop-filter: blur(24px); border: 1px solid rgba(255, 255, 255, 0.05); box-shadow: 0 10px 40px -10px rgba(0,0,0,0.5); }
-        
-        /* Inputs Premium */
-        .inp-dark { background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 12px 16px; color: #fff; font-size: 12px; outline: none; transition: 0.2s; box-shadow: inset 0 2px 4px rgba(0,0,0,0.2); width: 100%; font-weight: 500;}
-        .inp-dark:focus { border-color: #6366f1; background: rgba(0,0,0,0.6); }
-        
-        /* Abas */
-        .tab-btn { color: #64748b; font-weight: 700; padding: 16px 24px; transition: 0.3s; border-bottom: 2px solid transparent; cursor: pointer; font-size: 11px; text-transform: uppercase; letter-spacing: 1px;}
-        .tab-btn:hover { color: #fff; }
-        .tab-active { color: #818cf8; border-bottom: 2px solid #818cf8; background: linear-gradient(to top, rgba(99,102,241,0.1), transparent); }
-        
-        .circle-progress { transition: stroke-dashoffset 0.8s cubic-bezier(0.4, 0, 0.2, 1); stroke-linecap: round; }
-        .animate-fade-in { animation: fadeIn 0.4s ease-out forwards; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .tab-btn { transition: 0.3s; border-bottom: 2px solid transparent; }
+        .tab-active { color: #6366f1; border-color: #6366f1; }
+        .dark .tab-active { color: #818cf8; border-color: #818cf8; background: linear-gradient(to top, rgba(99,102,241,0.1), transparent); }
     </style>
 </head>
-<body class="flex h-screen overflow-hidden selection:bg-indigo-500/30">
+<body class="flex h-screen overflow-hidden bg-slate-50 dark:bg-[#050507] text-slate-800 dark:text-slate-200 transition-colors duration-300">
 
-    <div class="absolute top-0 right-0 w-[600px] h-[600px] bg-indigo-600/10 rounded-full blur-[150px] pointer-events-none z-0"></div>
-    <div class="absolute bottom-0 left-0 w-[600px] h-[600px] bg-rose-600/10 rounded-full blur-[150px] pointer-events-none z-0"></div>
-
-    <div id="toast-container" class="fixed top-6 right-6 z-50 flex flex-col gap-3 pointer-events-none"></div>
-
-    <aside class="w-20 lg:w-64 bg-[#050507]/90 border-r border-white/5 flex flex-col z-20 backdrop-blur-2xl">
-        <div class="h-20 flex items-center justify-center lg:justify-start lg:px-8 border-b border-white/5">
-            <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white shadow-[0_0_15px_rgba(99,102,241,0.4)]"><i class="fas fa-gem text-sm"></i></div>
+    <aside class="w-20 lg:w-64 bg-white dark:bg-[#09090b] border-r border-slate-200 dark:border-white/5 flex flex-col z-20 transition-colors duration-300">
+        <div class="h-20 flex items-center justify-center lg:justify-start lg:px-8 border-b border-slate-200 dark:border-white/5">
+            <div class="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center text-white"><i class="fas fa-gem text-sm"></i></div>
             <div class="hidden lg:block ml-3">
-                <h1 class="text-sm font-black tracking-tight text-white leading-none">Sóstrass</h1>
-                <p class="text-[9px] font-bold text-indigo-400 uppercase tracking-widest mt-0.5">PIM Master</p>
+                <h1 class="text-sm font-black tracking-tight text-slate-800 dark:text-white">Sóstrass</h1>
+                <p class="text-[9px] font-bold text-indigo-500 dark:text-indigo-400 uppercase tracking-widest mt-0.5">PIM Enterprise</p>
             </div>
         </div>
         <nav class="flex-1 py-8 px-4 flex flex-col gap-2">
-            <a href="#" class="flex items-center gap-4 px-4 py-3 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl transition"><i class="fas fa-chart-line text-lg"></i><span class="hidden lg:block text-xs font-bold">Cockpit</span></a>
-            <a href="#" class="flex items-center gap-4 px-4 py-3 bg-white/10 text-white rounded-xl border border-white/5 shadow-inner"><i class="fas fa-box-open text-indigo-400 text-lg"></i><span class="hidden lg:block text-xs font-bold">Editor de Ficha</span></a>
+            <a href="cockpit.html" class="flex items-center gap-4 px-4 py-3 text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/5 rounded-xl transition"><i class="fas fa-chart-line text-lg"></i><span class="hidden lg:block text-xs font-bold">Cockpit</span></a>
+            <a href="index.html" class="flex items-center gap-4 px-4 py-3 bg-indigo-50 dark:bg-white/10 text-indigo-600 dark:text-white rounded-xl border border-indigo-100 dark:border-white/5 shadow-inner"><i class="fas fa-box-open text-lg"></i><span class="hidden lg:block text-xs font-bold">Editor de Produto</span></a>
         </nav>
     </aside>
 
     <div class="flex-1 flex flex-col min-w-0 relative z-10">
         
-        <header class="bg-[#050507]/80 backdrop-blur-xl border-b border-white/5 sticky top-0 z-40">
+        <header class="bg-white/80 dark:bg-[#09090b]/80 backdrop-blur-xl border-b border-slate-200 dark:border-white/5 sticky top-0 z-40 transition-colors duration-300">
             <div class="px-10 py-5 flex justify-between items-center">
                 <div class="flex items-center gap-5 w-full max-w-3xl">
-                    <a href="#" class="w-10 h-10 rounded-xl border border-white/10 flex items-center justify-center text-slate-400 hover:bg-white/10 hover:text-white transition-all"><i class="fas fa-arrow-left"></i></a>
-                    <div class="flex flex-1 items-stretch bg-black/40 border border-white/10 rounded-xl overflow-hidden focus-within:border-indigo-500 focus-within:ring-2 focus-within:ring-indigo-500/20 transition-all shadow-inner">
-                        <input type="text" id="inp-nome" class="flex-1 bg-transparent px-5 py-3 text-xl font-black text-white outline-none" value="Kit 30 Caixas Organizadoras (30 Divisórias)">
-                        <button onclick="chamarIA('inp-nome')" title="Otimizar Título com I.A." class="px-6 bg-indigo-500/10 text-indigo-400 hover:bg-indigo-600 hover:text-white border-l border-white/10 transition-colors flex items-center justify-center gap-2 font-bold text-xs uppercase tracking-widest"><i class="fas fa-wand-magic-sparkles"></i> <span class="hidden lg:block">Otimizar</span></button>
+                    <a href="index.html" class="w-10 h-10 rounded-xl border border-slate-200 dark:border-white/10 flex items-center justify-center text-slate-500 hover:bg-slate-100 dark:hover:bg-white/10 transition-all"><i class="fas fa-arrow-left"></i></a>
+                    <div>
+                        <h2 class="text-2xl font-black text-slate-800 dark:text-white" id="hdr-nome">Carregando...</h2>
+                        <p class="text-xs font-mono text-slate-500 mt-1">SKU: <span id="hdr-sku" class="text-indigo-600 dark:text-indigo-400 font-bold">...</span></p>
                     </div>
                 </div>
                 <div class="flex items-center gap-4">
-                    <span class="text-xs font-mono font-bold text-slate-500 bg-black/40 px-3 py-2 rounded-lg border border-white/5">SKU: <span id="lbl-sku" class="text-indigo-400">CX-ORG-30</span></span>
-                    <button onclick="toast('Salvo e Enviado para a fila do Bling!')" class="px-6 py-3 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-black shadow-lg shadow-emerald-600/20 transition-all flex items-center gap-2"><i class="fas fa-cloud-upload-alt"></i> Salvar Ficha</button>
+                    <button onclick="toggleTheme()" class="w-10 h-10 rounded-full border border-slate-200 dark:border-white/10 flex items-center justify-center text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/5 transition">
+                        <i class="fas fa-sun dark:hidden"></i>
+                        <i class="fas fa-moon hidden dark:block"></i>
+                    </button>
+                    
+                    <button class="px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-black shadow-lg shadow-emerald-600/20 transition-all flex items-center gap-2"><i class="fas fa-cloud-upload-alt"></i> Atualizar Bling</button>
                 </div>
             </div>
             
-            <div class="px-10 flex gap-2 overflow-x-auto border-t border-white/5 bg-black/20">
-                <button onclick="switchTab('carac')" id="tab-carac" class="tab-btn tab-active"><i class="fas fa-tags mr-2"></i> Cadastro & Fiscal</button>
-                <button onclick="switchTab('copy')" id="tab-copy" class="tab-btn"><i class="fas fa-pen-nib mr-2"></i> Copy & SEO</button>
-                <button onclick="switchTab('midia')" id="tab-midia" class="tab-btn"><i class="fas fa-images mr-2"></i> Mídia & Estúdio</button>
-                <button onclick="switchTab('mkt')" id="tab-mkt" class="tab-btn"><i class="fas fa-calculator mr-2"></i> Precificação 8 Canais</button>
+            <div class="px-10 flex gap-2 overflow-x-auto border-t border-slate-200 dark:border-white/5 bg-slate-50 dark:bg-black/20">
+                <button onclick="carregarAba('produto')" id="tab-produto" class="tab-btn px-6 py-4 text-[11px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white"><i class="fas fa-tags mr-2"></i> Cadastro (Bling)</button>
+                <button onclick="carregarAba('estudio')" id="tab-estudio" class="tab-btn px-6 py-4 text-[11px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white"><i class="fas fa-images mr-2"></i> Mídia & Estúdio IA</button>
+                <button onclick="carregarAba('precificacao')" id="tab-precificacao" class="tab-btn px-6 py-4 text-[11px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white"><i class="fas fa-calculator mr-2"></i> Canais (Markup)</button>
             </div>
         </header>
 
-        <main class="flex-1 overflow-y-auto p-10 2xl:px-16 scroll-smooth bg-gradient-to-br from-[#050507] to-[#0a0a0f]">
-            
-            <div id="view-carac" class="space-y-8 animate-fade-in block max-w-7xl mx-auto">
-                <div class="glass-card rounded-2xl p-8 border-t-4 border-indigo-500">
-                    <h3 class="text-sm font-black text-indigo-400 uppercase tracking-widest mb-6 flex items-center gap-2"><i class="fas fa-id-card"></i> Identificação Base (Bling)</h3>
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                        <div class="flex flex-col gap-2"><label class="text-[10px] font-black text-slate-400 uppercase">Código (SKU)</label><input type="text" id="inp-sku" class="inp-dark font-mono text-indigo-300" value="CX-ORG-30"></div>
-                        <div class="flex flex-col gap-2"><label class="text-[10px] font-black text-slate-400 uppercase">Formato</label><select class="inp-dark"><option>Simples (Item único)</option><option>Com Variação</option></select></div>
-                        <div class="flex flex-col gap-2 lg:col-span-2">
-                            <label class="text-[10px] font-black text-slate-400 uppercase">Marca / Fabricante</label>
-                            <div class="flex items-stretch bg-black/40 border border-white/10 rounded-xl overflow-hidden focus-within:border-indigo-500 transition shadow-inner">
-                                <input type="text" id="inp-marca" class="flex-1 bg-transparent px-4 py-3 text-xs font-bold text-white outline-none" value="Sóstrass">
-                                <button onclick="chamarIA('inp-marca')" class="px-4 bg-indigo-500/10 text-indigo-400 hover:bg-indigo-500 hover:text-white border-l border-white/10 transition"><i class="fas fa-wand-magic-sparkles"></i></button>
-                            </div>
-                        </div>
-                        <div class="flex flex-col gap-2"><label class="text-[10px] font-black text-slate-400 uppercase">Situação</label><select class="inp-dark text-emerald-400"><option>Ativo</option><option>Inativo</option></select></div>
-                        <div class="flex flex-col gap-2"><label class="text-[10px] font-black text-slate-400 uppercase">Condição</label><select class="inp-dark"><option>Novo</option><option>Usado</option></select></div>
-                        <div class="flex flex-col gap-2"><label class="text-[10px] font-black text-slate-400 uppercase">Produção</label><select class="inp-dark"><option>Própria</option><option>Terceiros</option></select></div>
-                        <div class="flex flex-col gap-2"><label class="text-[10px] font-black text-slate-400 uppercase">Unidade</label><input type="text" class="inp-dark" value="UN"></div>
-                    </div>
-                </div>
-
-                <div class="grid grid-cols-1 xl:grid-cols-2 gap-8">
-                    <div class="glass-card rounded-2xl p-8 border-t-4 border-amber-500">
-                        <h3 class="text-sm font-black text-amber-500 uppercase tracking-widest mb-6 flex items-center gap-2"><i class="fas fa-box"></i> Logística</h3>
-                        <div class="grid grid-cols-3 gap-5">
-                            <div class="flex flex-col gap-2"><label class="text-[9px] font-black text-slate-400 uppercase">Peso Líq. (kg)</label><input type="number" id="inp-pesoliq" class="inp-dark" value="0.5" oninput="updateSEO()"></div>
-                            <div class="flex flex-col gap-2"><label class="text-[9px] font-black text-slate-400 uppercase">Peso Bru. (kg)</label><input type="number" class="inp-dark" value="0.55"></div>
-                            <div class="flex flex-col gap-2"><label class="text-[9px] font-black text-slate-400 uppercase">Volumes</label><input type="number" class="inp-dark" value="1"></div>
-                            <div class="flex flex-col gap-2"><label class="text-[9px] font-black text-slate-400 uppercase">Largura (cm)</label><input type="number" class="inp-dark" value="19"></div>
-                            <div class="flex flex-col gap-2"><label class="text-[9px] font-black text-slate-400 uppercase">Altura (cm)</label><input type="number" class="inp-dark" value="20"></div>
-                            <div class="flex flex-col gap-2"><label class="text-[9px] font-black text-slate-400 uppercase">Profund. (cm)</label><input type="number" class="inp-dark" value="10"></div>
-                        </div>
-                    </div>
-                    <div class="glass-card rounded-2xl p-8 border-t-4 border-emerald-500">
-                        <h3 class="text-sm font-black text-emerald-400 uppercase tracking-widest mb-6 flex items-center gap-2"><i class="fas fa-file-invoice-dollar"></i> Fiscal e Tributação</h3>
-                        <div class="grid grid-cols-2 gap-5">
-                            <div class="flex flex-col gap-2 col-span-2">
-                                <label class="text-[10px] font-black text-slate-400 uppercase">GTIN / EAN Comercial</label>
-                                <div class="flex items-stretch bg-black/40 border border-white/10 rounded-xl overflow-hidden focus-within:border-emerald-500 transition shadow-inner">
-                                    <input type="text" id="inp-ean" class="flex-1 bg-transparent px-4 py-3 text-xs font-mono font-bold text-emerald-200 outline-none" value="7890000000000" oninput="updateSEO()">
-                                    <button class="px-5 bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500 hover:text-white border-l border-white/10 transition" title="Validar EAN"><i class="fas fa-check-double"></i></button>
-                                </div>
-                            </div>
-                            <div class="flex flex-col gap-2"><label class="text-[10px] font-black text-slate-400 uppercase">Código NCM</label><input type="text" class="inp-dark font-mono text-white" value="3923.10.90"></div>
-                            <div class="flex flex-col gap-2"><label class="text-[10px] font-black text-slate-400 uppercase">Código CEST</label><input type="text" class="inp-dark font-mono text-white" value="10.001.00"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div id="view-copy" class="hidden animate-fade-in max-w-[1600px] mx-auto">
-                <div class="flex flex-col xl:flex-row gap-8">
-                    <div class="flex-1 space-y-6">
-                        <div class="glass-card rounded-2xl p-6 border border-white/5 group hover:border-indigo-500/30 transition">
-                            <div class="flex justify-between items-center mb-3">
-                                <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2"><i class="fas fa-heading text-indigo-400"></i> Descrição Curta (Título SEO)</label>
-                                <span class="text-[10px] font-mono font-bold text-slate-500 bg-black/40 px-2 py-1 rounded" id="char-curta">0/150</span>
-                            </div>
-                            <div class="flex items-stretch bg-black/40 border border-white/10 rounded-xl overflow-hidden focus-within:border-indigo-500 transition shadow-inner">
-                                <input type="text" id="inp-desc-curta" class="flex-1 bg-transparent px-5 py-4 text-sm font-bold text-white outline-none" value="Kit 30 Caixas Organizadoras Transparentes" oninput="updateSEO()">
-                                <button onclick="chamarIA('inp-desc-curta')" class="px-6 bg-indigo-500/10 text-indigo-400 hover:bg-indigo-600 hover:text-white border-l border-white/10 transition"><i class="fas fa-wand-magic-sparkles text-lg"></i></button>
-                            </div>
-                        </div>
-
-                        <div class="glass-card rounded-2xl p-6 border border-white/5 group hover:border-indigo-500/30 transition">
-                            <div class="flex justify-between items-center mb-3">
-                                <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2"><i class="fas fa-align-left text-indigo-400"></i> Descrição Comercial (Anti-Devolução)</label>
-                                <span class="text-[10px] font-mono font-bold text-slate-500 bg-black/40 px-2 py-1 rounded" id="char-longa">0 chars</span>
-                            </div>
-                            <div class="flex items-start bg-black/40 border border-white/10 rounded-xl overflow-hidden focus-within:border-indigo-500 transition shadow-inner">
-                                <textarea id="inp-desc-longa" rows="12" class="flex-1 bg-transparent px-5 py-4 text-[13px] leading-relaxed text-slate-300 outline-none resize-none" oninput="updateSEO()">Caixa perfeita para organização de miçangas e pérolas.
-- 30 compartimentos.
-- Material: Acrílico resistente.
-- Medidas Oficiais: 20cm x 19cm x 10cm.</textarea>
-                                <div class="flex flex-col border-l border-white/10 bg-black/20">
-                                    <button onclick="chamarIA('inp-desc-longa')" class="p-5 text-indigo-400 hover:bg-indigo-600 hover:text-white transition border-b border-white/10" title="Reescrever com I.A."><i class="fas fa-wand-magic-sparkles text-xl mb-1"></i><br><span class="text-[8px] font-black uppercase">Otimizar</span></button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="w-full xl:w-[400px] shrink-0 sticky top-0">
-                        <div class="glass-card rounded-2xl p-8 flex flex-col items-center justify-center relative overflow-hidden shadow-2xl border-t-4 border-rose-500">
-                            <div class="absolute inset-0 bg-gradient-to-b from-rose-500/10 to-transparent pointer-events-none"></div>
-                            <h3 class="text-xs font-black text-white uppercase tracking-widest mb-8 relative z-10 flex items-center gap-2"><i class="fas fa-heartbeat text-rose-500"></i> Quality Score (SEO)</h3>
-                            
-                            <div class="relative w-48 h-48 mb-8 z-10">
-                                <svg class="w-full h-full transform -rotate-90">
-                                    <circle cx="96" cy="96" r="84" stroke="rgba(255,255,255,0.05)" stroke-width="14" fill="transparent"/>
-                                    <circle cx="96" cy="96" r="84" stroke="currentColor" stroke-width="14" fill="transparent" stroke-dasharray="527.7" stroke-dashoffset="527.7" class="circle-progress text-rose-500" id="seo-circle"/>
-                                </svg>
-                                <div class="absolute inset-0 flex items-center justify-center flex-col"><span class="text-6xl font-black text-rose-500 leading-none tracking-tighter" id="seo-score">0</span></div>
-                            </div>
-                            
-                            <div class="w-full space-y-3 text-[11px] font-bold text-slate-400 bg-black/40 p-5 rounded-xl border border-white/5 z-10 shadow-inner">
-                                <div class="flex justify-between items-center"><span id="lbl-t">Título atrativo (> 30 char)</span><i class="fas fa-times text-rose-500 text-lg" id="icn-t"></i></div>
-                                <div class="flex justify-between items-center"><span id="lbl-d">Desc. Completa (> 200)</span><i class="fas fa-times text-rose-500 text-lg" id="icn-d"></i></div>
-                                <div class="flex justify-between items-center"><span id="lbl-e">EAN Nacional Válido</span><i class="fas fa-times text-rose-500 text-lg" id="icn-e"></i></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div id="view-midia" class="hidden animate-fade-in max-w-[1600px] mx-auto h-[75vh]">
-                <div class="flex flex-col lg:flex-row gap-8 h-full">
-                    <div class="w-full lg:w-1/2 glass-card rounded-2xl p-8 flex flex-col border-t-4 border-indigo-500">
-                        <div class="flex justify-between items-center mb-6">
-                            <h3 class="text-sm font-black text-white uppercase tracking-widest flex items-center gap-2"><i class="fas fa-images text-indigo-400"></i> Galeria do Produto</h3>
-                        </div>
-                        <div class="grid grid-cols-2 xl:grid-cols-3 gap-4 flex-1 overflow-y-auto content-start pr-2">
-                            <div class="aspect-square bg-black/40 rounded-2xl border-2 border-dashed border-white/20 flex flex-col items-center justify-center text-slate-500 hover:text-indigo-400 hover:border-indigo-500 transition cursor-pointer group">
-                                <i class="fas fa-cloud-upload-alt text-4xl mb-3 group-hover:-translate-y-2 transition-transform duration-300"></i><span class="text-[10px] font-black uppercase tracking-widest">Upload Local</span>
-                            </div>
-                            <div class="aspect-square rounded-2xl border border-white/10 relative group overflow-hidden bg-black/80">
-                                <img src="https://images.unsplash.com/photo-1617325247661-675ab03407bd?q=80&w=400&auto=format&fit=crop" class="w-full h-full object-cover opacity-90 group-hover:opacity-100 group-hover:scale-110 transition duration-700">
-                                <div class="absolute inset-0 bg-slate-900/70 opacity-0 group-hover:opacity-100 transition duration-300 flex items-center justify-center gap-3 backdrop-blur-sm">
-                                    <button class="w-12 h-12 bg-white/10 text-white rounded-full flex items-center justify-center hover:bg-rose-600 transition shadow-xl border border-white/20"><i class="fas fa-trash"></i></button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="w-full lg:w-1/2 glass-card rounded-2xl p-8 flex flex-col border border-rose-500/20 bg-gradient-to-br from-transparent to-rose-900/20 relative overflow-hidden shadow-2xl">
-                        <div class="absolute top-0 right-0 w-96 h-96 bg-rose-500/10 rounded-full blur-[120px] pointer-events-none z-0"></div>
-                        <div class="flex justify-between items-center mb-6 relative z-10">
-                            <h3 class="text-lg font-black text-white uppercase tracking-widest flex items-center gap-3"><i class="fas fa-camera-retro text-rose-400 text-2xl"></i> Nano Banana 2</h3>
-                            <span class="text-[10px] font-mono font-black text-rose-200 border border-rose-500/30 bg-rose-500/20 px-3 py-1 rounded-full shadow-sm">Image Gen PRO</span>
-                        </div>
-                        
-                        <div class="relative z-10 flex flex-col h-full gap-4">
-                            <div class="flex flex-col gap-2">
-                                <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Prompt de Cenário</label>
-                                <textarea id="ia-img-prompt" class="bg-black/60 border border-white/10 rounded-xl p-5 text-sm font-medium text-white outline-none focus:border-rose-500 transition shadow-inner resize-none h-32 placeholder:text-slate-600" placeholder="Ex: Fundo infinito branco, iluminação de estúdio fotográfico, sombra suave, 8k..."></textarea>
-                            </div>
-                            <button onclick="gerarImagemIA()" class="w-full py-4 bg-gradient-to-r from-rose-600 to-rose-500 hover:from-rose-500 hover:to-rose-400 text-white rounded-xl text-sm font-black transition shadow-lg shadow-rose-600/30 flex items-center justify-center gap-2 transform hover:-translate-y-0.5"><i class="fas fa-paint-brush"></i> Renderizar Imagem HQ</button>
-                            <div class="flex-1 border border-white/10 rounded-xl bg-black/80 relative overflow-hidden group flex flex-col items-center justify-center shadow-inner min-h-[200px]" id="ia-img-result">
-                                <i class="fas fa-image text-6xl text-white/10 mb-4"></i><p class="text-[10px] font-black text-slate-600 uppercase tracking-widest">Prévia</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div id="view-mkt" class="hidden animate-fade-in max-w-7xl mx-auto pb-20 space-y-8">
-                <div class="glass-card rounded-2xl p-8 border-l-4 border-emerald-500 bg-gradient-to-r from-[#151517] to-[#050507]">
-                    <div class="flex flex-col lg:flex-row gap-8 items-center">
-                        <div class="w-full lg:w-1/3">
-                            <h3 class="text-sm font-black text-white uppercase tracking-widest mb-3 flex items-center gap-2"><i class="fas fa-balance-scale text-emerald-400"></i> Motor Financeiro</h3>
-                            <p class="text-[11px] text-slate-400 leading-relaxed font-medium">A fórmula <b>Markup Reverso</b> protege o seu lucro. Altere o Custo Fornecedor e veja os marketplaces recalculaem a meta de preço ao vivo.</p>
-                        </div>
-                        <div class="hidden lg:block w-px h-24 bg-white/10"></div>
-                        <div class="w-full lg:flex-1 grid grid-cols-2 lg:grid-cols-4 gap-6">
-                            
-                            <div class="flex flex-col gap-2">
-                                <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Custo Fornecedor</label>
-                                <div class="flex items-center bg-black/40 border border-white/10 rounded-lg focus-within:border-emerald-500 transition px-4 py-3">
-                                    <span class="text-slate-500 font-bold text-sm mr-2">R$</span><input type="number" id="calc-custo" value="45.00" class="bg-transparent outline-none text-white font-black w-full" oninput="simularPrecosMaster()">
-                                </div>
-                            </div>
-                            
-                            <div class="flex flex-col gap-2">
-                                <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Emb. Adicional</label>
-                                <div class="flex items-center bg-black/40 border border-white/10 rounded-lg focus-within:border-emerald-500 transition px-4 py-3">
-                                    <span class="text-slate-500 font-bold text-sm mr-2">R$</span><input type="number" id="calc-embex" value="0.00" class="bg-transparent outline-none text-white font-black w-full" oninput="simularPrecosMaster()">
-                                </div>
-                            </div>
-
-                            <div class="bg-black/60 rounded-xl p-4 flex flex-col items-center justify-center border border-white/5 shadow-inner">
-                                <span class="text-[9px] font-bold text-slate-500 uppercase tracking-widest mb-1">Custo Saída Total</span>
-                                <span class="text-xl font-black text-emerald-400" id="lbl-custo-total">R$ 45,00</span>
-                            </div>
-                            <div class="bg-indigo-900/20 rounded-xl p-4 flex flex-col items-center justify-center border border-indigo-500/20 shadow-inner">
-                                <span class="text-[9px] font-bold text-indigo-400 uppercase tracking-widest mb-1">Margem Líq. Alvo</span>
-                                <span class="text-xl font-black text-indigo-300">30%</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="grid grid-cols-1 gap-5" id="mkt-container"></div>
-            </div>
-        </main>
+        <main id="app-container" class="flex-1 overflow-y-auto p-10 2xl:px-16 scroll-smooth bg-slate-50 dark:bg-gradient-to-br dark:from-[#050507] dark:to-[#0a0a0f] transition-colors duration-300">
+            </main>
     </div>
 
     <script>
-        const f2 = n => parseFloat(n||0).toFixed(2);
+        // CONTROLE DE TEMA (DARK/LIGHT)
+        function toggleTheme() {
+            document.documentElement.classList.toggle('dark');
+            localStorage.setItem('theme', document.documentElement.classList.contains('dark') ? 'dark' : 'light');
+        }
         
-        // Icones SVG Vetorizados em Miniatura
-        const PSVG = { shopee:'<span class="text-rose-500 font-black text-sm">Sh</span>', mercadolivre:'<i class="fas fa-handshake text-yellow-500 text-sm"></i>', nuvemshop:'<i class="fas fa-cloud text-indigo-500 text-sm"></i>', amazon:'<i class="fab fa-amazon text-amber-500 text-sm"></i>', shein:'<span class="text-slate-800 font-black text-xs">SH</span>', magalu:'<span class="text-blue-500 font-black text-sm">M</span>', tiktok:'<i class="fab fa-tiktok text-cyan-500 text-sm"></i>', americanas:'<span class="text-red-500 font-black text-sm">A</span>' };
-        
-        const PLATS = [
-            { id: 'shopee', name: 'Shopee', fees: [{k:'com',l:'Comissão (%)',d:20},{k:'txs',l:'Tx Serviço Fixo (R$)',d:3},{k:'txd',l:'Tx Frete (R$)',d:0}] },
-            { id: 'mercadolivre', name: 'Mercado Livre', fees: [{k:'com_menor',l:'Com < R$79 (%)',d:12},{k:'com_maior',l:'Com > R$79 (%)',d:16},{k:'frete',l:'Frete Fixo (R$)',d:0}] },
-            { id: 'tiktok', name: 'TikTok Shop', fees: [{k:'com',l:'Comissão (%)',d:5},{k:'fix',l:'Tx Fixa (R$)',d:0}] },
-            { id: 'shein', name: 'Shein', fees: [{k:'com',l:'Comissão (%)',d:18},{k:'log',l:'Logística (R$)',d:0}] },
-            { id: 'amazon', name: 'Amazon', fees: [{k:'com',l:'Comissão (%)',d:15},{k:'fix',l:'Tx Fixa (R$)',d:0}] },
-            { id: 'magalu', name: 'Magalu', fees: [{k:'com',l:'Comissão (%)',d:16},{k:'fix',l:'Tx Fixa (R$)',d:0}] },
-            { id: 'americanas', name: 'Americanas', fees: [{k:'com',l:'Comissão (%)',d:16},{k:'fix',l:'Tx Fixa (R$)',d:0}] },
-            { id: 'nuvemshop', name: 'Nuvemshop', fees: [{k:'gate',l:'Gateway (%)',d:2},{k:'fix',l:'Custo Fixo (R$)',d:0}] }
-        ];
-
-        function toast(msg, isIA = false) {
-            const c = document.getElementById('toast-container'); const t = document.createElement('div');
-            t.className = `bg-[#0B0B0C] border ${isIA ? 'border-indigo-500/50' : 'border-emerald-500/50'} text-white px-6 py-4 rounded-xl shadow-2xl font-bold text-xs flex items-center gap-3 relative overflow-hidden z-[9999] mb-3`;
-            let icon = isIA ? '<i class="fas fa-wand-magic-sparkles text-indigo-400 text-xl"></i>' : '<i class="fas fa-check-circle text-emerald-400 text-xl"></i>';
-            let bar = isIA ? 'bg-gradient-to-b from-indigo-400 to-purple-500' : 'bg-emerald-500';
-            t.innerHTML = `<div class="absolute left-0 top-0 bottom-0 w-1.5 ${bar}"></div>${icon} ${msg}`; 
-            c.appendChild(t); setTimeout(() => { t.style.opacity='0'; setTimeout(()=>t.remove(),300); }, 3500);
+        // Verifica o tema salvo
+        if (localStorage.getItem('theme') === 'light') {
+            document.documentElement.classList.remove('dark');
         }
 
-        // Navegação Totalmente Blindada
-        function switchTab(t) {
-            ['carac','copy','midia','mkt'].forEach(v => {
-                document.getElementById(`view-${v}`).classList.remove('block');
-                document.getElementById(`view-${v}`).classList.add('hidden');
-                const b = document.getElementById(`tab-${v}`);
-                b.classList.remove('tab-active', 'text-indigo-400', 'border-indigo-500', 'bg-indigo-500/5');
-                b.classList.add('text-slate-500', 'border-transparent');
+        // CONTROLADOR DE ABAS (O Roteador)
+        function carregarAba(aba) {
+            // Limpa botões
+            document.querySelectorAll('.tab-btn').forEach(b => {
+                b.classList.remove('tab-active', 'text-indigo-600', 'dark:text-indigo-400', 'border-indigo-600', 'dark:border-indigo-500', 'bg-indigo-50', 'dark:bg-indigo-500/5');
             });
             
-            document.getElementById(`view-${t}`).classList.remove('hidden');
-            document.getElementById(`view-${t}`).classList.add('block');
-            
-            const btn = document.getElementById(`tab-${t}`);
-            btn.classList.add('tab-active', 'text-indigo-400', 'border-indigo-500', 'bg-indigo-500/5');
-            btn.classList.remove('text-slate-500', 'border-transparent');
-            
-            if(t === 'copy' || t === 'carac') updateSEO();
-            if(t === 'mkt') simularPrecosMaster();
-        }
+            // Ativa botão atual
+            const btn = document.getElementById(`tab-${aba}`);
+            if(btn) btn.classList.add('tab-active', 'text-indigo-600', 'dark:text-indigo-400', 'border-indigo-600', 'dark:border-indigo-500', 'bg-indigo-50', 'dark:bg-indigo-500/5');
 
-        // Funções de Inteligência Artificial
-        function chamarIA(targetId) {
-            const el = document.getElementById(targetId); if(!el) return;
-            const originalVal = el.value;
-            el.value = "Gerando..."; el.classList.add("text-indigo-400", "animate-pulse");
-            
-            setTimeout(() => {
-                el.classList.remove("text-indigo-400", "animate-pulse");
-                if(targetId === 'inp-marca') el.value = "Sóstrass Ateliê";
-                else if(targetId === 'hdr-nome') el.value = "Kit 30 Caixas Organizadoras Premium";
-                else if(targetId === 'inp-desc-curta') el.value = "Caixa super resistente para as suas miçangas e pérolas com 30 divisões.";
-                else if(targetId === 'inp-desc-longa') el.value = "✔️ Acrílico Resistente.\n✔️ 30 Compartimentos.\n✔️ Medidas: 20x19x10cm.\nEvite produtos paralelos. Qualidade DAJP garantida.";
-                else el.value = originalVal;
-                toast("Conteúdo Gerado por I.A.", true);
-                updateSEO();
-            }, 1500);
-        }
+            const container = document.getElementById('app-container');
 
-        function gerarImagemIA() {
-            const r = document.getElementById('ia-img-result');
-            r.innerHTML = '<div class="flex flex-col items-center justify-center h-full text-rose-500"><i class="fas fa-circle-notch fa-spin text-5xl mb-4"></i><p class="text-[10px] font-black uppercase tracking-widest text-white">Nano Banana 2 Renderizando...</p></div>';
-            setTimeout(() => {
-                r.innerHTML = `<div class="absolute inset-0 bg-cover bg-center rounded-xl" style="background-image: url('https://images.unsplash.com/photo-1542272604-787c3835535d?auto=format&fit=crop&q=80')"></div><div class="absolute bottom-4 right-4 flex gap-3"><button class="bg-black/80 hover:bg-rose-600 text-white px-5 py-2.5 rounded-xl text-[10px] font-black backdrop-blur-sm border border-white/20 shadow-xl transition hover:scale-105"><i class="fas fa-download mr-1"></i> Salvar na Galeria</button></div>`;
-                toast("Imagem Gerada e Pronta!", true);
-            }, 2500);
-        }
-
-        // Radar SEO Completo
-        function updateSEO() {
-            const tit = document.getElementById('inp-desc-curta')?.value || document.getElementById('hdr-nome')?.value || '';
-            const desc = document.getElementById('inp-desc-longa')?.value || '';
-            const ean = document.getElementById('inp-ean')?.value || '';
-            
-            let s = 0;
-            if(document.getElementById('char-curta')) document.getElementById('char-curta').innerText = `${tit.length}/150`;
-            if(document.getElementById('char-longa')) document.getElementById('char-longa').innerText = `${desc.length} chars`;
-
-            const ct = (tit.length >= 30); if(ct) s+=35;
-            const cd = (desc.length >= 200); if(cd) s+=45;
-            const ce = (ean.length >= 8); if(ce) s+=20;
-
-            if(document.getElementById('icn-t')) document.getElementById('icn-t').className = ct ? 'fas fa-check text-emerald-400 text-lg' : 'fas fa-times text-rose-500 text-lg';
-            if(document.getElementById('icn-d')) document.getElementById('icn-d').className = cd ? 'fas fa-check text-emerald-400 text-lg' : 'fas fa-times text-rose-500 text-lg';
-            if(document.getElementById('icn-e')) document.getElementById('icn-e').className = ce ? 'fas fa-check text-emerald-400 text-lg' : 'fas fa-times text-rose-500 text-lg';
-
-            const circle = document.getElementById('seo-circle'); const txt = document.getElementById('seo-score');
-            if(circle && txt) {
-                circle.style.strokeDashoffset = 527.7 - (527.7 * (s / 100)); // 2*pi*84 = 527.7
-                let col = s >= 80 ? 'text-emerald-500' : (s >= 50 ? 'text-amber-500' : 'text-rose-500');
-                circle.setAttribute('class', `circle-progress ${col}`); txt.innerText = s; txt.className = `text-6xl font-black leading-none tracking-tighter ${col}`;
+            // Renderiza o módulo correto
+            if (aba === 'estudio') {
+                if (typeof renderAbaEstudio === 'function') {
+                    container.innerHTML = renderAbaEstudio();
+                } else {
+                    container.innerHTML = '<p class="text-rose-500">Erro: Arquivo aba-estudio.js não carregado.</p>';
+                }
+            } else if (aba === 'produto') {
+                container.innerHTML = '<div class="text-slate-500 dark:text-slate-400 text-center p-20"><i class="fas fa-tools text-4xl mb-4"></i><br>Módulo de Produtos (Bling) sendo construído...</div>';
+            } else if (aba === 'precificacao') {
+                container.innerHTML = '<div class="text-slate-500 dark:text-slate-400 text-center p-20"><i class="fas fa-tools text-4xl mb-4"></i><br>Módulo de Precificação Reversa sendo construído...</div>';
             }
         }
 
-        // Motor Financeiro Dinâmico das 8 Plataformas
-        function simularPrecosMaster() {
-            const custoForn = parseFloat(document.getElementById('calc-custo').value) || 0;
-            const custoEmbEx = parseFloat(document.getElementById('calc-embex').value) || 0;
-            const gEmb = 3; const gImposto = 6; const gCartao = 2.5; const gMargem = 30; // Globais da sua conta
-            
-            const custoTotal = custoForn + gEmb + custoEmbEx;
-            document.getElementById('lbl-custo-total').innerText = `R$ ${f2(custoTotal)}`;
-            
-            const divGeral = 1 - ((gImposto + gCartao + gMargem)/100);
-            const c = document.getElementById('mkt-container'); 
-            c.innerHTML = '';
-            
-            PLATS.forEach(pl => {
-                let sug = 0; let divAplicado = 0; let iTaxas = '';
-
-                if(pl.id === 'mercadolivre') {
-                    let tMen = pl.fees[0].d; let tMai = pl.fees[1].d; let tFix = pl.fees[2].d;
-                    let dMenor = divGeral - (tMen/100);
-                    let pMenor = dMenor > 0 ? (custoTotal + tFix) / dMenor : 0;
-                    
-                    if(pMenor > 0 && pMenor <= 79) { sug = pMenor; divAplicado = dMenor; }
-                    else { let dMaior = divGeral - (tMai/100); sug = dMaior > 0 ? (custoTotal + tFix) / dMaior : 0; divAplicado = dMaior; }
-                    iTaxas = `${tMen}% a ${tMai}%`;
-                } else {
-                    let tP = 0; let tF = 0;
-                    pl.fees.forEach(f => { if(f.l.includes('%')) tP += f.d; else tF += f.d; });
-                    divAplicado = divGeral - (tP/100);
-                    sug = divAplicado > 0 ? (custoTotal + tF) / divAplicado : 0;
-                    iTaxas = `${tP}% + R$${tF}`;
-                }
-
-                c.innerHTML += `
-                    <div class="glass-card rounded-2xl p-6 flex flex-col lg:flex-row items-center justify-between gap-6 group hover:border-indigo-500/50 transition duration-500">
-                        <div class="flex items-center gap-4 w-full lg:w-1/4">
-                            <div class="w-14 h-14 bg-white rounded-xl flex items-center justify-center shadow-inner text-2xl">${PSVG[pl.id] || ''}</div>
-                            <div>
-                                <h4 class="font-black text-white text-lg">${pl.name}</h4>
-                                <span class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Taxas: ${iTaxas}</span>
-                            </div>
-                        </div>
-                        <div class="w-full lg:w-1/4 bg-black/40 p-5 rounded-xl border border-white/5 flex justify-between items-center shadow-inner">
-                            <div><p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Preço Atual Bling</p><p class="text-2xl font-black text-slate-300">R$ 0,00</p></div>
-                        </div>
-                        <div class="w-full lg:w-1/4 text-center">
-                            <p class="text-[10px] font-black text-emerald-500 uppercase tracking-widest mb-1 flex justify-center gap-2"><i class="fas fa-magic mt-0.5"></i> Preço Seguro</p>
-                            <p class="text-4xl font-black text-emerald-400 tracking-tighter">R$ ${f2(sug)}</p>
-                            <p class="text-[10px] font-mono text-slate-500 mt-2 border border-white/10 bg-white/5 inline-block px-3 py-1 rounded">Divisor: ${divAplicado.toFixed(4)}</p>
-                        </div>
-                        <div class="w-full lg:w-1/4 text-right">
-                            <button class="w-full py-4 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-black uppercase tracking-widest transition shadow-lg shadow-indigo-600/20 transform hover:-translate-y-1">Acatar Valor</button>
-                        </div>
-                    </div>`;
-            });
-        }
-
-        // Initialize
-        window.onload = () => { switchTab('carac'); };
+        // Mock para Header
+        window.onload = () => {
+            document.getElementById('hdr-nome').innerText = "Kit 30 Caixas Organizadoras Transparentes";
+            document.getElementById('hdr-sku').innerText = "CX-ORG-30";
+            // Inicia na aba de Estúdio para você ver a mágica
+            carregarAba('estudio'); 
+        };
     </script>
 </body>
 </html>
