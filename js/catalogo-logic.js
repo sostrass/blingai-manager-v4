@@ -68,10 +68,115 @@ function aplicarFiltro(tipo, btnElement) {
     renderTable(); // Chama o render que vai ler o estadoAtual
 }
 
-// O Input text chama essa função
-function renderTerminal(texto) {
-    estadoAtual.filtroTexto = texto;
-    renderTable();
+// Substitua a função renderTerminal no seu js/catalogo-logic.js por esta versão com os Comandos Hardcore:
+
+function renderTerminal(filtro = '') {
+    const root = document.getElementById('terminal-body');
+    const prods = typeof products !== 'undefined' ? products : [];
+    
+    const items = [
+        { sku: 'CX-ORG-30', name: 'Kit 30 Caixas Organizadoras', price: 89.90, mkt: 85.00, views: 1240, vVar: 12, sales: 145, sVar: 5, estoque: 145, max: 200, seo: 95, plats: ['mercadolivre', 'shopee', 'amazon', 'nuvemshop'] },
+        { sku: 'PER-6MM-BR', name: 'Pérola Branca 6mm ABS (500g)', price: 35.00, mkt: 38.00, views: 85, vVar: -63, sales: 1, sVar: -50, estoque: 12, max: 500, seo: 45, plats: ['shopee', 'shein', 'tiktok'] },
+        { sku: 'TES-ROSE', name: 'Tesoura Vintage Rose Gold', price: 45.00, mkt: 45.00, views: 890, vVar: 5, sales: 45, sVar: 2, estoque: 50, max: 100, seo: 82, plats: ['mercadolivre', 'magalu', 'americanas'] }
+    ];
+
+    root.innerHTML = items.filter(i => i.sku.includes(filtro.toUpperCase()) || i.name.toUpperCase().includes(filtro.toUpperCase())).map(p => {
+        const pVar = p.price > p.mkt ? `<span class="text-rose-500 text-[9px] font-black">ALTO (+R$${(p.price - p.mkt).toFixed(2)})</span>` : `<span class="text-emerald-500 text-[9px] font-black">COMPETITIVO</span>`;
+        const estPerc = (p.estoque / p.max) * 100;
+        
+        return `
+        <tr class="hover:bg-slate-50 dark:hover:bg-white/[0.02] transition-colors group cursor-pointer" onclick="window.location.href='produto-editor.html?id=${p.sku}'">
+            <td class="px-6 py-5">
+                <div class="flex items-center gap-4">
+                    <div class="w-12 h-12 rounded-xl bg-slate-100 dark:bg-black border border-slate-200 dark:border-white/10 flex items-center justify-center text-slate-400 group-hover:border-indigo-500 transition-colors"><i class="fas fa-box text-xl"></i></div>
+                    <div>
+                        <p class="text-sm font-black text-slate-800 dark:text-white tracking-tight">${p.sku}</p>
+                        <p class="text-[10px] font-bold text-slate-500 truncate w-48">${p.name}</p>
+                    </div>
+                </div>
+            </td>
+            
+            <td class="px-6 py-5">
+                <div class="flex flex-col gap-2">
+                    <div class="flex gap-1.5">
+                        ${PLATS_CONFIG.map(pl => {
+                            const ativo = p.plats.includes(pl.id);
+                            return `<div class="w-6 h-6 rounded-lg flex items-center justify-center text-[9px] font-black border ${ativo ? 'bg-indigo-500/10 border-indigo-500/30 text-indigo-500' : 'bg-slate-100 dark:bg-white/5 border-transparent text-slate-300 dark:text-slate-700'}" title="${pl.name}">${pl.name.substring(0,2)}</div>`;
+                        }).join('')}
+                    </div>
+                    <div class="w-full h-1.5 bg-slate-100 dark:bg-white/5 rounded-full overflow-hidden">
+                        <div class="h-full ${p.estoque < 20 ? 'bg-rose-500 shadow-[0_0_10px_rgba(244,63,94,0.6)] animate-pulse' : 'bg-indigo-500'} transition-all duration-1000" style="width: ${estPerc}%"></div>
+                    </div>
+                </div>
+            </td>
+            
+            <td class="px-6 py-5">
+                <div class="flex flex-col">
+                    <span class="text-sm font-black text-slate-800 dark:text-white">R$ ${p.price.toFixed(2)}</span>
+                    ${pVar}
+                </div>
+            </td>
+            
+            <td class="px-6 py-5 text-xs font-bold">
+                <div class="grid grid-cols-2 gap-x-4">
+                    <div class="flex flex-col"><span class="text-[8px] text-slate-400 uppercase tracking-widest">Visitas</span><span class="${p.vVar < 0 ? 'text-rose-500' : 'text-emerald-500'}">${p.views} <i class="fas fa-caret-${p.vVar < 0 ? 'down' : 'up'}"></i></span></div>
+                    <div class="flex flex-col"><span class="text-[8px] text-slate-400 uppercase tracking-widest">Vendas</span><span>${p.sales}</span></div>
+                </div>
+            </td>
+            
+            <td class="px-6 py-5 text-center">
+                <div class="inline-flex items-center justify-center w-10 h-10 rounded-full border-2 ${p.seo < 50 ? 'border-rose-500 text-rose-500' : 'border-emerald-500 text-emerald-500'} text-[10px] font-black shadow-lg">
+                    ${p.seo}
+                </div>
+            </td>
+            
+            <td class="px-6 py-5 text-right">
+                <div class="flex items-center justify-end gap-2">
+                    
+                    <button onclick="comandoCopiar(event, '${p.sku}')" class="w-9 h-9 rounded-xl bg-slate-100 dark:bg-white/5 text-slate-500 dark:text-slate-400 hover:bg-emerald-500 hover:text-white hover:shadow-[0_0_15px_rgba(16,185,129,0.4)] transition-all flex items-center justify-center group/btn" title="Copiar SKU">
+                        <i class="fas fa-copy text-xs group-hover/btn:scale-110 transition-transform"></i>
+                    </button>
+
+                    <button onclick="comandoAbrirML(event, '${p.sku}')" class="w-9 h-9 rounded-xl bg-slate-100 dark:bg-white/5 text-slate-500 dark:text-slate-400 hover:bg-yellow-500 hover:text-white hover:shadow-[0_0_15px_rgba(234,179,8,0.4)] transition-all flex items-center justify-center group/btn" title="Ver no Mercado Livre">
+                        <i class="fas fa-external-link-alt text-xs group-hover/btn:scale-110 transition-transform"></i>
+                    </button>
+
+                    <button onclick="comandoEditar(event, '${p.sku}')" class="px-4 h-9 rounded-xl bg-slate-100 dark:bg-white/5 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-600 hover:text-white dark:hover:bg-indigo-500 dark:hover:text-white hover:shadow-[0_0_15px_rgba(99,102,241,0.4)] transition-all border border-transparent hover:border-indigo-400 flex items-center justify-center gap-2 font-black text-[9px] uppercase tracking-widest group/btn" title="Abrir Editor">
+                        <i class="fas fa-edit text-xs group-hover/btn:-translate-y-0.5 transition-transform"></i> Editar
+                    </button>
+                    
+                </div>
+            </td>
+        </tr>
+        `;
+    }).join('');
+}
+
+// ==========================================
+// FUNÇÕES DOS COMANDOS (Ações dos Botões)
+// ==========================================
+
+function comandoCopiar(evento, sku) {
+    evento.stopPropagation(); // Impede que o clique abra o editor da linha inteira
+    navigator.clipboard.writeText(sku);
+    
+    // Usa o Toast já existente no seu sistema
+    if(typeof toast === 'function') {
+        toast(`SKU ${sku} copiado!`);
+    } else {
+        alert(`SKU ${sku} copiado!`);
+    }
+}
+
+function comandoAbrirML(evento, sku) {
+    evento.stopPropagation(); 
+    // Simula abrir o link real do produto no ML
+    window.open('https://www.mercadolivre.com.br/anuncios/lista?search=' + sku, '_blank');
+}
+
+function comandoEditar(evento, sku) {
+    evento.stopPropagation();
+    window.location.href = 'produto-editor.html?id=' + sku;
 }
 
 // === O MOTOR DE RENDERIZAÇÃO ===
