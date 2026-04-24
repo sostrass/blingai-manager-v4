@@ -3,177 +3,221 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sóstrass PIM - Catálogo</title>
-    
+    <title>Sóstrass PIM - Terminal de Catálogo</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: { extend: { fontFamily: { sans: ['Inter', 'sans-serif'] } } }
-        }
+        tailwind.config = { darkMode: 'class', theme: { extend: { fontFamily: { sans: ['Inter', 'sans-serif'] } } } }
     </script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
         * { box-sizing: border-box; font-family: 'Inter', sans-serif; }
-        ::-webkit-scrollbar { width: 6px; height: 6px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
-        .dark ::-webkit-scrollbar-thumb { background: #334155; }
+        ::-webkit-scrollbar { width: 4px; height: 4px; }
+        ::-webkit-scrollbar-track { background: #050507; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
+        body { background-color: #050507; color: #f8fafc; }
         
-        .glass-card { background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(16px); border: 1px solid rgba(226, 232, 240, 0.8); box-shadow: 0 10px 40px -10px rgba(0,0,0,0.1); }
-        .dark .glass-card { background: rgba(15, 15, 17, 0.7); border-color: rgba(255, 255, 255, 0.05); box-shadow: 0 10px 40px -10px rgba(0,0,0,0.5); }
+        /* Efeitos Hardcore Terminal */
+        .glass-terminal { background: rgba(9, 9, 11, 0.85); backdrop-filter: blur(32px); border: 1px solid rgba(255,255,255,0.05); }
+        .text-glow-green { text-shadow: 0 0 10px rgba(52, 211, 153, 0.6); }
+        .text-glow-red { text-shadow: 0 0 10px rgba(244, 63, 94, 0.6); }
+        
+        /* Ticker Animado (Letreiro da Bolsa) */
+        @keyframes ticker { 0% { transform: translateX(100%); } 100% { transform: translateX(-100%); } }
+        .animate-ticker { display: inline-block; white-space: nowrap; animation: ticker 25s linear infinite; }
     </style>
 
     <script src="js/banco.js"></script>
     <script src="js/funcoes.js"></script>
 </head>
-<body class="flex h-screen overflow-hidden bg-slate-50 dark:bg-[#050507] text-slate-800 dark:text-slate-200 transition-colors duration-500 selection:bg-indigo-500/30">
+<body class="flex h-screen overflow-hidden selection:bg-indigo-500/30">
 
-    <div class="absolute top-0 left-1/4 w-[500px] h-[500px] bg-indigo-600/10 rounded-full blur-[150px] pointer-events-none z-0"></div>
-    <div class="absolute bottom-0 right-1/4 w-[500px] h-[500px] bg-emerald-600/10 rounded-full blur-[150px] pointer-events-none z-0"></div>
+    <div class="absolute top-[-20%] right-[-10%] w-[60%] h-[60%] bg-indigo-900/20 rounded-full blur-[150px] pointer-events-none z-0"></div>
+    <div class="absolute bottom-[-20%] left-[-10%] w-[60%] h-[60%] bg-emerald-900/10 rounded-full blur-[150px] pointer-events-none z-0"></div>
 
-    <div id="toast-container" class="fixed top-6 right-6 z-50 flex flex-col gap-3 pointer-events-none"></div>
-
-    <aside class="w-20 lg:w-64 bg-white dark:bg-[#050507]/80 border-r border-slate-200 dark:border-white/5 flex flex-col z-20 backdrop-blur-xl transition-colors duration-500">
-        <div class="h-20 flex items-center justify-center lg:justify-start lg:px-8 border-b border-slate-200 dark:border-white/5">
-            <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white shadow-lg shadow-indigo-500/30"><i class="fas fa-gem text-sm"></i></div>
+    <aside class="w-20 lg:w-64 bg-[#050507]/95 border-r border-white/5 flex flex-col z-20">
+        <div class="h-20 flex items-center justify-center lg:justify-start lg:px-8 border-b border-white/5">
+            <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-600 to-blue-800 flex items-center justify-center text-white shadow-[0_0_20px_rgba(79,70,229,0.4)]"><i class="fas fa-gem text-sm"></i></div>
             <div class="hidden lg:block ml-3">
-                <h1 class="text-sm font-black tracking-tight text-slate-800 dark:text-white leading-none">Sóstrass</h1>
-                <p class="text-[9px] font-bold text-indigo-500 dark:text-indigo-400 uppercase tracking-widest mt-0.5">PIM Enterprise</p>
+                <h1 class="text-sm font-black tracking-tight text-white leading-none">Sóstrass</h1>
+                <p class="text-[9px] font-black text-indigo-500 uppercase tracking-widest mt-0.5">Terminal PIM</p>
             </div>
         </div>
         <nav class="flex-1 py-8 px-4 flex flex-col gap-2">
-            <p class="hidden lg:block text-[10px] font-black text-slate-500 dark:text-slate-600 uppercase tracking-widest mb-2 px-4">Operacional</p>
-            <a href="cockpit.html" class="flex items-center gap-4 px-4 py-3 text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/5 rounded-xl transition group"><i class="fas fa-chart-line text-lg group-hover:scale-110 transition-transform"></i><span class="hidden lg:block text-xs font-bold">Cockpit Master</span></a>
-            <a href="catalogo.html" class="flex items-center gap-4 px-4 py-3 bg-indigo-50 dark:bg-white/10 text-indigo-600 dark:text-white rounded-xl border border-indigo-100 dark:border-white/5 shadow-inner"><i class="fas fa-box-open text-indigo-500 dark:text-indigo-400 text-lg"></i><span class="hidden lg:block text-xs font-bold">Catálogo PIM</span></a>
-            <a href="radar.html" class="flex items-center gap-4 px-4 py-3 text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/5 rounded-xl transition group"><i class="fas fa-satellite-dish text-lg group-hover:text-amber-500 transition-colors"></i><span class="hidden lg:block text-xs font-bold">Radar Market</span></a>
-            <a href="custos.html" class="flex items-center gap-4 px-4 py-3 text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/5 rounded-xl transition group"><i class="fas fa-globe text-lg group-hover:text-emerald-500 transition-colors"></i><span class="hidden lg:block text-xs font-bold">Custos Globais</span></a>
+            <a href="cockpit.html" class="flex items-center gap-4 px-4 py-3 text-slate-400 hover:bg-white/5 hover:text-white rounded-xl transition"><i class="fas fa-chart-line text-lg"></i><span class="hidden lg:block text-xs font-bold">Cockpit</span></a>
+            <a href="catalogo.html" class="flex items-center gap-4 px-4 py-3 bg-white/5 text-white rounded-xl border border-white/10 shadow-inner"><i class="fas fa-list-ul text-indigo-400 text-lg"></i><span class="hidden lg:block text-xs font-bold">Ativos (Catálogo)</span></a>
         </nav>
     </aside>
 
     <div class="flex-1 flex flex-col min-w-0 relative z-10">
         
-        <header class="h-20 px-10 flex items-center justify-between border-b border-slate-200 dark:border-white/5 bg-white/60 dark:bg-[#050507]/60 backdrop-blur-md sticky top-0 z-30 transition-colors duration-500">
-            <div class="flex-1 max-w-xl relative group">
-                <i class="fas fa-search absolute left-4 top-3.5 text-slate-400 dark:text-slate-500 text-sm group-focus-within:text-indigo-500 dark:group-focus-within:text-indigo-400 transition"></i>
-                <input type="text" placeholder="Buscar SKUs, Títulos ou EAN..." class="w-full bg-white dark:bg-black/40 border border-slate-200 dark:border-white/5 rounded-xl pl-12 py-3 text-xs font-bold text-slate-800 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-600 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition shadow-inner" oninput="renderCatalogo(this.value)">
+        <header class="bg-[#09090b]/90 backdrop-blur-xl border-b border-white/5 sticky top-0 z-40 flex flex-col">
+            <div class="h-6 bg-black/60 border-b border-white/5 overflow-hidden flex items-center px-4 relative">
+                <div class="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-[#09090b] to-transparent z-10"></div>
+                <div class="text-[9px] font-mono font-bold text-slate-400 uppercase tracking-widest animate-ticker w-full">
+                    <span class="mr-8"><i class="fas fa-circle text-[6px] text-emerald-500 mr-1 animate-pulse"></i> SHOPEE API: ONLINE (99.8%)</span>
+                    <span class="mr-8"><i class="fas fa-circle text-[6px] text-emerald-500 mr-1 animate-pulse"></i> MERCADO LIVRE: ONLINE (100%)</span>
+                    <span class="mr-8"><i class="fas fa-circle text-[6px] text-amber-500 mr-1 animate-pulse"></i> BLING: SYNC QUEUE (2 ITEMS)</span>
+                    <span class="mr-8 text-emerald-400"><i class="fas fa-arrow-up mr-1"></i> FATURAMENTO HOJE: R$ 14.850,00</span>
+                </div>
             </div>
-            <div class="flex items-center gap-4 ml-8">
-                <button onclick="toggleTheme()" class="w-10 h-10 rounded-full border border-slate-200 dark:border-white/10 flex items-center justify-center text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/5 transition bg-white dark:bg-transparent shadow-sm">
-                    <i class="fas fa-sun dark:hidden text-amber-500"></i>
-                    <i class="fas fa-moon hidden dark:block text-indigo-300"></i>
-                </button>
-                <div class="w-px h-8 bg-slate-200 dark:bg-white/10"></div>
-                <button onclick="toast('Enviando Fila para o Bling API...', true)" class="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-bold transition shadow-lg shadow-emerald-600/20 flex items-center gap-2 transform hover:-translate-y-0.5"><i class="fas fa-sync-alt"></i> Sync API Bling</button>
+
+            <div class="px-8 py-4 flex justify-between items-center">
+                <div class="flex-1 max-w-xl relative">
+                    <i class="fas fa-search absolute left-4 top-3 text-slate-500 text-sm"></i>
+                    <input type="text" placeholder="Buscar Ativos (SKU, NCM, Título)..." class="w-full bg-black/40 border border-white/10 rounded-lg pl-10 py-2.5 text-xs font-bold text-white placeholder:text-slate-600 outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/50 transition-all shadow-inner" oninput="renderTerminal(this.value)">
+                </div>
+                <div class="flex items-center gap-4 ml-4">
+                    <button class="w-9 h-9 rounded-lg border border-white/10 flex items-center justify-center text-slate-400 hover:bg-white/5 transition"><i class="fas fa-filter"></i></button>
+                    <a href="produto-editor.html?id=novo" class="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-xs font-black uppercase tracking-widest shadow-[0_0_15px_rgba(99,102,241,0.3)] transition-all flex items-center gap-2"><i class="fas fa-plus"></i> Novo Ativo</a>
+                </div>
             </div>
         </header>
 
-        <main class="flex-1 overflow-y-auto p-10 2xl:px-16 scroll-smooth">
-            
-            <div class="flex justify-between items-end mb-8">
-                <div>
-                    <h2 class="text-3xl font-black tracking-tight text-slate-800 dark:text-white mb-1">Catálogo Master (Bling)</h2>
-                    <p class="text-sm text-slate-500 dark:text-slate-400">Gerencie seu portfólio. Clique em qualquer produto para abrir o Editor Avançado.</p>
-                </div>
-                <a href="produto-editor.html?id=novo" class="px-6 py-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-sm font-black uppercase tracking-widest shadow-lg shadow-indigo-600/30 transition-all flex items-center gap-2 transform hover:-translate-y-1"><i class="fas fa-plus"></i> Novo Produto</a>
-            </div>
-
-            <div class="glass-card rounded-3xl overflow-hidden flex flex-col group">
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left whitespace-nowrap">
-                        <thead class="bg-slate-50 dark:bg-white/5 border-b border-slate-200 dark:border-white/5 text-[10px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400 transition-colors">
-                            <tr>
-                                <th class="px-8 py-5">SKU / Identificação Oficial</th>
-                                <th class="px-8 py-5">Canais Conectados</th>
-                                <th class="px-8 py-5 text-right">Custo Padrão</th>
-                                <th class="px-8 py-5 text-right">Preço de Venda</th>
-                                <th class="px-8 py-5 text-center">Margem Global</th>
-                                <th class="px-8 py-5 text-right">Editor</th>
-                            </tr>
-                        </thead>
-                        <tbody id="tabela-produtos" class="divide-y divide-slate-100 dark:divide-white/5 bg-white dark:bg-transparent transition-colors">
-                            </tbody>
-                    </table>
-                </div>
-            </div>
-
-        </main>
+        <main class="flex-1 overflow-y-auto p-8 scroll-smooth" id="terminal-root">
+            </main>
     </div>
 
     <script>
-        // CONTROLE DO TEMA (DARK/LIGHT MODE)
-        function toggleTheme() {
-            const html = document.documentElement;
-            html.classList.toggle('dark');
-            const isDark = html.classList.contains('dark');
-            localStorage.setItem('theme', isDark ? 'dark' : 'light');
-            toast(isDark ? "Dark Mode Ativado" : "Light Mode Ativado");
-        }
-
-        // Garante que o tema salvo seja respeitado no carregamento
-        if (localStorage.getItem('theme') === 'light') {
-            document.documentElement.classList.remove('dark');
-        }
-
-        // RENDERIZAÇÃO DA LISTA
-        function renderCatalogo(filtro = '') {
-            const tb = document.getElementById('tabela-produtos'); 
-            if(!tb) return;
-            tb.innerHTML = '';
+        const f2 = n => parseFloat(n||0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        
+        // Mini Gráfico em SVG (Sparkline simulado de tendência de vendas)
+        const getSparkline = (trend) => {
+            const isUp = trend === 'up';
+            const color = isUp ? '#34d399' : '#f43f5e'; // Emerald ou Rose
+            const path = isUp ? 'M0 20 Q 10 15, 20 18 T 40 10 T 60 5 L 60 25 L 0 25 Z' : 'M0 5 Q 10 10, 20 8 T 40 15 T 60 20 L 60 25 L 0 25 Z';
+            const line = isUp ? 'M0 20 Q 10 15, 20 18 T 40 10 T 60 5' : 'M0 5 Q 10 10, 20 8 T 40 15 T 60 20';
             
-            // Puxa os dados do banco.js
+            return `
+            <svg width="60" height="25" viewBox="0 0 60 25" class="drop-shadow-md">
+                <defs><linearGradient id="grad${trend}" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="${color}" stop-opacity="0.2"/><stop offset="100%" stop-color="${color}" stop-opacity="0"/></linearGradient></defs>
+                <path d="${path}" fill="url(#grad${trend})" />
+                <path d="${line}" fill="none" stroke="${color}" stroke-width="2" stroke-linecap="round" />
+            </svg>`;
+        };
+
+        function renderTerminal(filtro = '') {
+            const root = document.getElementById('terminal-root');
             const prods = typeof products !== 'undefined' ? products : [];
             
+            // Header Dinâmico de Resultados
+            let html = `
+                <div class="flex justify-between items-end mb-6">
+                    <div>
+                        <h2 class="text-2xl font-black text-white tracking-tighter uppercase mb-1">Listagem de Ativos</h2>
+                        <p class="text-[10px] font-mono text-slate-500 uppercase tracking-widest">Painel de Cotações e Saúde do Catálogo Bling</p>
+                    </div>
+                </div>
+                
+                <div class="glass-terminal rounded-2xl overflow-hidden shadow-2xl flex flex-col border border-white/10">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left whitespace-nowrap border-collapse">
+                            <thead class="bg-black/60 border-b border-white/10 text-[9px] font-black uppercase tracking-widest text-slate-400">
+                                <tr>
+                                    <th class="px-6 py-4">Ativo (SKU / Produto)</th>
+                                    <th class="px-6 py-4">Cotação (R$)</th>
+                                    <th class="px-6 py-4">Performance (Margem)</th>
+                                    <th class="px-6 py-4 text-center">Canais</th>
+                                    <th class="px-6 py-4 text-center">Saúde / Sync</th>
+                                    <th class="px-6 py-4 text-right">Ação</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-white/5 bg-transparent tabular-nums">
+            `;
+
             if(prods.length === 0) {
-                tb.innerHTML = `<tr><td colspan="6" class="px-8 py-10 text-center text-slate-500"><i class="fas fa-box-open text-4xl mb-3 opacity-50"></i><br>Nenhum produto encontrado. Cadastre o primeiro!</td></tr>`;
-                return;
+                html += `<tr><td colspan="6" class="p-10 text-center text-slate-500 font-mono text-xs">NENHUM ATIVO ENCONTRADO NO BANCO DE DADOS.</td></tr>`;
             }
 
             prods.filter(p => p.sku.toLowerCase().includes(filtro.toLowerCase()) || p.name.toLowerCase().includes(filtro.toLowerCase())).forEach((p) => {
                 
-                // Funções matemáticas importadas do banco.js
-                const base = typeof getBase === 'function' ? getBase(p) : p.cost; 
+                const base = typeof getBase === 'function' ? getBase(p) : (p.cost || 0);
                 const marg = typeof calcMargin === 'function' ? calcMargin(p.price, base) : 0;
                 
-                // Flag de Sincronização Bling
-                const sF = p.pendenteBling 
-                    ? `<span class="ml-3 px-2 py-0.5 rounded-md text-[9px] font-black bg-amber-100 dark:bg-amber-500/20 text-amber-600 dark:text-amber-400 border border-amber-300 dark:border-amber-500/30 uppercase tracking-widest shadow-sm animate-pulse"><i class="fas fa-exclamation-triangle mr-1"></i> Fila Sync</span>` 
-                    : '';
-                
-                // Canais Conectados (Ícones do banco.js)
-                let pH = p.platforms?.length > 0 
-                    ? `<div class="flex items-center gap-1">${p.platforms.map(plId => typeof getSvg === 'function' ? getSvg(plId, 28) : `[${plId}]`).join('')}</div>` 
-                    : `<span class="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">Sem Canais</span>`;
+                // Lógica Hardcore de Cores do Mercado
+                const isLucro = marg >= 30;
+                const margColor = isLucro ? 'text-emerald-400 text-glow-green' : 'text-rose-400 text-glow-red';
+                const margBg = isLucro ? 'bg-emerald-500/10 border-emerald-500/20' : 'bg-rose-500/10 border-rose-500/20';
+                const trend = isLucro ? 'up' : 'down';
 
-                // Cores de Margem Dinâmicas
-                let marginClass = marg >= 30 
-                    ? 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-500/20' 
-                    : 'bg-rose-50 dark:bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-500/20';
+                // Status Bling
+                const syncBadge = p.pendenteBling 
+                    ? `<div class="flex items-center gap-1.5 text-[9px] font-bold text-amber-500 bg-amber-500/10 px-2 py-1 rounded border border-amber-500/20 animate-pulse"><i class="fas fa-sync-alt fa-spin"></i> SYNC PENDENTE</div>`
+                    : `<div class="flex items-center gap-1.5 text-[9px] font-bold text-slate-400 bg-white/5 px-2 py-1 rounded border border-white/10"><i class="fas fa-check text-emerald-500"></i> BLING OK</div>`;
 
-                // Renderiza a Linha
-                tb.innerHTML += `
-                    <tr class="hover:bg-slate-50 dark:hover:bg-white/5 transition-colors duration-300 cursor-pointer group" onclick="window.location.href='produto-editor.html?id=${p.id}'">
-                        <td class="px-8 py-5">
-                            <div class="font-black text-slate-800 dark:text-white flex items-center text-sm tracking-tight transition-colors">${p.sku} ${sF}</div>
-                            <div class="text-[11px] font-bold text-slate-500 dark:text-slate-400 truncate w-72 mt-1 transition-colors" title="${p.name}">${p.name}</div>
+                // Saúde Fake SEO Circle
+                const seoScore = ((p.desc?.length > 30 ? 30:0) + (p.descComp?.length > 200 ? 40:0) + (p.ean?.length >= 8 ? 30:0)) || 85;
+                const seoColor = seoScore > 80 ? 'text-emerald-500' : 'text-amber-500';
+
+                // Canais
+                let platsHtml = p.platforms?.length > 0 
+                    ? p.platforms.map(plId => `<div class="w-6 h-6 rounded bg-white/10 flex items-center justify-center text-xs border border-white/5 shadow-inner" title="${plId}">${typeof PSVG !== 'undefined' ? PSVG[plId] : plId.charAt(0)}</div>`).join('')
+                    : `<span class="text-[9px] text-slate-600 font-bold">N/A</span>`;
+
+                html += `
+                    <tr class="hover:bg-white/[0.02] transition-colors group cursor-pointer" onclick="window.location.href='produto-editor.html?id=${p.id}'">
+                        
+                        <td class="px-6 py-4">
+                            <div class="flex items-center gap-4">
+                                <div class="w-10 h-10 rounded-lg bg-black/50 border border-white/10 overflow-hidden shrink-0 flex items-center justify-center shadow-inner group-hover:border-indigo-500/50 transition-colors">
+                                    <i class="fas fa-box text-slate-600 text-lg"></i>
+                                </div>
+                                <div class="flex flex-col">
+                                    <span class="text-sm font-black text-white tracking-tight group-hover:text-indigo-400 transition-colors">${p.sku}</span>
+                                    <span class="text-[10px] font-bold text-slate-500 truncate w-64">${p.name}</span>
+                                </div>
+                            </div>
                         </td>
-                        <td class="px-8 py-5">${pH}</td>
-                        <td class="px-8 py-5 text-right font-bold text-slate-500 dark:text-slate-400 text-sm transition-colors">R$ ${parseFloat(base).toFixed(2)}</td>
-                        <td class="px-8 py-5 text-right font-black text-slate-800 dark:text-white text-base transition-colors">R$ ${parseFloat(p.price).toFixed(2)}</td>
-                        <td class="px-8 py-5 text-center">
-                            <span class="px-3 py-1.5 rounded-lg text-[10px] font-black shadow-sm ${marginClass} transition-colors">${marg.toFixed(1)}%</span>
+
+                        <td class="px-6 py-4">
+                            <div class="flex flex-col">
+                                <span class="text-sm font-black text-white">R$ ${f2(p.price)}</span>
+                                <span class="text-[9px] font-mono text-slate-500">Base: R$ ${f2(base)}</span>
+                            </div>
                         </td>
-                        <td class="px-8 py-5 text-right">
-                            <a href="produto-editor.html?id=${p.id}" class="bg-white dark:bg-black/50 border border-slate-200 dark:border-white/10 text-indigo-600 dark:text-indigo-400 px-5 py-2.5 rounded-xl text-[10px] font-black hover:bg-indigo-600 hover:text-white dark:hover:bg-indigo-500 transition-all shadow-sm uppercase tracking-widest inline-block group-hover:scale-105">
-                                Editar Ficha
+
+                        <td class="px-6 py-4">
+                            <div class="flex items-center gap-4">
+                                ${getSparkline(trend)}
+                                <span class="px-2 py-1 rounded-md text-[10px] font-black border ${margBg} ${margColor}">
+                                    ${marg.toFixed(1)}%
+                                </span>
+                            </div>
+                        </td>
+
+                        <td class="px-6 py-4">
+                            <div class="flex items-center justify-center gap-1">
+                                ${platsHtml}
+                            </div>
+                        </td>
+
+                        <td class="px-6 py-4">
+                            <div class="flex flex-col items-center justify-center gap-2">
+                                ${syncBadge}
+                                <div class="flex items-center gap-2" title="Health Score SEO">
+                                    <svg width="14" height="14" viewBox="0 0 36 36" class="transform -rotate-90">
+                                        <circle cx="18" cy="18" r="16" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="4"></circle>
+                                        <circle cx="18" cy="18" r="16" fill="none" stroke="currentColor" stroke-width="4" stroke-dasharray="100" stroke-dashoffset="${100 - seoScore}" class="${seoColor}"></circle>
+                                    </svg>
+                                    <span class="text-[9px] font-black ${seoColor}">${seoScore}</span>
+                                </div>
+                            </div>
+                        </td>
+
+                        <td class="px-6 py-4 text-right">
+                            <a href="produto-editor.html?id=${p.id}" class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-white/5 border border-white/10 text-slate-400 hover:bg-indigo-600 hover:text-white hover:border-indigo-500 transition-all shadow-sm group-hover:scale-110" title="Abrir Editor Master">
+                                <i class="fas fa-edit"></i>
                             </a>
                         </td>
-                    </tr>`;
+                    </tr>
+                `;
             });
+
+            html += `</tbody></table></div></div>`;
+            root.innerHTML = html;
         }
 
-        window.onload = () => { renderCatalogo(); };
+        window.onload = () => { renderTerminal(); };
     </script>
 </body>
 </html>
