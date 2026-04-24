@@ -1,6 +1,28 @@
 // ARQUIVO: js/bling-service.js
 // Serviço Oficial de Integração PIM <-> Bling API V3
 
+// Exemplo de como ficará o seu bling-service.js no futuro:
+
+const BlingService = {
+    syncCatologo: async function(produtoData) {
+        try {
+            // Aqui você bate no seu servidor Node/PHP lá no Railway
+            const response = await fetch('https://seu-app.railway.app/api/sincronizar-bling', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(produtoData)
+            });
+            
+            const data = await response.json();
+            return { success: true, result: data };
+        } catch (error) {
+            console.error("Falha na API do Railway:", error);
+            return { success: false };
+        }
+    }
+};
+
+
 const BlingService = {
     // Configurações da API (Em produção, isso virá de um backend seguro)
     config: {
