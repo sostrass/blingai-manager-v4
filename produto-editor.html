@@ -3,461 +3,447 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PIM - Editor Master de Produto</title>
+    <title>Sóstrass PIM - Editor Avançado</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <script src="js/banco.js"></script>
+    <script src="js/funcoes.js"></script>
+    <script src="js/bling-service.js"></script>
+
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
         * { box-sizing: border-box; font-family: 'Inter', sans-serif; }
         ::-webkit-scrollbar { width: 6px; height: 6px; }
-        ::-webkit-scrollbar-thumb { background: #475569; border-radius: 10px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
         input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
         
-        /* Design System Premium (Dark/Glass) */
-        body { background-color: #070709; color: #e2e8f0; }
-        .glass-box { background: rgba(20, 20, 23, 0.7); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        body { background-color: #050507; color: #e2e8f0; }
+        .glass-card { background: rgba(15, 15, 17, 0.7); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.05); box-shadow: 0 10px 40px -10px rgba(0,0,0,0.5); }
         
-        .inp-pim { background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 10px 14px; color: #fff; font-size: 13px; font-weight: 500; outline: none; transition: 0.2s; width: 100%; }
-        .inp-pim:focus { border-color: #6366f1; background: rgba(0,0,0,0.7); box-shadow: inset 0 0 0 1px #6366f1; }
+        /* OTIMIZAÇÃO DE CLASSES PARA CÓDIGO LIMPO E RÁPIDO */
+        .form-group { display: flex; flex-direction: column; gap: 6px; }
+        .form-label { font-size: 10px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; }
+        .inp-dark { background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 12px 16px; color: #fff; font-size: 12px; outline: none; transition: 0.2s; box-shadow: inset 0 2px 4px rgba(0,0,0,0.2); width: 100%; font-weight: 500;}
+        .inp-dark:focus { border-color: #6366f1; background: rgba(0,0,0,0.6); }
+        .inp-dark-ai { padding-right: 45px; } /* Espaço pro botão IA */
         
-        .tab-btn { color: #64748b; font-weight: 700; padding: 12px 20px; transition: 0.3s; border-bottom: 2px solid transparent; cursor: pointer; font-size: 13px; text-transform: uppercase; letter-spacing: 1px;}
+        .ai-btn { position: absolute; right: 12px; top: 29px; color: #818cf8; background: transparent; border: none; cursor: pointer; transition: 0.2s; padding: 4px; }
+        .ai-btn:hover { color: #fff; transform: scale(1.1); filter: drop-shadow(0 0 5px #818cf8); }
+
+        .tab-btn { color: #64748b; font-weight: 700; padding: 16px 24px; transition: 0.3s; border-bottom: 2px solid transparent; cursor: pointer; font-size: 12px; text-transform: uppercase; letter-spacing: 1px;}
         .tab-btn:hover { color: #fff; }
         .tab-active { color: #818cf8; border-bottom: 2px solid #818cf8; background: linear-gradient(to top, rgba(99,102,241,0.1), transparent); }
-        
         .circle-progress { transition: stroke-dashoffset 0.5s ease-out; stroke-linecap: round; }
-        .ai-btn-inline { position: absolute; right: 10px; top: 8px; color: #818cf8; transition: 0.2s; cursor: pointer; padding: 4px; }
-        .ai-btn-inline:hover { color: #c7d2fe; transform: scale(1.1); filter: drop-shadow(0 0 5px #818cf8); }
     </style>
 </head>
-<body class="flex overflow-hidden relative">
+<body class="flex h-screen overflow-hidden selection:bg-indigo-500/30">
 
-    <div class="absolute top-0 left-1/4 w-96 h-96 bg-indigo-600/20 rounded-full blur-[120px] pointer-events-none z-0"></div>
-    <div class="absolute bottom-0 right-1/4 w-96 h-96 bg-rose-600/10 rounded-full blur-[120px] pointer-events-none z-0"></div>
+    <div id="toast-container" class="fixed top-20 right-6 z-50 flex flex-col gap-3 pointer-events-none"></div>
 
-    <div id="toast-container" class="fixed top-6 right-6 z-50 flex flex-col gap-3 pointer-events-none"></div>
+    <aside class="w-20 lg:w-64 bg-[#050507]/90 border-r border-white/5 flex flex-col z-20 backdrop-blur-xl transition-all">
+        <div class="h-20 flex items-center justify-center lg:justify-start lg:px-8 border-b border-white/5">
+            <div class="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center text-white"><i class="fas fa-layer-group text-sm"></i></div>
+            <div class="hidden lg:block ml-3">
+                <h1 class="text-sm font-black tracking-tight text-white leading-none">Sóstrass</h1>
+                <p class="text-[9px] font-bold text-indigo-400 uppercase tracking-widest mt-0.5">PIM Enterprise</p>
+            </div>
+        </div>
+        <nav class="flex-1 py-8 px-4 flex flex-col gap-2">
+            <a href="cockpit.html" class="flex items-center gap-4 px-4 py-3 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl transition"><i class="fas fa-chart-line text-lg"></i><span class="hidden lg:block text-xs font-bold">Cockpit Master</span></a>
+            <a href="index.html" class="flex items-center gap-4 px-4 py-3 bg-white/10 text-white rounded-xl border border-white/5 shadow-inner"><i class="fas fa-box-open text-indigo-400 text-lg"></i><span class="hidden lg:block text-xs font-bold">Catálogo PIM</span></a>
+            <a href="radar.html" class="flex items-center gap-4 px-4 py-3 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl transition"><i class="fas fa-satellite-dish text-lg"></i><span class="hidden lg:block text-xs font-bold">Radar Market</span></a>
+            <a href="custos.html" class="flex items-center gap-4 px-4 py-3 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl transition"><i class="fas fa-globe text-lg"></i><span class="hidden lg:block text-xs font-bold">Custos Globais</span></a>
+        </nav>
+    </aside>
 
-    <div class="flex-1 flex flex-col min-w-0 h-screen relative z-10">
+    <div class="flex-1 flex flex-col min-w-0 relative z-10">
         
-        <header class="glass-box rounded-none border-t-0 border-l-0 border-r-0 border-b border-white/10 px-8 py-4 flex justify-between items-center sticky top-0 z-40 bg-[#0B0B0C]/90">
-            <div class="flex items-center gap-5">
-                <a href="index.html" class="w-10 h-10 rounded-xl border border-white/10 flex items-center justify-center text-slate-400 hover:bg-white/5 hover:text-white transition"><i class="fas fa-arrow-left"></i></a>
-                <div>
-                    <div class="flex items-center gap-3">
-                        <span class="px-2 py-0.5 bg-indigo-500/20 text-indigo-400 border border-indigo-500/30 rounded text-[10px] font-black uppercase tracking-widest">Editor PIM Master</span>
-                        <span class="text-[10px] text-emerald-400 font-bold" id="status-sync"><i class="fas fa-circle text-[8px]"></i> Sincronizado</span>
+        <header class="bg-[#09090b]/80 backdrop-blur-md border-b border-white/5 sticky top-0 z-40">
+            <div class="px-10 py-5 flex justify-between items-center">
+                <div class="flex items-center gap-5">
+                    <a href="index.html" class="w-10 h-10 rounded-xl border border-white/10 flex items-center justify-center text-slate-400 hover:bg-white/5 hover:text-white transition"><i class="fas fa-arrow-left"></i></a>
+                    <div class="form-group mb-0 w-[500px] relative">
+                        <input type="text" id="inp-nome" class="bg-transparent border-none outline-none text-2xl font-black text-white placeholder:text-slate-600 focus:border-b focus:border-indigo-500 transition px-0" placeholder="Nome *">
+                        <button class="absolute right-0 top-1 text-indigo-400 hover:text-white" onclick="chamarIA('inp-nome')"><i class="fas fa-wand-magic-sparkles text-xl"></i></button>
                     </div>
-                    <input type="text" id="hdr-nome" class="bg-transparent border-none outline-none text-2xl font-black text-white mt-1 w-[400px] focus:border-b focus:border-indigo-500" value="Kit 30 Caixas Organizadoras (30 Divisórias)" oninput="updateScores()">
+                </div>
+                <div class="flex items-center gap-4">
+                    <button onclick="salvarProdutoPim()" class="px-8 py-3.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-black shadow-lg shadow-emerald-600/20 transition flex items-center gap-2"><i class="fas fa-check-circle"></i> Salvar Produto</button>
                 </div>
             </div>
             
-            <div class="flex items-center gap-4">
-                <span class="text-xs font-mono font-bold text-slate-500">SKU: <input type="text" id="hdr-sku" class="bg-transparent text-indigo-400 outline-none w-28" value="CX-ORG-30"></span>
-                <div class="w-px h-6 bg-white/10"></div>
-                <button onclick="simulateAIOptimize()" class="px-5 py-2.5 bg-indigo-600/20 hover:bg-indigo-600 text-indigo-400 hover:text-white border border-indigo-500/30 rounded-xl text-xs font-bold transition flex items-center gap-2"><i class="fas fa-wand-magic-sparkles"></i> Otimização I.A.</button>
-                <button onclick="salvarProduto()" class="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-bold shadow-lg shadow-emerald-600/20 transition flex items-center gap-2"><i class="fas fa-cloud-upload-alt"></i> Salvar e Enviar Bling</button>
+            <div class="px-10 flex gap-4 overflow-x-auto">
+                <button onclick="switchTab('carac')" id="tab-carac" class="tab-btn tab-active"><i class="fas fa-list-check mr-2"></i> Características (Bling)</button>
+                <button onclick="switchTab('copy')" id="tab-copy" class="tab-btn"><i class="fas fa-pen-nib mr-2"></i> Descrição & SEO</button>
+                <button onclick="switchTab('midia')" id="tab-midia" class="tab-btn"><i class="fas fa-images mr-2"></i> Imagens & I.A.</button>
+                <button onclick="switchTab('mkt')" id="tab-mkt" class="tab-btn"><i class="fas fa-calculator mr-2"></i> Precificação (Canais)</button>
             </div>
         </header>
 
-        <div class="px-8 py-6 grid grid-cols-4 gap-6 shrink-0">
-            <div class="glass-box p-4 flex items-center gap-4 border-l-4 border-indigo-500">
-                <div class="w-12 h-12 rounded-full bg-indigo-500/10 flex items-center justify-center text-indigo-400 text-xl"><i class="fas fa-list-check"></i></div>
-                <div><p class="text-[10px] font-bold uppercase tracking-widest text-slate-400">Qualidade Bling</p><p class="text-2xl font-black text-white"><span id="kpi-bling">85</span>%</p></div>
-            </div>
-            <div class="glass-box p-4 flex items-center gap-4 border-l-4 border-rose-500">
-                <div class="w-12 h-12 rounded-full bg-rose-500/10 flex items-center justify-center text-rose-400 text-xl"><i class="fas fa-search-plus"></i></div>
-                <div><p class="text-[10px] font-bold uppercase tracking-widest text-slate-400">Ranking SEO (I.A.)</p><p class="text-2xl font-black text-white"><span id="kpi-seo">60</span>/100</p></div>
-            </div>
-            <div class="glass-box p-4 flex items-center gap-4 border-l-4 border-emerald-500">
-                <div class="w-12 h-12 rounded-full bg-emerald-500/10 flex items-center justify-center text-emerald-400 text-xl"><i class="fas fa-chart-line"></i></div>
-                <div><p class="text-[10px] font-bold uppercase tracking-widest text-slate-400">Margem Sugerida</p><p class="text-2xl font-black text-emerald-400">30%</p></div>
-            </div>
-            <div class="glass-box p-4 flex items-center gap-4 border-l-4 border-amber-500">
-                <div class="w-12 h-12 rounded-full bg-amber-500/10 flex items-center justify-center text-amber-400 text-xl"><i class="fas fa-box-open"></i></div>
-                <div><p class="text-[10px] font-bold uppercase tracking-widest text-slate-400">Giro de Estoque</p><p class="text-2xl font-black text-amber-400">Alto Risco</p></div>
-            </div>
-        </div>
-
-        <main class="flex-1 overflow-hidden px-8 pb-8 flex gap-8">
+        <main class="flex-1 overflow-y-auto p-10 2xl:px-16 scroll-smooth bg-gradient-to-br from-[#050507] to-[#0a0a0f]">
             
-            <div class="w-2/3 glass-box flex flex-col overflow-hidden">
-                <div class="flex border-b border-white/5 bg-black/20 shrink-0">
-                    <button onclick="switchTab('ficha')" id="tab-ficha" class="tab-btn tab-active flex-1"><i class="fas fa-tags mr-2"></i> Cadastro & Fiscal Bling</button>
-                    <button onclick="switchTab('copy')" id="tab-copy" class="tab-btn flex-1"><i class="fas fa-pen-nib mr-2"></i> Copywriting & SEO</button>
-                    <button onclick="switchTab('mkt')" id="tab-mkt" class="tab-btn flex-1"><i class="fas fa-calculator mr-2"></i> Precificação 8 Canais</button>
-                    <button onclick="switchTab('midia')" id="tab-midia" class="tab-btn flex-1"><i class="fas fa-photo-video mr-2"></i> Mídia & Estúdio IA</button>
+            <div id="view-carac" class="space-y-8 animate-fade-in block max-w-7xl mx-auto">
+                
+                <div class="glass-card rounded-2xl p-8">
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                        <div class="form-group"><label class="form-label">Código (SKU) <i class="fas fa-info-circle text-indigo-400 ml-1"></i></label><input type="text" id="inp-sku" class="inp-dark font-mono text-indigo-300"></div>
+                        <div class="form-group"><label class="form-label">Formato <i class="fas fa-info-circle text-indigo-400 ml-1"></i></label><select id="inp-formato" class="inp-dark"><option value="Simples">Simples (Item único e sem variação)</option><option value="Com Variação">Com Variações</option></select></div>
+                        <div class="form-group"><label class="form-label">Tipo</label><select id="inp-tipo" class="inp-dark"><option value="Produto">Produto</option><option value="Serviço">Serviço</option></select></div>
+                        <div class="form-group"><label class="form-label">Situação</label><select id="inp-situacao" class="inp-dark"><option value="Ativo">🟢 Ativado</option><option value="Inativo">🔴 Inativo</option></select></div>
+                        
+                        <div class="form-group"><label class="form-label">Preço Venda (Ref) R$</label><input type="number" id="inp-price" class="inp-dark text-emerald-400 font-black"></div>
+                        <div class="form-group"><label class="form-label">Unidade <i class="fas fa-info-circle text-indigo-400 ml-1"></i></label><input type="text" id="inp-unidade" class="inp-dark" placeholder="UN, PC, KG..."></div>
+                        <div class="form-group"><label class="form-label">Condição</label><select id="inp-cond" class="inp-dark"><option value="Não Especificado">Não Especificado</option><option value="Novo">Novo</option><option value="Usado">Usado</option></select></div>
+                    </div>
                 </div>
 
-                <div class="flex-1 overflow-y-auto p-6 scroll-smooth">
+                <div class="glass-card rounded-2xl p-8">
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                        <div class="form-group relative"><label class="form-label">Marca <i class="fas fa-info-circle text-indigo-400 ml-1"></i></label><input type="text" id="inp-marca" class="inp-dark inp-dark-ai"><button class="ai-btn" onclick="chamarIA('inp-marca')"><i class="fas fa-wand-magic-sparkles"></i></button></div>
+                        <div class="form-group"><label class="form-label">Produção</label><select id="inp-producao" class="inp-dark"><option value="Própria">Própria</option><option value="Terceiros">Terceiros</option></select></div>
+                        <div class="form-group"><label class="form-label">Data de validade <i class="fas fa-info-circle text-indigo-400 ml-1"></i></label><input type="date" id="inp-validade" class="inp-dark text-slate-400"></div>
+                        <div class="form-group"><label class="form-label">Frete Grátis</label><select id="inp-fretegratis" class="inp-dark"><option value="Nao">Não</option><option value="Sim">Sim</option></select></div>
+
+                        <div class="form-group"><label class="form-label">Peso Líquido <i class="fas fa-info-circle text-indigo-400 ml-1"></i></label><input type="number" id="inp-pesoliq" class="inp-dark"></div>
+                        <div class="form-group"><label class="form-label">Peso Bruto <i class="fas fa-info-circle text-indigo-400 ml-1"></i></label><input type="number" id="inp-pesobru" class="inp-dark"></div>
+                        <div class="form-group"><label class="form-label">Largura <i class="fas fa-info-circle text-indigo-400 ml-1"></i></label><input type="number" id="inp-lar" class="inp-dark"></div>
+                        <div class="form-group"><label class="form-label">Altura <i class="fas fa-info-circle text-indigo-400 ml-1"></i></label><input type="number" id="inp-alt" class="inp-dark"></div>
+
+                        <div class="form-group"><label class="form-label">Profundidade <i class="fas fa-info-circle text-indigo-400 ml-1"></i></label><input type="number" id="inp-pro" class="inp-dark"></div>
+                        <div class="form-group"><label class="form-label">Volumes <i class="fas fa-info-circle text-indigo-400 ml-1"></i></label><input type="number" id="inp-vol" class="inp-dark" value="1"></div>
+                        <div class="form-group"><label class="form-label">Itens p/ caixa <i class="fas fa-info-circle text-indigo-400 ml-1"></i></label><input type="number" id="inp-itenscx" class="inp-dark" value="1"></div>
+                        <div class="form-group"><label class="form-label">Unidade de medida</label><select id="inp-unmedida" class="inp-dark"><option>Centímetros</option><option>Metros</option></select></div>
+
+                        <div class="form-group relative"><label class="form-label">GTIN/EAN <i class="fas fa-info-circle text-indigo-400 ml-1"></i></label><input type="text" id="inp-ean" class="inp-dark inp-dark-ai font-mono" oninput="updateScores()"><button class="ai-btn text-emerald-400 hover:text-emerald-300" title="Validar EAN" onclick="toast('EAN Validado')"><i class="fas fa-check"></i></button></div>
+                        <div class="form-group"><label class="form-label">GTIN/EAN tributário <i class="fas fa-info-circle text-indigo-400 ml-1"></i></label><input type="text" id="inp-eantrib" class="inp-dark font-mono"></div>
+                        <div class="form-group col-span-2"><label class="form-label">Código DUN <i class="fas fa-info-circle text-indigo-400 ml-1"></i></label><input type="text" id="inp-dun" class="inp-dark font-mono" placeholder="Digite o código DUN (Caixa Master)"></div>
+                    </div>
+                </div>
+
+                <div class="glass-card rounded-2xl p-8 border-l-4 border-rose-500">
+                    <h3 class="text-sm font-bold text-white mb-6">Campos customizados (DAJP)</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                        <div class="form-group"><label class="form-label">Inclui gancho</label><select id="inp-c-gancho" class="inp-dark"><option>Desativado</option><option>Ativado</option></select></div>
+                        <div class="form-group"><label class="form-label">Inclui correia</label><select id="inp-c-correia" class="inp-dark"><option>Desativado</option><option>Ativado</option></select></div>
+                        <div class="form-group"><label class="form-label">Pedra Principal</label><select id="inp-c-pedra" class="inp-dark"><option>Selecione uma opção</option><option>Pérola ABS</option><option>Vidro</option><option>Strass</option></select></div>
+                        <div class="form-group"><label class="form-label">Tamanho do furo</label><select id="inp-c-furo" class="inp-dark"><option>Selecione uma opção</option><option>Sem Furo</option><option>1mm</option><option>Passante</option></select></div>
+                    </div>
+                </div>
+                
+                <div class="glass-card rounded-2xl p-8 border-l-4 border-emerald-500">
+                    <h3 class="text-sm font-bold text-white mb-6">Tributação e Fornecimento</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div class="form-group"><label class="form-label">NCM</label><input type="text" id="inp-ncm" class="inp-dark font-mono"></div>
+                        <div class="form-group"><label class="form-label">CEST</label><input type="text" id="inp-cest" class="inp-dark font-mono"></div>
+                        <div class="form-group"><label class="form-label">Origem</label><select id="inp-origem" class="inp-dark"><option value="0">0 - Nacional</option><option value="1">1 - Estrangeira (Importação)</option><option value="2">2 - Estrangeira (Mercado Interno)</option></select></div>
+                        <div class="form-group"><label class="form-label">Custo Fornecedor (R$)</label><input type="number" id="inp-cost" class="inp-dark text-rose-400 font-bold"></div>
+                        <div class="form-group"><label class="form-label">Estoque (UN)</label><input type="number" id="inp-stock" class="inp-dark text-indigo-400 font-bold"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="view-copy" class="hidden animate-fade-in max-w-7xl mx-auto h-full pb-20">
+                <div class="flex flex-col xl:flex-row gap-8 h-full">
                     
-                    <div id="view-ficha" class="space-y-8 animate-fade-in block">
-                        <div>
-                            <h3 class="text-xs font-bold text-indigo-400 uppercase tracking-widest mb-4 flex items-center gap-2"><i class="fas fa-id-card"></i> Identificação Base</h3>
-                            <div class="grid grid-cols-3 gap-5">
-                                <div class="relative"><label class="block text-[10px] uppercase font-bold text-slate-400 mb-1.5">Código GTIN/EAN</label><input type="text" id="inp-ean" class="inp-pim input-dark-ai" value="7890000000000" oninput="updateScores()"><button class="ai-btn-inline" title="Gerar GTIN Falso (Teste)"><i class="fas fa-random"></i></button></div>
-                                <div><label class="block text-[10px] uppercase font-bold text-slate-400 mb-1.5">GTIN/EAN Tributário</label><input type="text" class="inp-pim"></div>
-                                <div class="relative"><label class="block text-[10px] uppercase font-bold text-slate-400 mb-1.5">Marca Oficial</label><input type="text" class="inp-pim input-dark-ai" value="Sóstrass"><button class="ai-btn-inline"><i class="fas fa-wand-magic-sparkles"></i></button></div>
-                                
-                                <div><label class="block text-[10px] uppercase font-bold text-slate-400 mb-1.5">Formato</label><select class="inp-pim cursor-pointer"><option>Simples</option><option>Com Variação</option></select></div>
-                                <div><label class="block text-[10px] uppercase font-bold text-slate-400 mb-1.5">Tipo</label><select class="inp-pim cursor-pointer"><option>Produto</option><option>Serviço</option></select></div>
-                                <div><label class="block text-[10px] uppercase font-bold text-slate-400 mb-1.5">Condição</label><select class="inp-pim cursor-pointer"><option>Novo</option><option>Usado</option></select></div>
-                                
-                                <div><label class="block text-[10px] uppercase font-bold text-slate-400 mb-1.5">Produção</label><select class="inp-pim cursor-pointer"><option>Própria</option><option>Terceiros</option></select></div>
-                                <div><label class="block text-[10px] uppercase font-bold text-slate-400 mb-1.5">Data Validade</label><input type="date" class="inp-pim text-slate-400"></div>
-                                <div><label class="block text-[10px] uppercase font-bold text-slate-400 mb-1.5">Frete Grátis?</label><select class="inp-pim cursor-pointer"><option>Não</option><option>Sim</option></select></div>
+                    <div class="flex-1 space-y-6 flex flex-col h-full">
+                        <div class="glass-card rounded-2xl p-6 relative">
+                            <div class="flex justify-between items-center mb-3">
+                                <label class="form-label flex items-center gap-2">Descrição curta (Descrição Principal) <i class="fas fa-info-circle text-indigo-400"></i></label>
+                                <span class="text-[10px] font-mono text-slate-500 bg-black/40 px-2 py-1 rounded" id="char-tit">0 caracteres</span>
+                            </div>
+                            <div class="relative">
+                                <textarea id="inp-desc-curta" rows="3" class="inp-dark input-dark-ai resize-none text-sm font-bold" oninput="updateScores()"></textarea>
+                                <button class="ai-btn" onclick="chamarIA('inp-desc-curta')"><i class="fas fa-wand-magic-sparkles text-xl"></i></button>
                             </div>
                         </div>
 
-                        <div class="pt-6 border-t border-white/10">
-                            <h3 class="text-xs font-bold text-amber-500 uppercase tracking-widest mb-4 flex items-center gap-2"><i class="fas fa-box"></i> Empacotamento e Logística</h3>
-                            <div class="grid grid-cols-4 gap-5">
-                                <div><label class="block text-[10px] uppercase font-bold text-slate-400 mb-1.5">Peso Líquido (kg)</label><input type="number" id="inp-pesoliq" class="inp-pim" value="0.5" oninput="updateScores()"></div>
-                                <div><label class="block text-[10px] uppercase font-bold text-slate-400 mb-1.5">Peso Bruto (kg)</label><input type="number" class="inp-pim" value="0.55"></div>
-                                <div><label class="block text-[10px] uppercase font-bold text-slate-400 mb-1.5">Volumes</label><input type="number" class="inp-pim" value="1"></div>
-                                <div><label class="block text-[10px] uppercase font-bold text-slate-400 mb-1.5">Itens p/ Caixa</label><input type="number" class="inp-pim" value="30"></div>
-                                
-                                <div><label class="block text-[10px] uppercase font-bold text-slate-400 mb-1.5">Largura</label><input type="number" class="inp-pim" value="19"></div>
-                                <div><label class="block text-[10px] uppercase font-bold text-slate-400 mb-1.5">Altura</label><input type="number" class="inp-pim" value="20"></div>
-                                <div><label class="block text-[10px] uppercase font-bold text-slate-400 mb-1.5">Profundidade</label><input type="number" class="inp-pim" value="10"></div>
-                                <div><label class="block text-[10px] uppercase font-bold text-slate-400 mb-1.5">Medida</label><select class="inp-pim cursor-pointer"><option>Centímetros</option><option>Metros</option></select></div>
+                        <div class="glass-card rounded-2xl p-6 flex-1 flex flex-col relative">
+                            <div class="flex justify-between items-center mb-3">
+                                <label class="form-label flex items-center gap-2">Descrição complementar <i class="fas fa-info-circle text-indigo-400"></i></label>
+                                <span class="text-[10px] font-mono text-slate-500 bg-black/40 px-2 py-1 rounded" id="char-desc">0 caracteres</span>
+                            </div>
+                            <div class="flex gap-2 mb-3 border-b border-white/5 pb-3">
+                                <button class="w-8 h-8 rounded bg-white/5 hover:bg-white/10 text-slate-300 text-xs"><i class="fas fa-bold"></i></button>
+                                <button class="w-8 h-8 rounded bg-white/5 hover:bg-white/10 text-slate-300 text-xs"><i class="fas fa-italic"></i></button>
+                                <button class="w-8 h-8 rounded bg-white/5 hover:bg-white/10 text-slate-300 text-xs"><i class="fas fa-underline"></i></button>
+                                <button class="w-8 h-8 rounded bg-white/5 hover:bg-white/10 text-slate-300 text-xs"><i class="fas fa-list-ul"></i></button>
+                            </div>
+                            <div class="relative flex-1 flex flex-col">
+                                <textarea id="inp-desc-longa" class="inp-dark input-dark-ai resize-none text-[13px] leading-relaxed flex-1" oninput="updateScores()"></textarea>
+                                <button class="ai-btn" onclick="chamarIA('inp-desc-longa')"><i class="fas fa-wand-magic-sparkles text-xl"></i></button>
                             </div>
                         </div>
 
-                        <div class="pt-6 border-t border-white/10">
-                            <h3 class="text-xs font-bold text-emerald-500 uppercase tracking-widest mb-4 flex items-center gap-2"><i class="fas fa-file-invoice-dollar"></i> Tributação Bling</h3>
-                            <div class="grid grid-cols-3 gap-5">
-                                <div><label class="block text-[10px] uppercase font-bold text-slate-400 mb-1.5">NCM</label><input type="text" id="inp-ncm" class="inp-pim font-mono tracking-widest" value="3923.10.90" oninput="updateScores()"></div>
-                                <div><label class="block text-[10px] uppercase font-bold text-slate-400 mb-1.5">CEST</label><input type="text" class="inp-pim font-mono tracking-widest" value="10.001.00"></div>
-                                <div><label class="block text-[10px] uppercase font-bold text-slate-400 mb-1.5">Origem</label><select class="inp-pim text-xs cursor-pointer"><option>0 - Nacional</option><option>1 - Estrangeira</option></select></div>
+                        <div class="grid grid-cols-2 gap-6 shrink-0">
+                            <div class="glass-card rounded-2xl p-6 form-group">
+                                <label class="form-label">Link Externo <i class="fas fa-info-circle text-indigo-400 ml-1"></i></label>
+                                <input type="text" id="inp-link" class="inp-dark">
                             </div>
-                        </div>
-                    </div>
-
-                    <div id="view-copy" class="space-y-6 hidden animate-fade-in">
-                        <div class="bg-indigo-900/10 border border-indigo-500/20 rounded-xl p-5 mb-6 flex items-start gap-4">
-                            <i class="fas fa-robot text-indigo-400 text-2xl mt-1"></i>
-                            <div>
-                                <h4 class="text-xs font-black text-indigo-300 uppercase tracking-widest mb-1">Gemini AI Copywriter</h4>
-                                <p class="text-[11px] text-indigo-200/70 leading-relaxed mb-3">Insira tópicos importantes abaixo (ex: "focar em artesãs", "não descasca") e deixe a IA gerar uma cópia comercial otimizada para os motores de busca.</p>
-                                <div class="flex gap-2">
-                                    <input type="text" id="ia-prompt-text" class="inp-pim bg-black/40 text-xs" placeholder="Contexto adicional para a I.A...">
-                                    <button onclick="mockIAGen()" class="bg-indigo-600 hover:bg-indigo-500 text-white px-4 rounded-lg text-xs font-bold transition shadow-lg whitespace-nowrap"><i class="fas fa-magic mr-1"></i> Gerar Textos</button>
-                                </div>
+                            <div class="glass-card rounded-2xl p-6 form-group">
+                                <label class="form-label">Vídeo <i class="fas fa-info-circle text-indigo-400 ml-1"></i></label>
+                                <input type="text" id="inp-video" class="inp-dark" placeholder="URL do YouTube">
                             </div>
                         </div>
 
-                        <div>
-                            <div class="flex justify-between items-end mb-2">
-                                <label class="block text-[10px] uppercase font-bold text-slate-400">Título / Descrição Curta</label>
-                                <span class="text-[10px] font-mono text-slate-500" id="cnt-tit">42/150</span>
-                            </div>
-                            <input type="text" id="inp-desc-curta" class="inp-pim text-sm font-bold text-white" value="Kit 30 Caixas Organizadoras (30 Divisórias)" oninput="updateScores()">
+                        <div class="glass-card rounded-2xl p-6 form-group shrink-0 relative">
+                            <label class="form-label">Observações <i class="fas fa-info-circle text-indigo-400 ml-1"></i></label>
+                            <textarea id="inp-obs" rows="2" class="inp-dark resize-none"></textarea>
                         </div>
-
-                        <div>
-                            <div class="flex justify-between items-end mb-2">
-                                <label class="block text-[10px] uppercase font-bold text-slate-400">Descrição Comercial Longa</label>
-                                <span class="text-[10px] font-mono text-slate-500" id="cnt-desc">0 caracteres</span>
+                        
+                        <div class="grid grid-cols-2 gap-6 shrink-0">
+                            <div class="glass-card rounded-2xl p-6 form-group relative">
+                                <label class="form-label">Tags <i class="fas fa-info-circle text-indigo-400 ml-1"></i></label>
+                                <input type="text" id="inp-tags" class="inp-dark input-dark-ai" placeholder="Ex: perola, artesnato">
+                                <button class="ai-btn" onclick="chamarIA('inp-tags')"><i class="fas fa-wand-magic-sparkles text-lg"></i></button>
                             </div>
-                            <textarea id="inp-desc-longa" rows="10" class="inp-pim resize-none text-[13px] leading-relaxed text-slate-300" placeholder="Especifique materiais, tamanhos exatos e o que vem na embalagem para evitar devoluções..." oninput="updateScores()"></textarea>
+                            <div class="glass-card rounded-2xl p-6 form-group relative">
+                                <label class="form-label">Categoria <i class="fas fa-info-circle text-indigo-400 ml-1"></i></label>
+                                <input type="text" id="inp-cat" class="inp-dark input-dark-ai">
+                                <button class="ai-btn" onclick="chamarIA('inp-cat')"><i class="fas fa-wand-magic-sparkles text-lg"></i></button>
+                            </div>
                         </div>
                     </div>
 
-                    <div id="view-mkt" class="hidden animate-fade-in">
-                        <div class="bg-rose-500/10 border border-rose-500/20 rounded-xl p-5 mb-8 flex items-center justify-between">
-                            <div>
-                                <h4 class="text-xs font-black text-rose-400 uppercase tracking-widest mb-1"><i class="fas fa-money-bill-wave"></i> Formação de Custo Deste SKU</h4>
-                                <p class="text-[10px] text-rose-200/70">O custo base do fornecedor somado com despesas específicas do item.</p>
+                    <div class="w-full xl:w-96 shrink-0 flex flex-col gap-6 sticky top-0">
+                        <div class="glass-card rounded-2xl p-8 flex flex-col items-center justify-center relative overflow-hidden shadow-2xl border-t-4 border-rose-500">
+                            <div class="absolute inset-0 bg-gradient-to-b from-rose-500/10 to-transparent pointer-events-none"></div>
+                            <h3 class="text-xs font-bold text-white uppercase tracking-widest mb-6 relative z-10"><i class="fas fa-heartbeat text-rose-400 mr-2"></i> Quality Score (SEO)</h3>
+                            
+                            <div class="relative w-40 h-40 mb-6 z-10">
+                                <svg class="w-full h-full transform -rotate-90"><circle cx="80" cy="80" r="70" stroke="rgba(255,255,255,0.05)" stroke-width="12" fill="transparent"/><circle cx="80" cy="80" r="70" stroke="currentColor" stroke-width="12" fill="transparent" stroke-dasharray="440" stroke-dashoffset="440" class="circle-progress text-rose-500" id="seo-circle"/></svg>
+                                <div class="absolute inset-0 flex items-center justify-center flex-col"><span class="text-5xl font-black text-rose-500 leading-none" id="seo-score">0</span></div>
                             </div>
-                            <div class="flex gap-4">
-                                <div><label class="block text-[9px] text-rose-300 mb-1">Fornecedor</label><input type="number" id="calc-custo" value="45.00" class="inp-pim w-24 text-rose-400 font-bold bg-black/40" oninput="simularPrecos()"></div>
-                                <div><label class="block text-[9px] text-rose-300 mb-1">Emb. Extra</label><input type="number" id="calc-emb" value="0.00" class="inp-pim w-24 text-slate-300 bg-black/40" oninput="simularPrecos()"></div>
-                                <div><label class="block text-[9px] text-rose-300 mb-1">Custo Total</label><div class="h-10 px-4 bg-rose-500/20 border border-rose-500/30 rounded-lg flex items-center justify-center text-rose-400 font-black text-lg" id="calc-res-custo">R$ 45,00</div></div>
+                            
+                            <div class="w-full space-y-3 text-xs font-bold text-slate-400 bg-black/40 p-4 rounded-xl border border-white/5 z-10">
+                                <div class="flex justify-between items-center"><span id="lbl-t">Desc. Curta (> 30 char)</span><i class="fas fa-times text-rose-500 text-base" id="icn-t"></i></div>
+                                <div class="flex justify-between items-center"><span id="lbl-d">Desc. Comp. (> 200)</span><i class="fas fa-times text-rose-500 text-base" id="icn-d"></i></div>
+                                <div class="flex justify-between items-center"><span id="lbl-e">EAN Válido</span><i class="fas fa-times text-rose-500 text-base" id="icn-e"></i></div>
                             </div>
                         </div>
 
-                        <div class="flex items-center gap-3 mb-6"><span class="w-8 h-px bg-white/10"></span><h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest">Calculadora Reversa por Plataforma</h3><span class="flex-1 h-px bg-white/10"></span></div>
-
-                        <div class="space-y-4" id="mkt-container"></div>
-                    </div>
-
-                    <div id="view-midia" class="hidden animate-fade-in h-[60vh] flex flex-col">
-                        <div class="grid grid-cols-2 gap-6 h-full">
-                            <div class="border border-white/10 rounded-xl bg-black/40 p-5 flex flex-col">
-                                <h3 class="text-xs font-bold text-white uppercase tracking-widest mb-4 flex items-center gap-2"><i class="fas fa-images text-indigo-400"></i> Galeria do Bling</h3>
-                                <div class="grid grid-cols-2 gap-3 flex-1">
-                                    <div class="bg-white/5 border-2 border-dashed border-white/20 rounded-xl flex flex-col items-center justify-center text-slate-500 hover:text-indigo-400 hover:border-indigo-500 transition cursor-pointer">
-                                        <i class="fas fa-cloud-upload-alt text-2xl mb-2"></i><span class="text-[10px] font-bold uppercase tracking-widest">Adicionar Foto</span>
-                                    </div>
-                                    <div class="rounded-xl overflow-hidden relative group">
-                                        <img src="https://images.unsplash.com/photo-1617325247661-675ab03407bd?q=80&w=300&auto=format&fit=crop" class="w-full h-full object-cover">
-                                        <div class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition flex items-center justify-center backdrop-blur-sm"><button class="bg-rose-500 w-8 h-8 rounded-full text-white"><i class="fas fa-trash"></i></button></div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="border border-rose-500/20 bg-rose-900/10 rounded-xl p-5 flex flex-col relative overflow-hidden">
-                                <div class="absolute top-0 right-0 w-64 h-64 bg-rose-500/20 rounded-full blur-[80px] pointer-events-none"></div>
-                                <h3 class="text-xs font-black text-white uppercase tracking-widest mb-1 relative z-10 flex items-center justify-between"><span class="flex items-center gap-2"><i class="fas fa-camera-retro text-rose-400"></i> Nano Banana 2 Studio</span><span class="text-[8px] bg-rose-500/20 text-rose-300 px-2 py-0.5 rounded border border-rose-500/30">PRO TIER</span></h3>
-                                <p class="text-[10px] text-slate-400 mb-4 relative z-10">Descreva o cenário e a I.A. renderizará uma imagem comercial 8k.</p>
-                                <textarea id="ia-img-prompt" class="inp-pim flex-1 resize-none text-xs bg-black/60 relative z-10 mb-3" placeholder="Ex: Produto centralizado, fundo de estúdio fotográfico iluminado..."></textarea>
-                                <button onclick="mockGerarImg()" class="w-full py-3 bg-rose-600 hover:bg-rose-500 text-white rounded-lg text-xs font-bold transition shadow-lg relative z-10"><i class="fas fa-paint-brush mr-2"></i> Renderizar Imagem</button>
-                            </div>
+                        <div class="glass-card rounded-2xl p-6 border border-indigo-500/20 bg-indigo-900/10">
+                            <h3 class="text-xs font-bold text-indigo-400 uppercase tracking-widest mb-3 flex items-center gap-2"><i class="fas fa-brain"></i> Contexto da I.A. Mestra</h3>
+                            <p class="text-[10px] text-slate-400 mb-4 leading-relaxed">Adicione diretrizes globais para a IA usar na geração dos textos desta ficha.</p>
+                            <textarea id="ia-master-context" rows="3" class="inp-dark text-[11px]" placeholder="Ex: Produto focado em atacadistas. Destacar a durabilidade extrema da embalagem..."></textarea>
                         </div>
                     </div>
 
                 </div>
             </div>
 
-            <div class="w-1/3 border-l border-white/10 bg-[#070709]/50 flex flex-col z-20 shadow-2xl">
-                <div class="p-6 border-b border-white/5 shrink-0 flex items-center gap-3">
-                    <i class="fas fa-satellite-dish text-indigo-500 text-xl animate-pulse"></i>
-                    <div><h3 class="font-black text-white text-sm uppercase tracking-widest">Insight Engine</h3><p class="text-[9px] text-slate-400">Análise em Tempo Real</p></div>
-                </div>
-
-                <div class="flex-1 overflow-y-auto p-6 space-y-8">
+            <div id="view-midia" class="hidden animate-fade-in max-w-7xl mx-auto h-[75vh]">
+                <div class="flex flex-col lg:flex-row gap-8 h-full">
                     
-                    <div>
-                        <h4 class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-4">Completude do Anúncio</h4>
-                        <div class="w-full aspect-square bg-black/30 rounded-xl border border-white/5 p-4 flex items-center justify-center shadow-inner">
-                            <canvas id="insightChart"></canvas>
+                    <div class="w-full lg:w-1/2 glass-card rounded-2xl p-6 flex flex-col">
+                        <div class="flex justify-between items-center mb-6">
+                            <h3 class="text-sm font-bold text-white uppercase tracking-widest flex items-center gap-2"><i class="fas fa-images text-indigo-400"></i> Imagens</h3>
+                            <button class="text-xs text-indigo-400 font-bold hover:text-white transition"><i class="fas fa-plus"></i> Novo</button>
+                        </div>
+                        <div class="grid grid-cols-2 gap-4 flex-1 overflow-y-auto content-start pr-2">
+                            <div class="aspect-square bg-white/5 rounded-xl border-2 border-dashed border-white/20 flex flex-col items-center justify-center text-slate-500 hover:text-indigo-400 hover:border-indigo-500 transition cursor-pointer">
+                                <i class="fas fa-cloud-upload-alt text-3xl mb-3"></i><span class="text-[10px] font-bold uppercase tracking-widest">Upload Área</span>
+                            </div>
+                            <div class="aspect-square rounded-xl border border-white/10 relative group overflow-hidden shadow-lg bg-black/50">
+                                <img src="https://images.unsplash.com/photo-1617325247661-675ab03407bd?q=80&w=300&auto=format&fit=crop" class="w-full h-full object-cover opacity-90 group-hover:opacity-100 transition duration-500 group-hover:scale-105">
+                                <div class="absolute inset-0 bg-slate-900/60 opacity-0 group-hover:opacity-100 transition flex items-center justify-center gap-3 backdrop-blur-sm">
+                                    <button class="w-10 h-10 bg-rose-500 text-white rounded-full flex items-center justify-center hover:scale-110 transition shadow-lg"><i class="fas fa-trash"></i></button>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
-                    <div class="space-y-4">
-                        <h4 class="text-[10px] font-bold text-slate-500 uppercase tracking-widest border-b border-white/5 pb-2">Diagnóstico Detalhado</h4>
+                    <div class="w-full lg:w-1/2 glass-card rounded-2xl p-6 flex flex-col border border-rose-500/20 bg-gradient-to-br from-[#0B0B0C] to-rose-900/10 relative overflow-hidden shadow-2xl">
+                        <div class="absolute top-0 right-0 w-80 h-80 bg-rose-500/10 rounded-full blur-[100px] z-0 pointer-events-none"></div>
+                        <div class="flex justify-between items-center mb-4 relative z-10">
+                            <div class="flex items-center gap-3"><i class="fas fa-camera-retro text-rose-400 text-xl"></i> <span class="text-sm font-black uppercase tracking-widest text-white">Nano Banana 2</span></div>
+                            <span class="text-[9px] font-mono font-bold text-rose-200 border border-rose-500/30 bg-rose-500/20 px-3 py-1 rounded-full shadow-sm"><i class="fas fa-star text-[8px] mr-1"></i> Image Gen (Pro)</span>
+                        </div>
+                        <p class="text-xs text-slate-400 mb-6 relative z-10 leading-relaxed">Descreva o cenário comercial ideal. A Inteligência Artificial irá renderizar uma imagem fotorrealista para o seu anúncio.</p>
                         
-                        <div>
-                            <div class="flex justify-between text-[10px] font-bold mb-1"><span class="text-slate-300">Qualidade SEO</span><span id="score-seo-txt" class="text-indigo-400">0%</span></div>
-                            <div class="w-full bg-white/5 rounded-full h-1.5"><div id="score-seo-bar" class="bg-indigo-500 h-1.5 rounded-full transition-all duration-500" style="width: 0%"></div></div>
-                        </div>
-                        
-                        <div>
-                            <div class="flex justify-between text-[10px] font-bold mb-1"><span class="text-slate-300">Dados Fiscais (Bling)</span><span id="score-fisc-txt" class="text-emerald-400">0%</span></div>
-                            <div class="w-full bg-white/5 rounded-full h-1.5"><div id="score-fisc-bar" class="bg-emerald-500 h-1.5 rounded-full transition-all duration-500" style="width: 0%"></div></div>
-                        </div>
+                        <div class="relative z-10 flex flex-col h-full">
+                            <textarea id="ia-img-prompt" class="w-full bg-black/60 border border-white/10 rounded-xl p-4 text-xs font-medium text-white outline-none focus:border-rose-500 transition shadow-inner resize-none mb-4 placeholder:text-slate-600 h-24 shrink-0" placeholder="Prompt. Ex: Fundo infinito branco iluminado, estilo macro fotografia 8k HDR..."></textarea>
+                            <button onclick="gerarImagemIA()" class="w-full py-4 bg-rose-600 hover:bg-rose-500 text-white rounded-xl text-sm font-bold transition shadow-lg shadow-rose-600/30 flex items-center justify-center gap-2 mb-6"><i class="fas fa-paint-brush"></i> Renderizar Imagem HQ</button>
 
-                        <div>
-                            <div class="flex justify-between text-[10px] font-bold mb-1"><span class="text-slate-300">Dados Logísticos</span><span id="score-log-txt" class="text-amber-400">0%</span></div>
-                            <div class="w-full bg-white/5 rounded-full h-1.5"><div id="score-log-bar" class="bg-amber-500 h-1.5 rounded-full transition-all duration-500" style="width: 0%"></div></div>
+                            <div class="flex-1 border border-white/10 rounded-xl bg-black/80 relative overflow-hidden group flex flex-col items-center justify-center shadow-inner" id="ia-img-result">
+                                <i class="fas fa-image text-5xl text-white/10 mb-4 group-hover:scale-110 transition-transform duration-500"></i>
+                                <p class="text-[10px] text-slate-500 font-bold uppercase tracking-widest">Preview da Renderização</p>
+                            </div>
                         </div>
                     </div>
-
-                    <div class="bg-rose-900/10 border border-rose-500/20 rounded-xl p-4">
-                        <h4 class="text-[10px] font-black text-rose-400 uppercase tracking-widest mb-3 flex items-center gap-2"><i class="fas fa-exclamation-triangle"></i> Alertas do Motor</h4>
-                        <ul class="text-[10px] font-medium text-slate-400 space-y-2" id="insight-alerts">
-                            <li class="flex gap-2"><i class="fas fa-times text-rose-500 mt-0.5"></i> Descrição muito curta.</li>
-                            <li class="flex gap-2"><i class="fas fa-times text-rose-500 mt-0.5"></i> NCM e CEST ausentes.</li>
-                        </ul>
-                    </div>
-
                 </div>
+            </div>
+
+            <div id="view-mkt" class="hidden animate-fade-in max-w-7xl mx-auto pb-20 space-y-6">
+                <div class="glass-card rounded-2xl p-6 border-l-4 border-indigo-500 flex flex-col lg:flex-row gap-8 items-center">
+                    <div class="w-full lg:w-1/3">
+                        <h3 class="text-sm font-black text-white uppercase tracking-widest mb-2 flex items-center gap-2"><i class="fas fa-balance-scale text-indigo-400"></i> Custo Global do Item</h3>
+                        <p class="text-[10px] text-slate-400 leading-relaxed">A soma do Fornecedor + Embalagem Média (Config) define a base para cálculo dos canais.</p>
+                    </div>
+                    <div class="hidden lg:block w-px h-16 bg-white/10"></div>
+                    <div class="w-full lg:flex-1 grid grid-cols-3 gap-4">
+                        <div class="bg-black/40 border border-white/5 rounded-xl p-4 flex flex-col items-center justify-center text-center">
+                            <span class="text-[9px] font-bold uppercase tracking-widest text-slate-500 mb-1">Custo Global Total</span>
+                            <span class="text-xl font-black text-rose-500" id="calc-res-custo">R$ 0,00</span>
+                        </div>
+                        <div class="bg-indigo-500/10 border border-indigo-500/30 rounded-xl p-4 flex flex-col items-center justify-center text-center">
+                            <span class="text-[9px] font-bold uppercase tracking-widest text-indigo-400 mb-1">Margem Líq. Alvo</span>
+                            <span class="text-xl font-black text-indigo-300" id="calc-res-margem">30%</span>
+                        </div>
+                        <div class="bg-emerald-500/10 border border-emerald-500/30 rounded-xl p-4 flex flex-col items-center justify-center text-center">
+                            <span class="text-[9px] font-bold uppercase tracking-widest text-emerald-400 mb-1">Preço Sugerido (Base)</span>
+                            <span class="text-xl font-black text-emerald-400" id="calc-res-preco">R$ 0,00</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="mkt-cards-container" class="space-y-4"></div>
             </div>
 
         </main>
     </div>
 
     <script>
-        // === 1. UTILITÁRIOS ===
-        const f2 = n => parseFloat(n||0).toFixed(2);
+        const setVSafe = (id, val) => { const el = document.getElementById(id); if(el) { if(['INPUT','TEXTAREA','SELECT'].includes(el.tagName)) el.value = val; else el.innerText = val; } };
+        const getVNum = id => { const el = document.getElementById(id); return el ? parseFloat(el.value) || 0 : 0; };
+        const getVStr = id => { const el = document.getElementById(id); return el ? el.value : ''; };
         
-        function toast(msg, isIA = false) {
-            const c = document.getElementById('toast-container'); 
-            const t = document.createElement('div');
-            t.className = `bg-[#151517] border border-white/10 text-white px-5 py-4 rounded-xl shadow-2xl font-bold text-xs flex items-center gap-3 relative overflow-hidden z-[9999] mb-2`;
-            let icon = isIA ? '<i class="fas fa-wand-magic-sparkles text-rose-400 text-lg"></i>' : '<i class="fas fa-check-circle text-emerald-400 text-lg"></i>';
-            let bar = isIA ? 'bg-gradient-to-b from-rose-400 to-indigo-500' : 'bg-emerald-500';
-            t.innerHTML = `<div class="absolute left-0 top-0 bottom-0 w-1.5 ${bar}"></div>${icon} ${msg}`; 
-            c.appendChild(t); 
-            setTimeout(() => { t.style.opacity='0'; setTimeout(()=>t.remove(),300); }, 3500);
+        let activeProd = null;
+
+        function loadEditor() {
+            const prods = BlingService.db.getProducts();
+            
+            // Simula pegar ID pela URL ou cria novo
+            const urlParams = new URLSearchParams(window.location.search);
+            const pId = urlParams.get('id');
+
+            if(pId === 'novo') {
+                activeProd = { id: Date.now(), isNew: true, sku: '', code: '', ean: '', marca: 'Sóstrass', cond: 'Novo', formato: 'Simples', name: '', price: 0, cost: 0, stock: 0, cat: '', platforms: [], desc: '', descComp: '', log: {peso:0, alt:0, lar:0, pro:0, embExtra:0, freteExtra:0}, fisc: {ncm:'', cest:'', origem:'0', cfop:'', icms:0}, pendenteBling: true, mktPrices: {} };
+            } else {
+                // Pega o primeiro como exemplo no nosso mockup
+                activeProd = prods[0] || { id: 1, sku: 'TESTE', name: 'Carregando...', price: 0, log:{}, fisc:{} };
+            }
+
+            if(!activeProd.log) activeProd.log = {}; 
+            if(!activeProd.fisc) activeProd.fisc = {};
+            if(!activeProd.platforms) activeProd.platforms = [];
+
+            // Popula os INUMEROS campos da tela
+            setVSafe('hdr-nome', activeProd.name); setVSafe('hdr-sku', activeProd.sku); setVSafe('hdr-codigo', activeProd.code);
+            setVSafe('inp-nome', activeProd.name); setVSafe('inp-sku', activeProd.sku);
+            setVSafe('inp-formato', activeProd.formato); setVSafe('inp-tipo', activeProd.tipo || 'Produto');
+            setVSafe('inp-situacao', activeProd.situacao || 'Ativo'); setVSafe('inp-price', activeProd.price);
+            setVSafe('inp-unidade', activeProd.unidade || 'UN'); setVSafe('inp-cond', activeProd.cond);
+            setVSafe('inp-marca', activeProd.marca); setVSafe('inp-producao', activeProd.producao || 'Própria');
+            setVSafe('inp-validade', activeProd.validade); setVSafe('inp-fretegratis', activeProd.freteGratis || 'Nao');
+            setVSafe('inp-pesoliq', activeProd.log.peso); setVSafe('inp-pesobru', activeProd.log.pesoBru || activeProd.log.peso);
+            setVSafe('inp-lar', activeProd.log.lar); setVSafe('inp-alt', activeProd.log.alt); setVSafe('inp-pro', activeProd.log.pro);
+            setVSafe('inp-vol', activeProd.log.volumes || 1); setVSafe('inp-itenscx', activeProd.log.itensCaixa || 1);
+            setVSafe('inp-unmedida', activeProd.log.unMedida || 'Centímetros');
+            setVSafe('inp-ean', activeProd.ean); setVSafe('inp-eantrib', activeProd.fisc.eanTrib); setVSafe('inp-dun', activeProd.fisc.dun);
+            setVSafe('inp-ncm', activeProd.fisc.ncm); setVSafe('inp-cest', activeProd.fisc.cest); setVSafe('inp-origem', activeProd.fisc.origem);
+            setVSafe('inp-cost', activeProd.cost); setVSafe('inp-stock', activeProd.stock);
+
+            // Copy
+            setVSafe('inp-desc-curta', activeProd.desc); setVSafe('inp-desc-longa', activeProd.descComp);
+            setVSafe('inp-link', activeProd.linkExt); setVSafe('inp-video', activeProd.video);
+            setVSafe('inp-obs', activeProd.obs); setVSafe('inp-tags', activeProd.tags); setVSafe('inp-cat', activeProd.cat);
+
+            updateScores();
         }
 
-        // === 2. DADOS E MATEMÁTICA ===
-        const PLATS = [
-            { id: 'shopee', name: 'Shopee', icon: '<span class="text-rose-500">Sh</span>', fees: [{k:'com',l:'Comissão (%)',d:20},{k:'txs',l:'Tx Fixo (R$)',d:3}] },
-            { id: 'mercadolivre', name: 'Mercado Livre', icon: '<i class="fas fa-handshake text-yellow-500"></i>', fees: [{k:'com_menor',l:'Com < R$79 (%)',d:12},{k:'com_maior',l:'Com > R$79 (%)',d:16},{k:'frete',l:'Frete Fixo (R$)',d:0}] },
-            { id: 'nuvemshop', name: 'Nuvemshop', icon: '<i class="fas fa-cloud text-indigo-500"></i>', fees: [{k:'gate',l:'Gateway (%)',d:2},{k:'fix',l:'Custo Fixo (R$)',d:0}] }
-        ];
-
-        let insightChartInstance = null; // Guardar a instancia do grafico
-        
-        // === 3. NAVEGAÇÃO DE ABAS ===
+        // Navegação das Tabs
         function switchTab(t) {
             ['ficha','copy','mkt','midia'].forEach(v => document.getElementById(`view-${v}`).classList.replace('block', 'hidden'));
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('tab-active'));
-            
             document.getElementById(`view-${t}`).classList.replace('hidden', 'block');
             document.getElementById(`tab-${t}`).classList.add('tab-active');
-            
-            if(t === 'mkt') simularPrecos();
+            if(t === 'mkt') renderMarketplaces();
+            if(t === 'copy' || t === 'ficha') updateScores();
         }
 
-        // === 4. INSIGHT ENGINE (CÁLCULOS EM TEMPO REAL) ===
-        function updateScores() {
-            // Pega valores
-            const tit = document.getElementById('inp-desc-curta')?.value || document.getElementById('hdr-nome').value || '';
-            const desc = document.getElementById('inp-desc-longa')?.value || '';
-            const ean = document.getElementById('inp-ean')?.value || '';
-            const ncm = document.getElementById('inp-ncm')?.value || '';
-            const peso = document.getElementById('inp-pesoliq')?.value || '';
-
-            // Contadores
-            if(document.getElementById('cnt-tit')) document.getElementById('cnt-tit').innerText = `${tit.length}/150`;
-            if(document.getElementById('cnt-desc')) document.getElementById('cnt-desc').innerText = `${desc.length} chars`;
-
-            // Score SEO
-            let seoScore = 0;
-            if(tit.length >= 30) seoScore += 40;
-            if(desc.length >= 200) seoScore += 60;
-            document.getElementById('score-seo-txt').innerText = `${seoScore}%`;
-            document.getElementById('score-seo-bar').style.width = `${seoScore}%`;
-
-            // Score Fiscal
-            let fiscScore = 0;
-            if(ean.length >= 8) fiscScore += 50;
-            if(ncm.length >= 8) fiscScore += 50;
-            document.getElementById('score-fisc-txt').innerText = `${fiscScore}%`;
-            document.getElementById('score-fisc-bar').style.width = `${fiscScore}%`;
-
-            // Score Logística
-            let logScore = peso > 0 ? 100 : 0;
-            document.getElementById('score-log-txt').innerText = `${logScore}%`;
-            document.getElementById('score-log-bar').style.width = `${logScore}%`;
-
-            // Alertas
-            const ul = document.getElementById('insight-alerts');
-            ul.innerHTML = '';
-            if(seoScore < 100) ul.innerHTML += `<li class="flex gap-2"><i class="fas fa-times text-rose-500 mt-0.5"></i> SEO incompleto (Verifique Copy).</li>`;
-            if(fiscScore < 100) ul.innerHTML += `<li class="flex gap-2"><i class="fas fa-times text-rose-500 mt-0.5"></i> Falta EAN ou NCM. Bling irá travar.</li>`;
-            if(logScore < 100) ul.innerHTML += `<li class="flex gap-2"><i class="fas fa-times text-rose-500 mt-0.5"></i> Peso zerado. Falha no Frete.</li>`;
-            if(ul.innerHTML === '') ul.innerHTML = `<li class="flex gap-2 text-emerald-400"><i class="fas fa-check mt-0.5"></i> Tudo Perfeito!</li>`;
-
-            // KPI Superior
-            document.getElementById('kpi-bling').innerText = Math.round((fiscScore + logScore) / 2);
-            document.getElementById('kpi-seo').innerText = seoScore;
-
-            updateChart(seoScore, fiscScore, logScore);
-        }
-
-        // Gráfico de Radar Chart.js
-        function updateChart(seo, fisc, log) {
-            const ctx = document.getElementById('insightChart');
-            if(!ctx) return;
+        // Otimização IA
+        function chamarIA(targetId, ctx) {
+            const el = document.getElementById(targetId); if(!el) return;
+            const valAntigo = el.value;
+            el.value = "Gerando texto..."; el.classList.add("text-indigo-400");
+            toast("Gemini 2.5 processando...", true);
             
-            if(insightChartInstance) {
-                insightChartInstance.data.datasets[0].data = [seo, fisc, log, 100]; // 100 fixo p/ Preço simulado
-                insightChartInstance.update();
-                return;
-            }
-
-            insightChartInstance = new Chart(ctx, {
-                type: 'radar',
-                data: {
-                    labels: ['SEO', 'Fiscal', 'Logística', 'Mídia'],
-                    datasets: [{
-                        data: [seo, fisc, log, 50],
-                        backgroundColor: 'rgba(99, 102, 241, 0.4)',
-                        borderColor: '#818cf8',
-                        pointBackgroundColor: '#fff',
-                        borderWidth: 2
-                    }]
-                },
-                options: {
-                    scales: { r: { angleLines: { color: 'rgba(255,255,255,0.1)' }, grid: { color: 'rgba(255,255,255,0.1)' }, pointLabels: { color: '#94a3b8', font: { size: 10, family:'Inter' } }, ticks: { display: false, min: 0, max: 100 } } },
-                    plugins: { legend: { display: false } },
-                    maintainAspectRatio: false
-                }
-            });
-        }
-
-        // === 5. PRECIFICAÇÃO REVERSA ===
-        function simularPrecos() {
-            const custoProd = parseFloat(document.getElementById('calc-custo').value) || 0;
-            const embEx = parseFloat(document.getElementById('calc-emb').value) || 0;
-            
-            // Assume globais fixos para o preview (Na versão real puxa do BD)
-            const embGlobal = 3; const imposto = 6; const cartao = 2.5; const margem = 30;
-            
-            const totalFixoBase = custoProd + embGlobal + embEx;
-            document.getElementById('calc-res-custo').innerText = `R$ ${f2(totalFixoBase)}`;
-            document.getElementById('calc-res-taxa').innerText = `${imposto + cartao}%`;
-            document.getElementById('calc-res-margem').innerText = `${margem}%`;
-
-            const taxaGlobalPct = imposto + cartao + margem;
-            const divGeral = 1 - (taxaGlobalPct/100);
-            document.getElementById('calc-res-preco').innerText = `R$ ${f2(divGeral > 0 ? totalFixoBase / divGeral : 0)}`;
-
-            const container = document.getElementById('mkt-cards-container');
-            container.innerHTML = '';
-
-            PLATS.forEach(pl => {
-                let inputs = '';
-                pl.fees.forEach(f => {
-                    inputs += `<div class="flex items-center justify-between mb-2"><span class="text-[9px] font-bold text-slate-500 uppercase">${f.l}</span><input type="number" value="${f.d}" class="w-16 input-dark text-center py-1"></div>`;
-                });
-
-                // Calculo Mock Simplificado para Preview Visual
-                let sug = divGeral > 0 ? (totalFixoBase + (pl.fees[1]?.d || 0)) / (divGeral - ((pl.fees[0]?.d || 0)/100)) : 0;
-                
-                container.innerHTML += `
-                    <div class="bg-[#151517] border border-white/5 rounded-xl p-5 flex items-center justify-between gap-6 transition hover:border-indigo-500/50">
-                        <div class="flex items-center gap-4 w-1/4">
-                            <div class="w-10 h-10 bg-white rounded-lg flex items-center justify-center text-xl shadow-inner">${pl.icon}</div>
-                            <h4 class="font-black text-white text-sm">${pl.name}</h4>
-                        </div>
-                        <div class="w-1/4 bg-black/40 p-3 rounded-lg border border-white/5">${inputs}</div>
-                        <div class="w-1/4 text-center">
-                            <p class="text-[9px] font-bold text-slate-500 uppercase tracking-widest mb-1">Cálculo Sugerido</p>
-                            <p class="text-3xl font-black text-emerald-400">R$ ${f2(Math.abs(sug))}</p>
-                        </div>
-                        <div class="w-1/4 text-right">
-                            <button class="bg-indigo-600 hover:bg-indigo-500 text-white px-6 py-3 rounded-xl text-xs font-bold transition shadow-lg w-full flex items-center justify-center gap-2"><i class="fas fa-check"></i> Acatar</button>
-                        </div>
-                    </div>`;
-            });
-        }
-
-        // === 6. I.A. MOCKUPS ===
-        function simulateAIOptimize() {
-            toast("Gemini analisando Ficha Completa...", true);
             setTimeout(() => {
-                document.getElementById('inp-desc-curta').value = "Caixa Organizadora Premium 30 Divisórias Acrílico";
-                document.getElementById('inp-desc-longa').value = "A organização perfeita para o seu ateliê.\n\nMaterial: Acrílico de alta resistência.\nMedidas: 19x20x10cm\nIdeal para: Miçangas, pérolas e pequenos itens.";
-                document.getElementById('inp-ean').value = "7891234567890";
-                document.getElementById('inp-ncm').value = "3923.10.90";
-                document.getElementById('inp-pesoliq').value = "0.5";
+                el.classList.remove("text-indigo-400");
+                if(targetId.includes('nome')) el.value = "Kit 30 Caixas Organizadoras Transparentes - Original";
+                else if(targetId.includes('marca')) el.value = "Sóstrass Ateliê";
+                else if(targetId.includes('cat')) el.value = "Armarinhos > Organização";
+                else if(targetId.includes('tags')) el.value = "caixa, organizadora, 30 divisorias, transparente, atacado";
+                else if(targetId.includes('desc-curta')) el.value = "A caixa perfeita para as suas pérolas e miçangas.";
+                else if(targetId.includes('desc-longa')) el.value = "Material resistente.\nFecho de segurança.\nMedidas exatas para não haver devoluções.";
+                else el.value = valAntigo;
                 updateScores();
-                toast("Campos otimizados com sucesso!", true);
-            }, 1500);
+            }, 1200);
         }
 
-        function chamarIA(tgt) {
-            toast("Processando texto via I.A...", true);
+        function gerarImagemIA() {
+            const resultBox = document.getElementById('ia-img-result');
+            resultBox.innerHTML = '<div class="flex flex-col items-center justify-center text-rose-500 h-full"><i class="fas fa-circle-notch fa-spin text-4xl mb-4"></i><p class="text-[10px] font-bold uppercase tracking-widest text-white">Nano Banana 2: Renderizando...</p></div>';
+            toast("Estúdio I.A. ativado.", true);
             setTimeout(() => {
-                const el = document.getElementById(tgt);
-                if(el && tgt === 'inp-marca') el.value = "Sóstrass Premium";
-                if(el && tgt === 'inp-cat') el.value = "Armarinhos > Organização";
-                if(el && tgt === 'inp-desc-curta') el.value = "Caixa Organizadora 30 Divisórias Transparente Premium";
-                updateScores();
-            }, 1000);
-        }
-
-        function mockGerarImg() {
-            toast("Nano Banana 2 renderizando 8k...", true);
-            setTimeout(() => {
-                document.getElementById('ia-img-result').innerHTML = `<div class="absolute inset-0 bg-cover bg-center" style="background-image: url('https://images.unsplash.com/photo-1542272604-787c3835535d?auto=format&fit=crop&q=80')"></div><button class="absolute bottom-4 right-4 bg-rose-600 text-white px-4 py-2 rounded-lg text-[10px] font-bold shadow-lg"><i class="fas fa-download mr-1"></i> Salvar Imagem</button>`;
-                toast("Imagem fotorrealista gerada!", true);
+                resultBox.innerHTML = `
+                    <div class="absolute inset-0 bg-cover bg-center" style="background-image: url('https://images.unsplash.com/photo-1542272604-787c3835535d?auto=format&fit=crop&q=80')"></div>
+                    <div class="absolute bottom-4 right-4"><button class="bg-black/80 hover:bg-rose-600 text-white px-4 py-2 rounded-xl text-[10px] font-bold transition shadow-lg border border-white/20"><i class="fas fa-download mr-1"></i> Salvar Galeria</button></div>`;
+                toast("Imagem gerada!", true);
             }, 3000);
         }
 
-        function salvarProduto() {
-            document.getElementById('status-sync').innerHTML = '<i class="fas fa-circle text-[8px] text-amber-500"></i> Fila Bling';
-            document.getElementById('status-sync').className = "text-[10px] text-amber-500 font-bold";
-            toast("Rascunho salvo localmente!");
+        // Análise de SEO Viva
+        function updateScores() {
+            const tit = getVStr('inp-desc-curta') || getVStr('inp-nome') || '';
+            const desc = getVStr('inp-desc-longa'); const ean = getVStr('inp-ean');
+            
+            let s = 0;
+            if(document.getElementById('char-tit')) document.getElementById('char-tit').innerText = `${tit.length}/150`;
+            if(document.getElementById('char-desc')) document.getElementById('char-desc').innerText = `${desc.length} chars`;
+
+            const ct = (tit.length >= 30); if(ct) s+=40;
+            const cd = (desc.length >= 200); if(cd) s+=40;
+            const ce = (ean.length >= 8); if(ce) s+=20;
+
+            document.getElementById('icn-t').className = ct ? 'fas fa-check text-emerald-400' : 'fas fa-times text-rose-500';
+            document.getElementById('icn-d').className = cd ? 'fas fa-check text-emerald-400' : 'fas fa-times text-rose-500';
+            document.getElementById('icn-e').className = ce ? 'fas fa-check text-emerald-400' : 'fas fa-times text-rose-500';
+
+            const circle = document.getElementById('seo-circle'); const txt = document.getElementById('seo-score');
+            if(circle && txt) {
+                circle.style.strokeDashoffset = 440 - (440 * (s / 100)); 
+                let col = s >= 80 ? 'text-emerald-500' : (s >= 50 ? 'text-amber-500' : 'text-rose-500');
+                circle.setAttribute('class', `circle-progress ${col}`); txt.innerText = s; txt.className = `text-5xl font-black leading-none ${col}`;
+            }
         }
 
-        // INIT
-        window.onload = () => { updateScores(); simularPrecos(); };
+        // Salvar
+        function salvarProduto() {
+            activeProd.name = getVStr('inp-nome'); activeProd.sku = getVStr('inp-sku');
+            activeProd.price = getVNum('inp-price'); activeProd.cost = getVNum('inp-cost');
+            activeProd.ean = getVStr('inp-ean'); activeProd.stock = getVNum('inp-estoque');
+            
+            // Simula Salvar
+            activeProd.pendenteBling = true;
+            let prods = BlingService.db.getProducts();
+            if(activeProd.isNew) { delete activeProd.isNew; prods.unshift(activeProd); }
+            else { const idx = prods.findIndex(p => p.id === activeProd.id); if(idx > -1) prods[idx] = activeProd; }
+            
+            BlingService.db.saveProducts(prods);
+            BlingService.db.saveEvent(`Ficha do SKU ${activeProd.sku} salva.`, 'edit');
+            toast("Ficha salva localmente com sucesso!");
+        }
+
+        // Render Precificação Placeholder
+        function renderMarketplaces() {
+            document.getElementById('calc-res-custo').innerText = `R$ ${f2(activeProd.cost + globalCosts.embalagem)}`;
+            document.getElementById('mkt-cards-container').innerHTML = '<div class="glass-card p-8 text-center text-slate-400 rounded-xl border border-white/5"><i class="fas fa-cogs text-4xl mb-4 opacity-50 text-indigo-500"></i><p>O Motor de Marketplaces puxa a configuração global do <b>banco.js</b>.<br>Selecione as taxas na tela de "Custos Globais".</p></div>';
+        }
+
+        window.onload = () => loadEditor();
     </script>
 </body>
 </html>
