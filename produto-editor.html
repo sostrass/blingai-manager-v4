@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PIM - Editor Master de Produto</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+        * { box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-thumb { background: #94a3b8; border-radius: 10px; }
+        input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+        
+        .input-std { background: #fff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px 14px; outline: none; transition: 0.2s; font-size: 13px; width: 100%; color: #1e293b; font-weight: 500; box-shadow: inset 0 1px 2px rgba(0,0,0,0.02);}
+        .input-std:focus { border-color: #6366f1; box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15); }
+        
+        .tab-btn { color: #64748b; font-weight: 600; border-bottom: 2px solid transparent; transition: 0.2s; }
+        .tab-btn:hover { color: #4f46e5; }
+        .tab-active { color: #4f46e5; border-bottom: 2px solid #4f46e5; }
+        
+        .card-box { background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 h-screen flex overflow-hidden">
+
+    <div id="toast-container" class="fixed top-20 right-6 z-50 flex flex-col gap-3 pointer-events-none"></div>
+
+    <aside class="w-20 lg:w-64 bg-slate-900 text-slate-400 flex flex-col shadow-xl z-20 shrink-0 transition-all">
+        <div class="h-16 flex items-center justify-center lg:justify-start lg:px-6 border-b border-slate-800 bg-slate-950">
+            <i class="fas fa-gem text-indigo-500 text-xl lg:mr-2"></i>
+            <h1 class="hidden lg:block text-sm font-bold text-white">Sóstrass<span class="text-[9px] bg-indigo-500/20 text-indigo-400 px-1.5 py-0.5 rounded ml-1">SaaS</span></h1>
+        </div>
+        <div class="flex-1 py-6 flex flex-col gap-2 px-3 overflow-y-auto">
+            <a href="index.html" class="w-full flex items-center gap-3 px-3 py-3 hover:text-white hover:bg-slate-800 rounded-lg text-xs font-medium transition justify-center lg:justify-start" title="Dashboard"><i class="fas fa-chart-pie text-lg lg:text-base w-5"></i> <span class="hidden lg:block">Dashboard</span></a>
+            <a href="catalogo.html" class="w-full flex items-center gap-3 px-3 py-3 bg-indigo-600 text-white rounded-lg text-xs font-bold shadow-lg justify-center lg:justify-start" title="Catálogo"><i class="fas fa-box-open text-lg lg:text-base w-5"></i> <span class="hidden lg:block">Catálogo (PIM)</span></a>
+            <a href="radar.html" class="w-full flex items-center gap-3 px-3 py-3 hover:text-white hover:bg-slate-800 rounded-lg text-xs font-medium transition justify-center lg:justify-start" title="Radar"><i class="fas fa-satellite-dish text-lg lg:text-base w-5"></i> <span class="hidden lg:block">Radar Market</span></a>
+        </div>
+    </aside>
+
+    <div class="flex-1 flex flex-col min-w-0 h-full overflow-y-auto relative">
+        
+        <header class="bg-white border-b border-slate-200 sticky top-0 z-40 shadow-sm">
+            <div class="px-8 py-4 flex justify-between items-center">
+                <div class="flex items-center gap-4">
+                    <a href="catalogo.html" class="w-10 h-10 rounded-full border border-slate-200 flex items-center justify-center text-slate-500 hover:bg-slate-50 hover:text-indigo-600 transition"><i class="fas fa-arrow-left"></i></a>
+                    <div>
+                        <h2 class="text-xl font-black text-slate-800 flex items-center gap-3" id="hdr-nome">Carregando Produto...</h2>
+                        <p class="text-xs text-slate-500 font-mono mt-0.5"><span id="hdr-sku" class="font-bold text-indigo-600">SKU</span> | Cód Bling: <span id="hdr-codigo">---</span></p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-3">
+                    <button onclick="salvarProduto()" class="px-6 py-2.5 bg-slate-800 hover:bg-slate-900 text-white rounded-lg text-xs font-bold shadow-md transition flex items-center gap-2"><i class="fas fa-save"></i> Salvar Rascunho</button>
+                    <button onclick="enviarBling()" class="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold shadow-md transition flex items-center gap-2"><i class="fas fa-cloud-upload-alt"></i> Sincronizar API Bling</button>
+                </div>
+            </div>
+            
+            <div class="px-8 flex gap-8">
+                <button onclick="switchTab('ficha')" id="tab-ficha" class="tab-btn tab-active pb-3 text-sm flex items-center gap-2"><i class="fas fa-list-alt"></i> Dados & Ficha Bling</button>
+                <button onclick="switchTab('copy')" id="tab-copy" class="tab-btn pb-3 text-sm flex items-center gap-2"><i class="fas fa-pen-nib"></i> Copy & SEO (I.A.)</button>
+                <button onclick="switchTab('mkt')" id="tab-mkt" class="tab-btn pb-3 text-sm flex items-center gap-2"><i class="fas fa-calculator"></i> Precificação (8 Canais)</button>
+                <button onclick="switchTab('midia')" id="tab-midia" class="tab-btn pb-3 text-sm flex items-center gap-2"><i class="fas fa-camera"></i> Mídia & Estúdio IA</button>
+            </div>
+        </header>
+
+        <main class="p-8 max-w-[1400px] mx-auto w-full">
+            
+            <div id="view-ficha" class="space-y-6 block">
+                
+                <div class="card-box p-6">
+                    <h3 class="text-sm font-bold text-slate-800 uppercase tracking-widest mb-6 pb-2 border-b border-slate-100 flex items-center gap-2"><i class="fas fa-tag text-indigo-500"></i> Identificação Principal</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                        <div><label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">SKU</label><input type="text" id="inp-sku" class="input-std font-mono font-bold text-indigo-600"></div>
+                        <div class="col-span-2 lg:col-span-3"><label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">Nome do Produto</label><input type="text" id="inp-nome" class="input-std font-bold"></div>
+                        
+                        <div><label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">Código GTIN/EAN</label><input type="text" id="inp-ean" class="input-std font-mono"></div>
+                        <div><label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">Marca Oficial</label><input type="text" id="inp-marca" class="input-std"></div>
+                        <div><label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">Categoria Mestre</label><input type="text" id="inp-cat" class="input-std"></div>
+                        <div><label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">Condição</label><select id="inp-cond" class="input-std cursor-pointer"><option value="Novo">Novo</option><option value="Usado">Usado</option></select></div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div class="card-box p-6">
+                        <h3 class="text-sm font-bold text-slate-800 uppercase tracking-widest mb-6 pb-2 border-b border-slate-100 flex items-center gap-2"><i class="fas fa-file-invoice-dollar text-emerald-500"></i> Dados Fiscais (NFe)</h3>
+                        <div class="grid grid-cols-2 gap-5">
+                            <div><label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">NCM</label><input type="text" id="inp-ncm" class="input-std font-mono"></div>
+                            <div><label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">CEST</label><input type="text" id="inp-cest" class="input-std font-mono"></div>
+                            <div class="col-span-2"><label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">Origem do Produto</label><select id="inp-origem" class="input-std cursor-pointer"><option value="0">0 - Nacional</option><option value="1">1 - Estrangeira (Importação)</option><option value="2">2 - Estrangeira (Mercado Interno)</option></select></div>
+                        </div>
+                    </div>
+
+                    <div class="card-box p-6">
+                        <h3 class="text-sm font-bold text-slate-800 uppercase tracking-widest mb-6 pb-2 border-b border-slate-100 flex items-center gap-2"><i class="fas fa-box text-amber-500"></i> Logística & Dimensões</h3>
+                        <div class="grid grid-cols-3 gap-5">
+                            <div><label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">Peso Líq. (kg)</label><input type="number" id="inp-pesoliq" class="input-std"></div>
+                            <div><label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">Peso Bruto (kg)</label><input type="number" id="inp-pesobru" class="input-std"></div>
+                            <div><label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">Estoque (un)</label><input type="number" id="inp-estoque" class="input-std font-bold text-indigo-600"></div>
+                            
+                            <div><label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">Largura (cm)</label><input type="number" id="inp-lar" class="input-std"></div>
+                            <div><label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">Altura (cm)</label><input type="number" id="inp-alt" class="input-std"></div>
+                            <div><label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">Profundidade (cm)</label><input type="number" id="inp-pro" class="input-std"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="view-copy" class="space-y-6 hidden">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    
+                    <div class="col-span-2 space-y-6">
+                        <div class="card-box p-6">
+                            <div class="flex justify-between items-center mb-4">
+                                <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest"><i class="fas fa-heading text-indigo-500 mr-1"></i> Título Comercial (Anúncio)</label>
+                                <span class="text-[10px] font-mono font-bold bg-slate-100 text-slate-500 px-2 py-1 rounded" id="char-tit">0/150</span>
+                            </div>
+                            <input type="text" id="inp-titulo-anuncio" class="input-std text-sm font-bold" oninput="checkSEO()">
+                        </div>
+
+                        <div class="card-box p-6">
+                            <div class="flex justify-between items-center mb-4">
+                                <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest"><i class="fas fa-align-left text-indigo-500 mr-1"></i> Descrição Rica (Anti-Devolução)</label>
+                                <span class="text-[10px] font-mono font-bold bg-slate-100 text-slate-500 px-2 py-1 rounded" id="char-desc">0 caracteres</span>
+                            </div>
+                            <textarea id="inp-desc-longa" rows="12" class="input-std leading-relaxed resize-none" oninput="checkSEO()"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="space-y-6">
+                        
+                        <div class="card-box p-6 flex flex-col items-center justify-center bg-gradient-to-br from-white to-slate-50">
+                            <h3 class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-6">Saúde SEO do Anúncio</h3>
+                            <div class="relative w-32 h-32 mb-6">
+                                <svg class="w-full h-full transform -rotate-90"><circle cx="64" cy="64" r="56" stroke="#f1f5f9" stroke-width="12" fill="transparent"/><circle cx="64" cy="64" r="56" stroke="currentColor" stroke-width="12" fill="transparent" stroke-dasharray="351.8" stroke-dashoffset="351.8" class="circle-progress text-rose-500" id="seo-circle"/></svg>
+                                <div class="absolute inset-0 flex items-center justify-center flex-col"><span class="text-3xl font-black text-rose-500 leading-none" id="seo-score">0</span></div>
+                            </div>
+                            <div class="w-full space-y-3 text-xs font-bold text-slate-400">
+                                <div class="flex justify-between items-center"><span id="lbl-t">Título (> 30 char)</span><i class="fas fa-times text-rose-500" id="icn-t"></i></div>
+                                <div class="flex justify-between items-center"><span id="lbl-d">Descrição (> 200 char)</span><i class="fas fa-times text-rose-500" id="icn-d"></i></div>
+                                <div class="flex justify-between items-center"><span id="lbl-e">EAN Preenchido</span><i class="fas fa-times text-rose-500" id="icn-e"></i></div>
+                            </div>
+                        </div>
+
+                        <div class="card-box p-6 border-indigo-200 bg-indigo-50/30">
+                            <h3 class="text-xs font-bold text-indigo-700 uppercase tracking-widest mb-4 flex items-center gap-2"><i class="fas fa-wand-magic-sparkles"></i> Gemini Copywriter</h3>
+                            <textarea id="ia-txt-prompt" rows="3" class="input-std text-[11px] mb-4" placeholder="Instruções. Ex: Crie uma descrição focada em artesãs, destacando que a pérola não descasca..."></textarea>
+                            <div class="flex flex-col gap-2">
+                                <button onclick="gerarTextoIA('titulo')" class="w-full py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-[11px] font-bold transition shadow-md">Gerar Título Magnético</button>
+                                <button onclick="gerarTextoIA('desc')" class="w-full py-2 bg-indigo-100 hover:bg-indigo-200 text-indigo-700 rounded-lg text-[11px] font-bold transition border border-indigo-200">Gerar Descrição Detalhada</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="view-mkt" class="space-y-6 hidden">
+                
+                <div class="card-box p-6 border-l-4 border-rose-500">
+                    <h3 class="text-sm font-bold text-slate-800 uppercase tracking-widest mb-6 pb-2 border-b border-slate-100 flex items-center gap-2"><i class="fas fa-money-bill-wave text-rose-500"></i> Custo de Formação (Apenas para este SKU)</h3>
+                    <div class="grid grid-cols-4 gap-6">
+                        <div><label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">Custo Base (Fornecedor)</label><div class="relative"><span class="absolute left-3 top-2.5 text-xs text-slate-400 font-bold">R$</span><input type="number" id="inp-custo" class="input-std pl-8 text-rose-600 font-black text-lg" onchange="renderCalculadora()"></div></div>
+                        <div><label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">Custo Emb. Específica</label><div class="relative"><span class="absolute left-3 top-2.5 text-xs text-slate-400 font-bold">R$</span><input type="number" id="inp-embex" class="input-std pl-8 text-slate-600" onchange="renderCalculadora()"></div><p class="text-[9px] text-slate-400 mt-1">Soma-se aos R$ 3,00 globais</p></div>
+                        <div><label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">Custo Frete Específico</label><div class="relative"><span class="absolute left-3 top-2.5 text-xs text-slate-400 font-bold">R$</span><input type="number" id="inp-frex" class="input-std pl-8 text-slate-600" onchange="renderCalculadora()"></div></div>
+                        <div class="bg-rose-50 rounded-lg p-3 flex flex-col justify-center border border-rose-100"><span class="text-[9px] font-bold text-rose-400 uppercase tracking-widest mb-1">Custo Total de Saída</span><span class="text-2xl font-black text-rose-600" id="lbl-custo-total">R$ 0,00</span></div>
+                    </div>
+                </div>
+
+                <div class="card-box overflow-hidden">
+                    <div class="p-6 bg-slate-50 border-b border-slate-200 flex justify-between items-center">
+                        <div>
+                            <h3 class="text-sm font-black text-slate-800 uppercase tracking-widest flex items-center gap-2"><i class="fas fa-calculator text-indigo-500"></i> Calculadora Reversa de Marketplaces</h3>
+                            <p class="text-[10px] text-slate-500 mt-1 font-medium max-w-2xl">O sistema utiliza o Custo Total acima, soma com a Margem Global (30%) e Impostos (8.5%), e aplica o divisor reverso de cada canal abaixo para sugerir um preço onde você não tenha prejuízo.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left whitespace-nowrap">
+                            <thead class="bg-white border-b border-slate-200 text-slate-400 uppercase text-[9px] font-black tracking-wider">
+                                <tr>
+                                    <th class="px-6 py-4 w-64">Plataforma</th>
+                                    <th class="px-6 py-4">Regras de Taxa do Canal</th>
+                                    <th class="px-6 py-4 text-right bg-slate-50">Preço Sugerido (Seguro)</th>
+                                    <th class="px-6 py-4 text-right">Preço Atual (Bling)</th>
+                                    <th class="px-6 py-4 text-right">Ação</th>
+                                </tr>
+                            </thead>
+                            <tbody id="lista-marketplaces" class="divide-y divide-slate-100 bg-white">
+                                </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div id="view-midia" class="hidden space-y-6">
+                <div class="flex flex-col lg:flex-row gap-6 h-[70vh]">
+                    
+                    <div class="w-full lg:w-1/2 card-box p-6 flex flex-col">
+                        <h3 class="text-sm font-bold text-slate-800 uppercase tracking-widest mb-6 pb-2 border-b border-slate-100 flex items-center gap-2"><i class="fas fa-images text-indigo-500"></i> Galeria do Produto</h3>
+                        <div class="grid grid-cols-3 gap-4 flex-1 overflow-y-auto content-start pr-2">
+                            <div class="aspect-square bg-slate-50 rounded-xl border-2 border-dashed border-slate-300 flex flex-col items-center justify-center text-slate-400 hover:text-indigo-500 hover:border-indigo-400 hover:bg-indigo-50 transition cursor-pointer group">
+                                <i class="fas fa-cloud-upload-alt text-3xl mb-2 group-hover:-translate-y-1 transition-transform"></i>
+                                <span class="text-[10px] font-bold uppercase tracking-widest">Upload Manual</span>
+                            </div>
+                            <div class="aspect-square rounded-xl border border-slate-200 relative group overflow-hidden shadow-sm">
+                                <img src="https://images.unsplash.com/photo-1617325247661-675ab03407bd?q=80&w=200&auto=format&fit=crop" class="w-full h-full object-cover">
+                                <div class="absolute inset-0 bg-slate-900/60 opacity-0 group-hover:opacity-100 transition flex items-center justify-center backdrop-blur-sm">
+                                    <button class="w-10 h-10 bg-rose-500 text-white rounded-full flex items-center justify-center hover:scale-110 transition shadow-lg"><i class="fas fa-trash"></i></button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="w-full lg:w-1/2 card-box overflow-hidden flex flex-col relative border-0 shadow-xl">
+                        <div class="absolute inset-0 bg-slate-900 z-0"></div>
+                        <div class="absolute top-0 right-0 w-96 h-96 bg-rose-500/20 rounded-full blur-[100px] z-0 pointer-events-none"></div>
+                        
+                        <div class="relative z-10 p-8 flex flex-col h-full">
+                            <div class="flex justify-between items-center mb-6">
+                                <h3 class="text-lg font-black text-white flex items-center gap-3"><i class="fas fa-wand-magic-sparkles text-rose-400"></i> Nano Banana 2</h3>
+                                <span class="text-[9px] font-mono font-bold text-rose-200 border border-rose-500/30 bg-rose-500/20 px-3 py-1 rounded-full shadow-sm">Image Gen AI</span>
+                            </div>
+                            <p class="text-xs text-slate-400 mb-6 leading-relaxed">Não tem fotos de estúdio? Descreva o cenário ideal para o seu produto (fundo, iluminação, estilo) e a inteligência artificial criará uma imagem fotorrealista pronta para venda.</p>
+                            
+                            <textarea id="ia-img-prompt" class="w-full bg-black/40 border border-white/10 rounded-xl p-4 text-sm font-medium text-white outline-none focus:border-rose-500 transition shadow-inner resize-none mb-6 placeholder:text-slate-600" rows="3" placeholder="Ex: Produto isolado no centro, fundo infinito branco, iluminação de estúdio fotográfico suave com sombra sutil no chão..."></textarea>
+                            
+                            <button onclick="gerarImagemIA()" class="w-full py-4 bg-rose-600 hover:bg-rose-500 text-white rounded-xl text-sm font-bold transition shadow-lg shadow-rose-600/30 flex items-center justify-center gap-2 mb-8"><i class="fas fa-paint-brush"></i> Renderizar Imagem</button>
+
+                            <div class="flex-1 flex flex-col items-center justify-center border border-white/10 rounded-xl bg-black/60 relative overflow-hidden group" id="ia-img-result">
+                                <i class="fas fa-image text-6xl text-white/10 mb-4 group-hover:scale-110 transition-transform duration-500"></i>
+                                <p class="text-[10px] text-slate-500 font-bold uppercase tracking-widest">Aguardando Prompt...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <script>
+        // 1. FUNÇÕES BASE
+        const f2 = n => parseFloat(n||0).toFixed(2);
+        
+        const PSVG = {
+            shopee: '<span class="text-rose-500 font-black text-[12px]">Sh</span>',
+            mercadolivre: '<i class="fas fa-handshake text-yellow-500 text-[12px]"></i>',
+            tiktok: '<i class="fab fa-tiktok text-slate-800 text-[12px]"></i>',
+            shein: '<span class="text-slate-800 font-black text-[10px]">SH</span>',
+            amazon: '<i class="fab fa-amazon text-amber-500 text-[12px]"></i>',
+            magalu: '<span class="text-blue-500 font-black text-[12px]">M</span>',
+            americanas: '<span class="text-red-500 font-black text-[12px]">A</span>',
+            nuvemshop: '<i class="fas fa-cloud text-indigo-500 text-[12px]"></i>'
+        };
+        const getSvg = (id, sz=24) => `<div style="width:${sz}px;height:${sz}px;flex-shrink:0;" class="bg-white rounded border border-slate-200 shadow-sm flex items-center justify-center">${PSVG[id] || ''}</div>`;
+
+        function toast(msg, isIA = false) {
+            const c = document.getElementById('toast-container'); const t = document.createElement('div');
+            t.className = `bg-slate-800 border border-slate-700 text-white px-5 py-4 rounded-xl shadow-2xl font-bold text-xs flex items-center gap-3 relative overflow-hidden`;
+            let icon = isIA ? '<i class="fas fa-wand-magic-sparkles text-rose-400 text-lg"></i>' : '<i class="fas fa-check-circle text-emerald-400 text-lg"></i>';
+            let bar = isIA ? 'bg-rose-500' : 'bg-emerald-500';
+            t.innerHTML = `<div class="absolute left-0 top-0 bottom-0 w-1.5 ${bar}"></div>${icon} ${msg}`; 
+            c.appendChild(t); setTimeout(() => { t.style.opacity='0'; setTimeout(()=>t.remove(),300); }, 4000);
+        }
+
+        // 2. DADOS (Simulando o Banco)
+        const PLATS = [
+            { id: 'shopee', name: 'Shopee', fees: [{k:'com',l:'Comissão (%)',d:20},{k:'txs',l:'Tx Serviço (R$)',d:3},{k:'frete',l:'Frete (R$)',d:0}] },
+            { id: 'mercadolivre', name: 'Mercado Livre', fees: [{k:'com_menor',l:'Com < R$79 (%)',d:12},{k:'com_maior',l:'Com > R$79 (%)',d:16},{k:'frete',l:'Frete Fixo (R$)',d:0}] },
+            { id: 'tiktok', name: 'TikTok Shop', fees: [{k:'com',l:'Comissão (%)',d:5},{k:'fix',l:'Tx Fixa (R$)',d:0}] },
+            { id: 'shein', name: 'Shein', fees: [{k:'com',l:'Comissão (%)',d:18},{k:'log',l:'Logística (R$)',d:0}] },
+            { id: 'amazon', name: 'Amazon', fees: [{k:'com',l:'Comissão (%)',d:15},{k:'fix',l:'Tx Fixa (R$)',d:0}] },
+            { id: 'magalu', name: 'Magalu', fees: [{k:'com',l:'Comissão (%)',d:16},{k:'fix',l:'Tx Fixa (R$)',d:0}] },
+            { id: 'americanas', name: 'Americanas', fees: [{k:'com',l:'Comissão (%)',d:16},{k:'fix',l:'Tx Fixa (R$)',d:0}] },
+            { id: 'nuvemshop', name: 'Nuvemshop', fees: [{k:'gate',l:'Gateway (%)',d:2},{k:'fix',l:'Custo Fixo (R$)',d:0}] }
+        ];
+
+        let globalCosts = JSON.parse(localStorage.getItem('sostrass_gc')) || { imposto: 6, cartao: 2.5, embalagem: 3, ganho: 30 };
+        let products = JSON.parse(localStorage.getItem('sostrass_prods')) || []; // Carrega o DB real
+        
+        // Dados Mock caso DB esteja vazio para o preview
+        if(products.length === 0) {
+            products = [ { id: 1, sku: 'CX-ORG-30', code: '40028922', ean: '7891234567890', marca: 'Sóstrass', cond: 'Novo', formato: 'Simples', name: 'Kit 30 Caixas Organizadoras', price: 89.90, cost: 45.00, stock: 145, cat: 'Caixas', hist:[], platforms:['shopee','mercadolivre','nuvemshop'], desc:'', descComp:'', descData:{}, log:{peso: 0.5, alt: 20, lar: 19, pro: 10, embExtra: 0, freteExtra:0}, fisc:{ncm:'3923.10.90', cest:'10.001.00', origem:'0', cfop:'5102'}, pendenteBling: true, mktPrices: { shopee: 110.00, mercadolivre: 95.00 } } ];
+        }
+
+        let mpRates = JSON.parse(localStorage.getItem('sostrass_rates')) || {};
+        let activeProdId = 1; // Puxaria da URL em um sistema real (ex: ?id=1)
+        let activeProd = products.find(p => p.id === activeProdId) || products[0];
+
+        // 3. NAVEGAÇÃO DAS ABAS
+        function switchTab(t) {
+            ['ficha','copy','mkt','midia'].forEach(v => document.getElementById(`view-${v}`).classList.replace('block', 'hidden'));
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('tab-active'));
+            document.getElementById(`view-${t}`).classList.replace('hidden', 'block');
+            document.getElementById(`tab-${t}`).classList.add('tab-active');
+            if(t === 'mkt') renderCalculadora();
+            if(t === 'copy') checkSEO();
+        }
+
+        // 4. CARREGAR DADOS NO EDITOR
+        function carregarEditor() {
+            if(!activeProd) return;
+            
+            document.getElementById('hdr-nome').innerText = activeProd.name;
+            document.getElementById('hdr-sku').innerText = activeProd.sku;
+            document.getElementById('hdr-codigo').innerText = activeProd.code || '---';
+
+            // Aba Ficha
+            const setVal = (id, v) => { const e=document.getElementById(id); if(e) e.value=v; };
+            setVal('inp-sku', activeProd.sku); setVal('inp-nome', activeProd.name);
+            setVal('inp-ean', activeProd.ean); setVal('inp-marca', activeProd.marca);
+            setVal('inp-cat', activeProd.cat); setVal('inp-cond', activeProd.cond);
+            
+            // Fiscais / Log
+            if(!activeProd.fisc) activeProd.fisc = {}; if(!activeProd.log) activeProd.log = {};
+            setVal('inp-ncm', activeProd.fisc.ncm); setVal('inp-cest', activeProd.fisc.cest); setVal('inp-origem', activeProd.fisc.origem);
+            setVal('inp-pesoliq', activeProd.log.peso); setVal('inp-pesobru', activeProd.log.pesoBru || activeProd.log.peso);
+            setVal('inp-estoque', activeProd.stock);
+            setVal('inp-lar', activeProd.log.lar); setVal('inp-alt', activeProd.log.alt); setVal('inp-pro', activeProd.log.pro);
+
+            // Copy
+            setVal('inp-titulo-anuncio', activeProd.desc || activeProd.name);
+            setVal('inp-desc-longa', activeProd.descComp);
+
+            // Calculadora Base
+            setVal('inp-custo', activeProd.cost);
+            setVal('inp-embex', activeProd.log.embExtra || 0);
+            setVal('inp-frex', activeProd.log.freteExtra || 0);
+            
+            checkSEO();
+        }
+
+        // 5. COPY E SEO
+        function checkSEO() {
+            const tit = document.getElementById('inp-titulo-anuncio').value || '';
+            const desc = document.getElementById('inp-desc-longa').value || '';
+            const ean = document.getElementById('inp-ean').value || '';
+
+            let score = 0;
+            document.getElementById('char-tit').innerText = `${tit.length}/150`;
+            document.getElementById('char-desc').innerText = `${desc.length} char`;
+
+            const ct = (tit.length >= 30); if(ct) score+=30;
+            const cd = (desc.length >= 200); if(cd) score+=40;
+            const ce = (ean.length >= 8); if(ce) score+=30;
+
+            document.getElementById('icn-t').className = ct ? 'fas fa-check text-emerald-400' : 'fas fa-times text-rose-500';
+            document.getElementById('icn-d').className = cd ? 'fas fa-check text-emerald-400' : 'fas fa-times text-rose-500';
+            document.getElementById('icn-e').className = ce ? 'fas fa-check text-emerald-400' : 'fas fa-times text-rose-500';
+
+            const circle = document.getElementById('seo-circle');
+            if(circle) {
+                circle.style.strokeDashoffset = 351.8 - (351.8 * (score / 100)); // 2*pi*56
+                let cClass = score >= 80 ? 'text-emerald-500' : (score >= 50 ? 'text-amber-500' : 'text-rose-500');
+                circle.setAttribute('class', `circle-progress ${cClass}`);
+                document.getElementById('seo-score').innerText = score;
+                document.getElementById('seo-score').className = `text-4xl font-black leading-none ${cClass}`;
+            }
+        }
+
+        function gerarTextoIA(tipo) {
+            const prompt = document.getElementById('ia-txt-prompt').value;
+            toast("Enviando requisição ao Gemini 2.5...", true);
+            setTimeout(() => {
+                if(tipo === 'titulo') {
+                    document.getElementById('inp-titulo-anuncio').value = activeProd.name + " Premium Profissional";
+                } else {
+                    document.getElementById('inp-desc-longa').value = "Descrição gerada por IA baseada no contexto:\n\n• Excelente qualidade e acabamento.\n• Material premium testado na fábrica.\n• Embalagem segura anti-impacto.";
+                }
+                checkSEO();
+                toast("Copy gerada com sucesso!", true);
+            }, 1500);
+        }
+
+        // 6. ABA DE PRECIFICAÇÃO (A MATEMÁTICA CORRETA)
+        function renderCalculadora() {
+            // Pega custos base deste produto
+            const custoProd = parseFloat(document.getElementById('inp-custo').value) || 0;
+            const embEx = parseFloat(document.getElementById('inp-embex').value) || 0;
+            const freEx = parseFloat(document.getElementById('inp-frex').value) || 0;
+            
+            const custoTotalSaida = custoProd + globalCosts.embalagem + embEx + freEx;
+            document.getElementById('lbl-custo-total').innerText = `R$ ${f2(custoTotalSaida)}`;
+
+            const container = document.getElementById('lista-marketplaces');
+            container.innerHTML = '';
+            const taxasGlobaisPct = globalCosts.imposto + globalCosts.cartao + globalCosts.ganho;
+
+            PLATS.forEach(pl => {
+                // Pegar taxas customizadas deste produto/plataforma ou usar o padrão global
+                const rates = (mpRates[activeProd.id] && mpRates[activeProd.id][pl.id]) ? mpRates[activeProd.id][pl.id] : {};
+                
+                let inputsHtml = '';
+                let sugestao = 0;
+                let txPlatPct = 0;
+                let txPlatFix = 0;
+
+                // Lógica de Inputs e Coleta
+                pl.fees.forEach(f => {
+                    const val = rates[f.k] ?? f.d;
+                    inputsHtml += `
+                        <div class="flex items-center gap-2 mb-1.5 last:mb-0">
+                            <span class="text-[9px] font-bold text-slate-400 w-24">${f.l}</span>
+                            <input type="number" value="${val}" class="w-16 bg-slate-100 border border-slate-200 rounded p-1 text-[10px] font-black text-slate-700 outline-none focus:border-indigo-500 text-center" onchange="salvarTaxaIndividual('${pl.id}', '${f.k}', this.value)">
+                        </div>`;
+                    
+                    if(pl.id !== 'mercadolivre') {
+                        if(f.l.includes('%')) txPlatPct += val; else txPlatFix += val;
+                    }
+                });
+
+                // Calculo Matemático Específico
+                if(pl.id === 'mercadolivre') {
+                    const cMenor = rates['com_menor'] ?? pl.fees[0].d;
+                    const cMaior = rates['com_maior'] ?? pl.fees[1].d;
+                    const cFrete = rates['frete'] ?? pl.fees[2].d;
+
+                    let divMenor = 1 - ((taxasGlobaisPct + cMenor)/100);
+                    let pMenor = divMenor > 0 ? (custoTotalSaida + cFrete) / divMenor : 0;
+
+                    if(pMenor > 0 && pMenor <= 79) sugestao = pMenor;
+                    else {
+                        let divMaior = 1 - ((taxasGlobaisPct + cMaior)/100);
+                        sugestao = divMaior > 0 ? (custoTotalSaida + cFrete) / divMaior : 0;
+                    }
+                } else {
+                    let divisor = 1 - ((taxasGlobaisPct + txPlatPct)/100);
+                    sugestao = divisor > 0 ? (custoTotalSaida + txPlatFix) / divisor : 0;
+                }
+
+                // Preço Atual Salvo
+                const precoAtualSalvo = activeProd.mktPrices[pl.id] || 0;
+                const statusHtml = sugestao === precoAtualSalvo && sugestao > 0 
+                    ? `<span class="text-[9px] font-black text-emerald-500 bg-emerald-50 px-2 py-1 rounded border border-emerald-200"><i class="fas fa-check mr-1"></i> Precificado</span>`
+                    : `<button onclick="acatarSugerido('${pl.id}', ${sugestao})" class="text-[9px] font-black text-indigo-600 bg-indigo-50 hover:bg-indigo-600 hover:text-white border border-indigo-200 px-3 py-1.5 rounded transition uppercase tracking-widest">Acatar Preço</button>`;
+
+                const classRow = activeProd.platforms.includes(pl.id) ? 'bg-white' : 'bg-slate-50 opacity-60';
+
+                container.innerHTML += `
+                    <tr class="border-b border-slate-100 ${classRow}">
+                        <td class="px-6 py-4">
+                            <div class="flex items-center gap-3">
+                                ${getSvg(pl.id, 28)}
+                                <div>
+                                    <h4 class="font-black text-sm text-slate-800">${pl.name}</h4>
+                                    <label class="flex items-center gap-1.5 mt-1 cursor-pointer">
+                                        <input type="checkbox" class="w-3 h-3 text-indigo-600 rounded focus:ring-0" ${activeProd.platforms.includes(pl.id)?'checked':''} onchange="toggleAtivacao('${pl.id}')">
+                                        <span class="text-[9px] font-bold text-slate-400">Ativar Canal</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 border-l border-slate-100 bg-slate-50/50">${inputsHtml}</td>
+                        <td class="px-6 py-4 text-right bg-slate-50 border-l border-r border-slate-100"><span class="text-lg font-black text-emerald-500">R$ ${f2(sugestao)}</span></td>
+                        <td class="px-6 py-4 text-right"><span class="text-base font-black text-slate-700">R$ ${f2(precoAtualSalvo)}</span></td>
+                        <td class="px-6 py-4 text-right">${statusHtml}</td>
+                    </tr>
+                `;
+            });
+        }
+
+        function toggleAtivacao(plId) {
+            const idx = activeProd.platforms.indexOf(plId);
+            if(idx > -1) activeProd.platforms.splice(idx, 1); else activeProd.platforms.push(plId);
+            renderCalculadora();
+        }
+
+        function salvarTaxaIndividual(plId, chave, valor) {
+            if(!mpRates[activeProd.id]) mpRates[activeProd.id] = {};
+            if(!mpRates[activeProd.id][plId]) mpRates[activeProd.id][plId] = {};
+            mpRates[activeProd.id][plId][chave] = parseFloat(valor) || 0;
+            localStorage.setItem('sostrass_rates', JSON.stringify(mpRates));
+            renderCalculadora();
+        }
+
+        function acatarSugerido(plId, valor) {
+            if(!activeProd.mktPrices) activeProd.mktPrices = {};
+            activeProd.mktPrices[plId] = valor;
+            if(!activeProd.platforms.includes(plId)) activeProd.platforms.push(plId);
+            renderCalculadora();
+            toast("Preço do Marketplace Atualizado!");
+        }
+
+        // 7. IA DE IMAGENS
+        function gerarImagemIA() {
+            const prompt = document.getElementById('ia-img-prompt').value;
+            if(!prompt) return toast("Descreva o cenário da imagem primeiro!");
+            
+            const resultBox = document.getElementById('ia-img-result');
+            resultBox.innerHTML = '<div class="flex flex-col items-center justify-center text-rose-500 h-full"><i class="fas fa-circle-notch fa-spin text-5xl mb-4"></i><p class="text-[10px] font-bold uppercase tracking-widest text-white">Nano Banana 2: Renderizando Pixels...</p></div>';
+            
+            toast("Conectando ao Nano Banana 2 (Image Gen)...", true);
+            
+            setTimeout(() => {
+                const fakeImg = "https://images.unsplash.com/photo-1542272604-787c3835535d?auto=format&fit=crop&q=80&w=800";
+                resultBox.innerHTML = `
+                    <div class="absolute inset-0 bg-cover bg-center" style="background-image: url('${fakeImg}')"></div>
+                    <div class="absolute bottom-4 right-4 flex gap-2">
+                        <button class="bg-black/80 hover:bg-rose-600 text-white px-4 py-2 rounded-lg text-[10px] font-bold backdrop-blur-sm transition shadow-xl border border-white/10"><i class="fas fa-download mr-1"></i> Salvar na Galeria</button>
+                    </div>`;
+                toast("Imagem fotorrealista gerada com sucesso!", true);
+            }, 3500);
+        }
+
+        // 8. FLUXO FINAL
+        function salvarProduto() {
+            // Puxa da Ficha
+            activeProd.sku = document.getElementById('inp-sku').value;
+            activeProd.name = document.getElementById('inp-nome').value;
+            activeProd.ean = document.getElementById('inp-ean').value;
+            activeProd.marca = document.getElementById('inp-marca').value;
+            
+            // Puxa da Precificação (Se estivesse na aba geral antes, mas aqui estamos salvando o objeto inteiro)
+            activeProd.cost = parseFloat(document.getElementById('inp-custo').value) || 0;
+            
+            // Logística e Fiscais
+            if(!activeProd.log) activeProd.log = {}; if(!activeProd.fisc) activeProd.fisc = {};
+            activeProd.log.embExtra = parseFloat(document.getElementById('inp-embex').value) || 0;
+            activeProd.log.freteExtra = parseFloat(document.getElementById('inp-frex').value) || 0;
+            activeProd.log.peso = parseFloat(document.getElementById('inp-pesoliq').value) || 0;
+            
+            activeProd.pendenteBling = true;
+            
+            // Salva na RAM do LocalStorage
+            const idx = products.findIndex(p => p.id === activeProd.id);
+            if(idx > -1) products[idx] = activeProd; else products.unshift(activeProd);
+            
+            localStorage.setItem('sostrass_prods', JSON.stringify(products));
+            
+            document.getElementById('hdr-nome').innerText = activeProd.name;
+            document.getElementById('hdr-sku').innerText = activeProd.sku;
+            toast("Ficha do Produto Salva Localmente.");
+        }
+
+        function enviarBling() {
+            salvarProduto();
+            toast("Sincronizando com a API do Bling...");
+            setTimeout(() => {
+                activeProd.pendenteBling = false;
+                localStorage.setItem('sostrass_prods', JSON.stringify(products));
+                toast("Sincronização com o ERP Bling concluída!");
+            }, 1000);
+        }
+
+        window.onload = () => carregarEditor();
+    </script>
+</body>
+</html>
