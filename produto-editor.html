@@ -1,8 +1,9 @@
 <!DOCTYPE html>
-<html lang="pt-BR" class="dark"> <head>
+<html lang="pt-BR" class="dark">
+<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PIM - Editor Modular</title>
+    <title>Sóstrass PIM - Editor Master</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -14,114 +15,142 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 
-    <script src="js/aba-estudio.js"></script>
+    <script src="js/banco.js" onerror="console.warn('banco.js não encontrado.')"></script>
+    <script src="js/funcoes.js" onerror="console.warn('funcoes.js não encontrado.')"></script>
+    
     <script src="js/aba-produto.js"></script>
-    <script src="js/aba-precificacao.js"></script>
     <style>
+        /* Scrollbar Stealth */
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
-        .dark ::-webkit-scrollbar-thumb { background: #334155; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #4f46e5; }
         
-        .tab-btn { transition: 0.3s; border-bottom: 2px solid transparent; }
-        .tab-active { color: #6366f1; border-color: #6366f1; }
-        .dark .tab-active { color: #818cf8; border-color: #818cf8; background: linear-gradient(to top, rgba(99,102,241,0.1), transparent); }
+        /* Remove setas de input number */
+        input[type=number]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+        
+        body { background-color: #09090b; color: #f8fafc; }
+        
+        /* Glassmorphism Classes */
+        .glass-panel { background: rgba(9, 9, 11, 0.7); backdrop-filter: blur(24px); border-bottom: 1px solid rgba(255, 255, 255, 0.05); }
+        .glass-card { background: rgba(24, 24, 27, 0.4); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.05); box-shadow: 0 4px 30px rgba(0,0,0,0.5); }
+        
+        /* Animações Globais */
+        @keyframes fadeUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-fade-up { animation: fadeUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        .circle-progress { transition: stroke-dashoffset 0.8s cubic-bezier(0.4, 0, 0.2, 1); stroke-linecap: round; }
     </style>
 </head>
-<body class="flex h-screen overflow-hidden bg-slate-50 dark:bg-[#050507] text-slate-800 dark:text-slate-200 transition-colors duration-300">
+<body class="flex h-screen overflow-hidden selection:bg-indigo-500/30 selection:text-white relative">
 
-    <aside class="w-20 lg:w-64 bg-white dark:bg-[#09090b] border-r border-slate-200 dark:border-white/5 flex flex-col z-20 transition-colors duration-300">
-        <div class="h-20 flex items-center justify-center lg:justify-start lg:px-8 border-b border-slate-200 dark:border-white/5">
-            <div class="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center text-white"><i class="fas fa-gem text-sm"></i></div>
+    <div class="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-indigo-600/10 rounded-full blur-[120px] pointer-events-none z-0"></div>
+    <div class="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-emerald-600/5 rounded-full blur-[120px] pointer-events-none z-0"></div>
+
+    <div id="toast-container" class="fixed top-6 right-6 z-50 flex flex-col gap-3 pointer-events-none"></div>
+
+    <aside class="w-20 lg:w-64 bg-[#09090b]/90 border-r border-white/5 flex flex-col z-20 backdrop-blur-2xl transition-all">
+        <div class="h-20 flex items-center justify-center lg:justify-start lg:px-8 border-b border-white/5">
+            <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white shadow-[0_0_15px_rgba(99,102,241,0.5)]">
+                <i class="fas fa-gem text-sm"></i>
+            </div>
             <div class="hidden lg:block ml-3">
-                <h1 class="text-sm font-black tracking-tight text-slate-800 dark:text-white">Sóstrass</h1>
-                <p class="text-[9px] font-bold text-indigo-500 dark:text-indigo-400 uppercase tracking-widest mt-0.5">PIM Enterprise</p>
+                <h1 class="text-sm font-black tracking-tight text-white leading-none">Sóstrass</h1>
+                <p class="text-[9px] font-bold text-indigo-400 uppercase tracking-widest mt-0.5">PIM Enterprise</p>
             </div>
         </div>
         <nav class="flex-1 py-8 px-4 flex flex-col gap-2">
-            <a href="cockpit.html" class="flex items-center gap-4 px-4 py-3 text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/5 rounded-xl transition"><i class="fas fa-chart-line text-lg"></i><span class="hidden lg:block text-xs font-bold">Cockpit</span></a>
-            <a href="index.html" class="flex items-center gap-4 px-4 py-3 bg-indigo-50 dark:bg-white/10 text-indigo-600 dark:text-white rounded-xl border border-indigo-100 dark:border-white/5 shadow-inner"><i class="fas fa-box-open text-lg"></i><span class="hidden lg:block text-xs font-bold">Editor de Produto</span></a>
+            <p class="hidden lg:block text-[10px] font-black text-slate-600 uppercase tracking-widest mb-2 px-4">Operacional</p>
+            <a href="cockpit.html" class="flex items-center gap-4 px-4 py-3 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl transition group"><i class="fas fa-chart-line text-lg group-hover:scale-110 transition-transform"></i><span class="hidden lg:block text-xs font-bold">Cockpit</span></a>
+            <a href="index.html" class="flex items-center gap-4 px-4 py-3 bg-white/5 text-white rounded-xl border border-white/10 shadow-inner group"><i class="fas fa-box-open text-indigo-400 text-lg group-hover:rotate-12 transition-transform"></i><span class="hidden lg:block text-xs font-bold">Editor de Ficha</span></a>
         </nav>
     </aside>
 
-    <div class="flex-1 flex flex-col min-w-0 relative z-10">
+    <div class="flex-1 flex flex-col min-w-0 relative z-10 bg-transparent">
         
-        <header class="bg-white/80 dark:bg-[#09090b]/80 backdrop-blur-xl border-b border-slate-200 dark:border-white/5 sticky top-0 z-40 transition-colors duration-300">
-            <div class="px-10 py-5 flex justify-between items-center">
-                <div class="flex items-center gap-5 w-full max-w-3xl">
-                    <a href="index.html" class="w-10 h-10 rounded-xl border border-slate-200 dark:border-white/10 flex items-center justify-center text-slate-500 hover:bg-slate-100 dark:hover:bg-white/10 transition-all"><i class="fas fa-arrow-left"></i></a>
-                    <div>
-                        <h2 class="text-2xl font-black text-slate-800 dark:text-white" id="hdr-nome">Carregando...</h2>
-                        <p class="text-xs font-mono text-slate-500 mt-1">SKU: <span id="hdr-sku" class="text-indigo-600 dark:text-indigo-400 font-bold">...</span></p>
+        <header class="glass-panel h-20 px-8 flex items-center justify-between sticky top-0 z-40">
+            <div class="flex items-center gap-5 w-full max-w-3xl">
+                <a href="index.html" class="w-10 h-10 rounded-xl border border-white/10 bg-black/20 flex items-center justify-center text-slate-400 hover:bg-white/10 hover:text-white transition-all shadow-inner"><i class="fas fa-arrow-left"></i></a>
+                
+                <div class="flex flex-col">
+                    <div class="flex items-center gap-3">
+                        <span class="px-2 py-0.5 bg-indigo-500/20 text-indigo-400 border border-indigo-500/30 rounded text-[9px] font-black uppercase tracking-widest shadow-[0_0_10px_rgba(99,102,241,0.2)]">Modo Edição</span>
+                        <span class="text-[10px] text-slate-400 font-bold" id="status-sync"><i class="fas fa-cloud text-slate-600"></i> Rascunho Local</span>
+                    </div>
+                    <div class="flex items-center gap-3 mt-1">
+                        <input type="text" id="hdr-nome" class="bg-transparent border-none outline-none text-2xl font-black text-white w-[500px] placeholder:text-slate-700 transition" value="Kit 30 Caixas Organizadoras (30 Divisórias)" onchange="sincronizarHeaders()">
+                        <button onclick="chamarIA('hdr-nome')" class="text-indigo-500 hover:text-indigo-400 transition" title="Gerar com IA"><i class="fas fa-wand-magic-sparkles"></i></button>
                     </div>
                 </div>
-                <div class="flex items-center gap-4">
-                    <button onclick="toggleTheme()" class="w-10 h-10 rounded-full border border-slate-200 dark:border-white/10 flex items-center justify-center text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/5 transition">
-                        <i class="fas fa-sun dark:hidden"></i>
-                        <i class="fas fa-moon hidden dark:block"></i>
-                    </button>
-                    
-                    <button class="px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-black shadow-lg shadow-emerald-600/20 transition-all flex items-center gap-2"><i class="fas fa-cloud-upload-alt"></i> Atualizar Bling</button>
-                </div>
             </div>
-            
-            <div class="px-10 flex gap-2 overflow-x-auto border-t border-slate-200 dark:border-white/5 bg-slate-50 dark:bg-black/20">
-                <button onclick="carregarAba('produto')" id="tab-produto" class="tab-btn px-6 py-4 text-[11px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white"><i class="fas fa-tags mr-2"></i> Cadastro (Bling)</button>
-                <button onclick="carregarAba('estudio')" id="tab-estudio" class="tab-btn px-6 py-4 text-[11px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white"><i class="fas fa-images mr-2"></i> Mídia & Estúdio IA</button>
-                <button onclick="carregarAba('precificacao')" id="tab-precificacao" class="tab-btn px-6 py-4 text-[11px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white"><i class="fas fa-calculator mr-2"></i> Canais (Markup)</button>
+
+            <div class="flex items-center gap-4">
+                <span class="text-[11px] font-mono font-bold text-slate-500 bg-black/40 px-3 py-2 rounded-lg border border-white/5 flex items-center gap-2">SKU: <span id="lbl-sku" class="text-white">CX-ORG-30</span></span>
+                <button onclick="salvarRascunho()" class="px-6 py-2.5 bg-white/5 hover:bg-white/10 text-white rounded-xl text-xs font-bold transition-all border border-white/10 flex items-center gap-2"><i class="fas fa-save text-slate-400"></i> Salvar</button>
+                <button onclick="enviarBling()" class="px-6 py-2.5 bg-gradient-to-r from-emerald-600 to-teal-500 hover:from-emerald-500 hover:to-teal-400 text-white rounded-xl text-xs font-black shadow-[0_0_20px_rgba(16,185,129,0.3)] transition-all transform hover:-translate-y-0.5 flex items-center gap-2"><i class="fas fa-cloud-upload-alt"></i> Atualizar Bling</button>
             </div>
         </header>
 
-        <main id="app-container" class="flex-1 overflow-y-auto p-10 2xl:px-16 scroll-smooth bg-slate-50 dark:bg-gradient-to-br dark:from-[#050507] dark:to-[#0a0a0f] transition-colors duration-300">
-            </main>
+        <div class="px-10 py-4 bg-[#09090b]/90 backdrop-blur-md border-b border-white/5 flex gap-3 overflow-x-auto z-30 relative">
+            <button onclick="carregarAba('produto')" id="tab-produto" class="px-5 py-2.5 rounded-full text-[11px] font-black uppercase tracking-widest transition-all bg-indigo-600 text-white shadow-[0_0_15px_rgba(99,102,241,0.4)]"><i class="fas fa-tags mr-1.5 opacity-80"></i> Cadastro & SEO</button>
+            <button onclick="carregarAba('precificacao')" id="tab-precificacao" class="px-5 py-2.5 rounded-full text-[11px] font-black uppercase tracking-widest transition-all bg-transparent text-slate-500 hover:text-white hover:bg-white/5"><i class="fas fa-calculator mr-1.5 opacity-80"></i> Preços & Marketplaces</button>
+            <button onclick="carregarAba('estudio')" id="tab-estudio" class="px-5 py-2.5 rounded-full text-[11px] font-black uppercase tracking-widest transition-all bg-transparent text-slate-500 hover:text-white hover:bg-white/5"><i class="fas fa-images mr-1.5 opacity-80"></i> Mídia & Estúdio IA</button>
+        </div>
+
+        <main id="app-container" class="flex-1 overflow-y-auto p-8 lg:p-12 scroll-smooth">
+            <div class="flex flex-col items-center justify-center h-full text-indigo-500/50">
+                <i class="fas fa-circle-notch fa-spin text-4xl mb-4"></i>
+                <p class="text-xs font-black uppercase tracking-widest">Iniciando Módulo...</p>
+            </div>
+        </main>
     </div>
 
     <script>
-        // CONTROLE DE TEMA (DARK/LIGHT)
-        function toggleTheme() {
-            document.documentElement.classList.toggle('dark');
-            localStorage.setItem('theme', document.documentElement.classList.contains('dark') ? 'dark' : 'light');
-        }
-        
-        // Verifica o tema salvo
-        if (localStorage.getItem('theme') === 'light') {
-            document.documentElement.classList.remove('dark');
+        function sincronizarHeaders() {
+            const hNome = document.getElementById('hdr-nome').value;
+            const inpNome = document.getElementById('inp-prod-nome');
+            if(inpNome) { inpNome.value = hNome; validarFormulario(); }
         }
 
-        // CONTROLADOR DE ABAS (O Roteador)
+        // Roteador de Abas
         function carregarAba(aba) {
-            // Limpa botões
-            document.querySelectorAll('.tab-btn').forEach(b => {
-                b.classList.remove('tab-active', 'text-indigo-600', 'dark:text-indigo-400', 'border-indigo-600', 'dark:border-indigo-500', 'bg-indigo-50', 'dark:bg-indigo-500/5');
+            // Estilização das Pílulas (Tabs)
+            document.querySelectorAll('button[id^="tab-"]').forEach(b => {
+                b.className = "px-5 py-2.5 rounded-full text-[11px] font-black uppercase tracking-widest transition-all bg-transparent text-slate-500 hover:text-white hover:bg-white/5";
             });
-            
-            // Ativa botão atual
             const btn = document.getElementById(`tab-${aba}`);
-            if(btn) btn.classList.add('tab-active', 'text-indigo-600', 'dark:text-indigo-400', 'border-indigo-600', 'dark:border-indigo-500', 'bg-indigo-50', 'dark:bg-indigo-500/5');
+            if(btn) btn.className = "px-5 py-2.5 rounded-full text-[11px] font-black uppercase tracking-widest transition-all bg-indigo-600 text-white shadow-[0_0_15px_rgba(99,102,241,0.4)]";
 
             const container = document.getElementById('app-container');
 
             // Renderiza o módulo correto
-            if (aba === 'estudio') {
-                if (typeof renderAbaEstudio === 'function') {
-                    container.innerHTML = renderAbaEstudio();
+            if (aba === 'produto') {
+                if (typeof renderAbaProduto === 'function') {
+                    container.innerHTML = renderAbaProduto();
+                    validarFormulario(); // Dispara o cálculo de SEO inicial
                 } else {
-                    container.innerHTML = '<p class="text-rose-500">Erro: Arquivo aba-estudio.js não carregado.</p>';
+                    container.innerHTML = '<p class="text-rose-500">Erro: aba-produto.js não carregado.</p>';
                 }
-            } else if (aba === 'produto') {
-                container.innerHTML = '<div class="text-slate-500 dark:text-slate-400 text-center p-20"><i class="fas fa-tools text-4xl mb-4"></i><br>Módulo de Produtos (Bling) sendo construído...</div>';
+            } else if (aba === 'estudio') {
+                container.innerHTML = typeof renderAbaEstudio === 'function' ? renderAbaEstudio() : '<p class="text-rose-500">Módulo Estudio não encontrado.</p>';
             } else if (aba === 'precificacao') {
-                container.innerHTML = '<div class="text-slate-500 dark:text-slate-400 text-center p-20"><i class="fas fa-tools text-4xl mb-4"></i><br>Módulo de Precificação Reversa sendo construído...</div>';
+                container.innerHTML = typeof renderAbaPrecificacao === 'function' ? renderAbaPrecificacao() : '<p class="text-rose-500">Módulo Precificação não encontrado.</p>';
+                if(typeof dispararCalculadora === 'function') dispararCalculadora();
             }
         }
 
-        // Mock para Header
-        window.onload = () => {
-            document.getElementById('hdr-nome').innerText = "Kit 30 Caixas Organizadoras Transparentes";
-            document.getElementById('hdr-sku').innerText = "CX-ORG-30";
-            // Inicia na aba de Estúdio para você ver a mágica
-            carregarAba('estudio'); 
-        };
+        // Simulações de Ação do Topbar
+        function salvarRascunho() {
+            if(typeof toast === 'function') toast("Rascunho salvo localmente.", false);
+        }
+        function enviarBling() {
+            document.getElementById('status-sync').innerHTML = '<i class="fas fa-spinner fa-spin text-amber-400"></i> Enviando API...';
+            setTimeout(() => {
+                document.getElementById('status-sync').innerHTML = '<i class="fas fa-circle text-[8px] text-emerald-400"></i> 100% Sincronizado';
+                if(typeof toast === 'function') toast("Atualizado no Bling com Sucesso!", false);
+            }, 1500);
+        }
+
+        window.onload = () => { carregarAba('produto'); };
     </script>
 </body>
 </html>
