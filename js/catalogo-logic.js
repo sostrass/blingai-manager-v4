@@ -1,15 +1,160 @@
 // ARQUIVO: js/catalogo-logic.js
 // Motor 100% amarrado para o Front-End do Terminal
 
+// ARQUIVO: js/catalogo-logic.js
+
 const f2 = n => parseFloat(n||0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
-// Banco de Dados de Mock Avançado
+// Banco de Dados Mockado (Incluindo a métrica de queda de 63,6% que você pediu)
 const dbAnuncios = [
-    { sku: 'CX-ORG-30', name: 'Kit 30 Caixas Organizadoras', img: 'https://images.unsplash.com/photo-1542272604-787c3835535d?auto=format&fit=crop&q=80&w=150', estoque: 145, estoqueMax: 200, preco: 89.90, precoMercado: 85.00, views: 1240, viewsVar: 12, sales: 145, salesVar: 5, conv: 11.6, seo: 95, sync: true },
-    { sku: 'PER-6MM-BR', name: 'Pérola Branca 6mm ABS (500g)', img: 'https://images.unsplash.com/photo-1596751303254-e69fb2fc7d23?auto=format&fit=crop&q=80&w=150', estoque: 12, estoqueMax: 500, preco: 35.00, precoMercado: 38.00, views: 11, viewsVar: -63.6, sales: 1, salesVar: -50, conv: 9.0, seo: 60, sync: false },
-    { sku: 'TES-ROSE', name: 'Tesoura Vintage Rose Gold', img: 'https://images.unsplash.com/photo-1617325247661-675ab03407bd?auto=format&fit=crop&q=80&w=150', estoque: 50, estoqueMax: 100, preco: 45.00, precoMercado: 45.00, views: 890, viewsVar: 5, sales: 45, salesVar: 2, conv: 5.0, seo: 85, sync: true },
-    { sku: 'FIO-SIL-10M', name: 'Fio de Silicone 10m Transparente', img: 'https://images.unsplash.com/photo-1584820927498-cafe8c117769?auto=format&fit=crop&q=80&w=150', estoque: 8, estoqueMax: 300, preco: 12.50, precoMercado: 10.00, views: 340, viewsVar: -10, sales: 20, salesVar: -5, conv: 5.8, seo: 45, sync: true }
+    { 
+        sku: 'CX-ORG-30', name: 'Kit 30 Caixas Organizadoras (30 Div)', img: 'https://images.unsplash.com/photo-1542272604-787c3835535d?auto=format&fit=crop&q=80&w=150', 
+        estoque: 145, max: 200, price: 89.90, mkt: 85.00, 
+        views: 1240, vVar: 25.0, sales: 145, sVar: 12.0, conv: '11,6%',
+        seo: 95, sync: true 
+    },
+    { 
+        sku: 'PER-6MM-BR', name: 'Pérola Branca 6mm ABS (500g)', img: 'https://images.unsplash.com/photo-1596751303254-e69fb2fc7d23?auto=format&fit=crop&q=80&w=150', 
+        estoque: 12, max: 500, price: 35.00, mkt: 38.00, 
+        views: 11, vVar: -63.6, sales: 1, sVar: -50.0, conv: '9,0%', // A métrica da sua imagem!
+        seo: 60, sync: false 
+    },
+    { 
+        sku: 'TES-ROSE', name: 'Tesoura Vintage Rose Gold', img: 'https://images.unsplash.com/photo-1617325247661-675ab03407bd?auto=format&fit=crop&q=80&w=150', 
+        estoque: 50, max: 100, price: 45.00, mkt: 45.00, 
+        views: 890, vVar: 5.4, sales: 45, sVar: 2.1, conv: '5,0%',
+        seo: 85, sync: true 
+    }
 ];
+
+let estadoFiltro = { texto: '', btn: 'todos' };
+
+// Sistema de Notificação
+function toast(msg) {
+    const c = document.getElementById('toast-container'); const t = document.createElement('div');
+    t.className = `bg-[#0B0B0C] border border-emerald-500/50 text-white px-6 py-4 rounded-xl shadow-2xl font-bold text-xs flex items-center gap-3 animate-fade-up`;
+    t.innerHTML = `<div class="absolute left-0 top-0 bottom-0 w-1.5 bg-emerald-500 rounded-l-xl"></div><i class="fas fa-check-circle text-emerald-400 text-xl"></i> ${msg}`; 
+    c.appendChild(t); setTimeout(() => { t.style.opacity='0'; setTimeout(()=>t.remove(),300); }, 3000);
+}
+
+// Ações Globais do Header
+function comandoAcaoGlobal(acao, btn) {
+    const orig = btn.innerHTML;
+    btn.innerHTML = `<i class="fas fa-circle-notch fa-spin"></i> Processando...`;
+    setTimeout(() => {
+        btn.innerHTML = orig;
+        if(acao === 'exportar') toast("Planilha XLSX gerada com as variações D-7.");
+        if(acao === 'sync') toast("Preços e Estoques sincronizados com o Bling.");
+    }, 1500);
+}
+
+// Gestor de Filtros
+function aplicarFiltro(tipo, btnElement) {
+    estadoFiltro.btn = tipo;
+    document.querySelectorAll('.filter-btn').forEach(b => {
+        b.className = "filter-btn px-4 py-2 bg-white/5 text-slate-400 hover:text-white rounded-lg text-[10px] font-black uppercase tracking-widest transition border border-white/5 flex items-center gap-1.5";
+    });
+    btnElement.className = "filter-btn active px-4 py-2 bg-indigo-600 text-white rounded-lg text-[10px] font-black uppercase tracking-widest transition shadow-md flex items-center gap-1.5";
+    renderTable();
+}
+
+// Formatador da Seta do Mercado Livre
+const formataVar = (val) => {
+    if(val > 0) return `<span class="text-emerald-500 font-black"><i class="fas fa-caret-up mr-0.5"></i>${val}%</span>`;
+    if(val < 0) return `<span class="text-rose-500 font-black"><i class="fas fa-caret-down mr-0.5"></i>${Math.abs(val)}%</span>`;
+    return `<span class="text-slate-500 font-black">-%</span>`;
+};
+
+// Renderização Master da Tabela
+function renderTable(buscaTexto = null) {
+    if(buscaTexto !== null) estadoFiltro.texto = buscaTexto;
+    const root = document.getElementById('terminal-body');
+    let html = '';
+
+    // Filtragem
+    let filtrados = dbAnuncios.filter(p => p.sku.toLowerCase().includes(estadoFiltro.texto.toLowerCase()) || p.name.toLowerCase().includes(estadoFiltro.texto.toLowerCase()));
+    if (estadoFiltro.btn === 'estoque') filtrados = filtrados.filter(p => p.estoque <= 20);
+    if (estadoFiltro.btn === 'vendas') filtrados = filtrados.filter(p => p.sales > 50);
+
+    if (filtrados.length === 0) {
+        root.innerHTML = `<tr><td colspan="6" class="px-6 py-10 text-center text-slate-500 text-xs font-mono">NENHUM ANÚNCIO CORRESPONDE AOS CRITÉRIOS.</td></tr>`; return;
+    }
+
+    filtrados.forEach((p) => {
+        const percEst = (p.estoque / p.max) * 100;
+        const corEst = p.estoque <= 20 ? 'bg-rose-500 shadow-[0_0_10px_rgba(244,63,94,0.5)]' : 'bg-indigo-500';
+        const txtEst = p.estoque <= 20 ? 'text-rose-400 animate-pulse' : 'text-slate-300';
+        const seoCor = p.seo > 80 ? 'text-emerald-400' : 'text-rose-400';
+        
+        let buybox = p.price > p.mkt 
+            ? `<span class="text-rose-500 text-[9px] font-black uppercase bg-rose-500/10 px-1.5 py-0.5 rounded border border-rose-500/20 mt-1">Caro (+R$${f2(p.price - p.mkt)})</span>` 
+            : `<span class="text-emerald-500 text-[9px] font-black uppercase bg-emerald-500/10 px-1.5 py-0.5 rounded border border-emerald-500/20 mt-1">Competitivo</span>`;
+
+        html += `
+        <tr class="hover:bg-white/[0.03] transition-colors group">
+            <td class="px-6 py-4">
+                <div class="flex items-center gap-4">
+                    <img src="${p.img}" class="w-10 h-10 rounded-lg object-cover border border-white/10 opacity-80 group-hover:opacity-100">
+                    <div class="flex flex-col">
+                        <span class="text-sm font-black text-white tracking-tight">${p.sku}</span>
+                        <span class="text-[10px] font-bold text-slate-500 truncate w-48">${p.name}</span>
+                    </div>
+                </div>
+            </td>
+            
+            <td class="px-6 py-4 pr-8">
+                <div class="flex justify-between text-[10px] font-mono mb-1.5"><span class="font-black ${txtEst}">${p.estoque} UN</span><span class="text-slate-600">Max ${p.max}</span></div>
+                <div class="w-full h-1 bg-white/5 rounded-full overflow-hidden"><div class="h-full ${corEst}" style="width: ${percEst}%"></div></div>
+            </td>
+
+            <td class="px-6 py-4">
+                <div class="flex flex-col items-start">
+                    <span class="text-sm font-black text-white">R$ ${f2(p.price)}</span>
+                    ${buybox}
+                </div>
+            </td>
+
+            <td class="px-6 py-4 bg-white/[0.01]">
+                <div class="grid grid-cols-2 gap-x-6 gap-y-2 text-[10px]">
+                    <div class="flex justify-between items-center border-b border-white/5 pb-1">
+                        <span class="text-slate-400 font-bold"><i class="fas fa-eye w-4"></i> Visitas</span>
+                        <div class="flex gap-3"><span class="text-white font-black">${p.views}</span> ${formataVar(p.vVar)}</div>
+                    </div>
+                    <div class="flex justify-between items-center border-b border-white/5 pb-1">
+                        <span class="text-slate-400 font-bold"><i class="fas fa-shopping-cart w-4"></i> Vendas</span>
+                        <div class="flex gap-3"><span class="text-white font-black">${p.sales}</span> ${formataVar(p.sVar)}</div>
+                    </div>
+                    <div class="flex justify-between items-center col-span-2">
+                        <span class="text-slate-400 font-bold"><i class="fas fa-chart-line w-4"></i> Conversão</span>
+                        <span class="text-indigo-400 font-black">${p.conv}</span>
+                    </div>
+                </div>
+            </td>
+
+            <td class="px-6 py-4 text-center">
+                <div class="inline-flex w-8 h-8 rounded-full border-2 border-current ${seoCor} items-center justify-center text-[9px] font-black">${p.seo}</div>
+            </td>
+
+            <td class="px-6 py-4 text-right">
+                <div class="flex justify-end gap-2 opacity-30 group-hover:opacity-100 transition-opacity">
+                    <button onclick="copiarSKU('${p.sku}')" class="w-8 h-8 rounded-lg bg-white/10 hover:bg-emerald-500 text-slate-300 hover:text-white transition flex items-center justify-center" title="Copiar SKU"><i class="fas fa-copy text-xs"></i></button>
+                    <button onclick="window.open('https://www.mercadolivre.com.br/','_blank')" class="w-8 h-8 rounded-lg bg-white/10 hover:bg-yellow-500 text-slate-300 hover:text-white transition flex items-center justify-center" title="Ver no ML"><i class="fas fa-external-link-alt text-xs"></i></button>
+                    <button onclick="window.location.href='produto-editor.html?id=${p.sku}'" class="px-3 h-8 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-black text-[9px] uppercase tracking-widest transition flex items-center gap-1.5"><i class="fas fa-edit"></i> Editar</button>
+                </div>
+            </td>
+        </tr>`;
+    });
+    root.innerHTML = html;
+}
+
+// Comando de Copiar (Isolado)
+window.copiarSKU = function(sku) {
+    navigator.clipboard.writeText(sku);
+    toast(`SKU ${sku} copiado!`);
+};
+
+// Start
+window.onload = () => renderTable();
 
 // Estado Global da Tela
 let estadoAtual = { filtroTexto: '', filtroBotao: 'todos' };
